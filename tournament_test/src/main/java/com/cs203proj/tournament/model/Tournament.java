@@ -1,4 +1,4 @@
-package services.tournament.src.main.java.com.cs203proj.tournament.model;
+package src.main.java.com.cs203proj.tournament.model;
 
 import jakarta.persistence.*;
 import lombok.*;
