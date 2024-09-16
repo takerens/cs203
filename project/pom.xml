@@ -8,9 +8,17 @@
 		<version>3.3.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.project</groupId>
-	<artifactId>tournament</artifactId>
+	<groupId>project</groupId>
+	<artifactId>project-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>services/tournament</module>
+		<module>services/admin</module>
+		<module>services/user</module>
+	</modules>
+
 	<name>tournament</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
