@@ -3,9 +3,9 @@ package csd.grp3.user;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -24,10 +24,13 @@ public class UserController {
 //    }
 
     @PostMapping("/register")
-    public User registerUser(@RequestBody User newUser) {
+    public ResponseEntity<User> registerUser(@RequestBody User newUser) {
         System.out.println(newUser.getUsername() + ":" + newUser.getPassword());
-        userService.createNewUser(newUser.getUsername(), newUser.getPassword());
-        return newUser;
+        if (userService.createNewUser(newUser.getUsername(), newUser.getPassword()) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); //TODO SHOULD NOT BE NOTFOUND, ADD PROPER EXCEPTION
+        }
+        
+        return new ResponseEntity<>(HttpStatus.OK);
     }
     
 }
