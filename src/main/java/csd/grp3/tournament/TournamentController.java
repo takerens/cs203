@@ -45,6 +45,17 @@ public class TournamentController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @GetMapping("/tournaments/{title}")
+    public ResponseEntity<Tournament> getTournamentByTitle(@PathVariable String title) {
+        Tournament tournamentData = tournamentRepo.findByTitle(title);
+        
+        if (tournamentData != null) {
+            return new ResponseEntity<>(tournamentData, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
     @PostMapping("/tournaments")
     public ResponseEntity<Tournament> addTournament(@RequestBody Tournament tournament) {
         Tournament tournamentObj = tournamentRepo.save(tournament);
@@ -58,6 +69,27 @@ public class TournamentController {
 
         if (oldTournamentData.isPresent()) {
             Tournament updatedTournamentData = oldTournamentData.get();
+            updatedTournamentData.setTitle(newTournamentData.getTitle());
+            updatedTournamentData.setDate(newTournamentData.getDate());
+            // updatedTournamentData.setMatches(newTournamentData.getMatches());
+            updatedTournamentData.setMaxElo(newTournamentData.getMaxElo());
+            // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
+            updatedTournamentData.setMinElo(newTournamentData.getMinElo());
+
+            Tournament tournamentObj = tournamentRepo.save(updatedTournamentData);
+            return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping("/tournaments/{title}")
+    public ResponseEntity<Tournament> updateTournamentByTitle(@PathVariable String title, @RequestBody Tournament newTournamentData) {
+        Tournament oldTournamentData = tournamentRepo.findByTitle(title);
+
+        if (oldTournamentData != null) {
+            Tournament updatedTournamentData = oldTournamentData;
+            updatedTournamentData.setTitle(newTournamentData.getTitle());
             updatedTournamentData.setDate(newTournamentData.getDate());
             // updatedTournamentData.setMatches(newTournamentData.getMatches());
             updatedTournamentData.setMaxElo(newTournamentData.getMaxElo());
@@ -74,6 +106,12 @@ public class TournamentController {
     @DeleteMapping("/tournaments/{id}")
     public ResponseEntity<HttpStatus> deleteTournamentById(@PathVariable Long id) {
         tournamentRepo.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/tournaments/{title}")
+    public ResponseEntity<HttpStatus> deleteTournamentByTitle(@PathVariable String title) {
+        tournamentRepo.deleteByTitle(title);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
