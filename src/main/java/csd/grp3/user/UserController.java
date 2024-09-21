@@ -5,12 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-
-
-
 
 @Controller
 public class UserController {
@@ -28,9 +22,14 @@ public class UserController {
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user, Model model) {
-        User newUser = new User(user.getUsername(), user.getPassword());
-        System.out.println(user.getUsername());
-        model.addAttribute("message", "User registered successfully!");
+        if (userService.createNewUser(user.getUsername(), user.getPassword()) == null) {
+            model.addAttribute("status", "User registration failed.");
+            model.addAttribute("message", "error message");
+            System.out.println("[User Registration]: Failed");
+        } else {
+            model.addAttribute("status", "User registered successfully.");
+            System.out.println("[User Registration]: Successfully added: " + user.getUsername());
+        }        
         return "result";
     }
 
