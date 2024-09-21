@@ -22,6 +22,9 @@
         h2 {
             text-align: center;
         }
+        h3 {
+            color:red;
+        }
         input[type="text"],
         input[type="password"] {
             width: 100%;
@@ -46,6 +49,7 @@
 </head>
 <body>
     <div class="container">
+        <h3 th:if="${errorMessage}" th:text="${errorMessage}">Error message here</h3>
         <h2>User Registration</h2>
         <form th:action="@{/register}" method="post" th:object="${user}">
             <div class="form-group">
@@ -57,11 +61,12 @@
                 <label for="password">Password:</label>
                 <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="Enter password" required />
             </div>
-    
-            <button type="submit" class="btn btn-primary">Register</button>
+            
+            <input type="submit" class="btn btn-primary" value="Register">
         </form>
-        <p><a th:href="@{/login}">Return to Login</a></p>
-       
+        <p>
+            Already have an account? <a th:href="@{/login}">Login here</a>
+        </p>
     </div>
 </body>
 </html>
