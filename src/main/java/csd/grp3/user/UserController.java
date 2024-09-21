@@ -2,30 +2,55 @@ package csd.grp3.user;
 
 import java.util.List;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
 
-@RestController
-public class UserController {
-    private UserRepository users;
 
-    public UserController(UserRepository users){
-        this.users = users;
+
+@Controller
+public class UserController {
+    private UserService userService;
+
+    public UserController(UserService userService){
+        this.userService = userService;
     }
 
-    @GetMapping("/users")
-    public List<User> getUsers() {
-        return users.findAll();
+    @GetMapping("/register")
+    public String registerPage(Model model) {
+        model.addAttribute("user", new User());
+        return "register";
     }
 
     @PostMapping("/register")
-    public User registerUser(@RequestBody User newUser) {
-        System.out.println(newUser.getUsername() + ":" + newUser.getPassword());
-        users.save(newUser);
-        return newUser;
+    public String registerUser(@ModelAttribute User user, Model model) {
+        User newUser = new User(user.getUsername(), user.getPassword());
+        System.out.println(user.getUsername());
+        model.addAttribute("message", "User registered successfully!");
+        return "result";
+    }
+
+    @GetMapping("/login")
+    public String loginPage(Model model) {
+        return "login";
+    }
+
+    @PostMapping("/login")
+    public String loginUser(@ModelAttribute User user, Model model) {
+        model.addAttribute("message", "User Log In successfully!");
+        return "result";
+    }
+    
+
+    @PutMapping("/user/{username}")
+    public String putMethodName(@PathVariable String id, @RequestBody String entity) {
+        //TODO: process PUT request
+        
+        return entity;
     }
     
 }
