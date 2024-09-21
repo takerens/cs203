@@ -41,7 +41,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void addPlayer(User player, Long id) {
+    public void registerPlayer(User player, Long id) {
         // check if got tournament
         Optional<Tournament> tournament = tournaments.findById(id);
 
@@ -66,5 +66,26 @@ public class TournamentServiceImpl implements TournamentService {
         }
     }
 
+    @Override
+    public void withdrawPlayer(User player, Long id) {
+        Optional<Tournament> tournament = tournaments.findById(id);
+        if (tournament.isPresent()) {
+            Tournament tournamentData = tournament.get();
+            List<User> participantList = tournamentData.getParticipants();
+            List<User> waitingList = tournamentData.getWaitingList();
 
+            // Remove from participants
+            if (participantList.remove(player)) {
+                // If removed from participants, check waiting list
+                if (!waitingList.isEmpty()) {
+                    participantList.add(waitingList.remove(0)); // Move next from waiting list to participants
+                }
+                tournamentData.setParticipants(participantList);
+                tournamentData.setWaitingList(waitingList);
+                tournaments.save(tournamentData);
+            }
+        }
+    }
 }
+
+
