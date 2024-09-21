@@ -18,10 +18,10 @@ public class UserController {
         this.userService = userService;
     }
 
-//    @GetMapping("/users")
-//    public List<User> getUsers() {
-//        return user.findAll();
-//    }
+   @GetMapping("/users")
+   public List<User> getUsers() {
+       return userService.findAll();
+   }
 
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User newUser) {

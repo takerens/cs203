@@ -1,5 +1,8 @@
 package csd.grp3.user;
 
+import java.util.List;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,7 +14,7 @@ public class UserServiceImpl implements UserService{
         this.userRepository = userRepository;
     }
 
-    //This function checks if password is alphanumeric
+    //This function checks if password is alphanumeric and is 8 chars long
     private boolean checkPasswordRequirement(String password) {
     
         //Initialise booleans for password requirements
@@ -61,10 +64,19 @@ public class UserServiceImpl implements UserService{
             System.out.println("Does not meet password requirements");
             return null;
         }
-        return userRepository.save(new User(username, password));
+
+        //Encode password given by user to store
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodedPassword = encoder.encode(password);
+
+        return userRepository.save(new User(username, encodedPassword));
     }
 
     public void login(String username, String password) {
 
+    }
+    
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }
