@@ -4,6 +4,9 @@ import csd.grp3.user.User;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public interface TournamentService {
     List<Tournament> listTournaments();
     Tournament getTournament(Long id);

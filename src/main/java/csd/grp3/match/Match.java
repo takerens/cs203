@@ -23,7 +23,7 @@ import lombok.*;
 public class Match {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "round_id", nullable = false)
