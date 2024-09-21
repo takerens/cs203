@@ -4,18 +4,21 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface UserService {
-    private UserRepository users;
+//    public UserService(UserRepository users) {
+//        this.users = users;
+//    }
+//
+//
+//    public void createAccount(User newUser) {
+//        if (users.findByUsername(newUser.getUsername()).isPresent()) {
+//            System.out.println("Username already exists. Please choose another username");
+//        } else {
+//            users.save(new User(newUser.getUsername(), newUser.getPassword()));
+//        }
+//    }
 
-    public UserService(UserRepository users) {
-        this.users = users;
-    }
+    User createUser(String username, String password);
 
-
-    public void createAccount(User newUser) {
-        if (users.findByUsername(newUser.getUsername()).isPresent()) {
-            System.out.println("Username already exists. Please choose another username");
-        } else {
-            users.save(new User(newUser.getUsername(), newUser.getPassword()));
-        }
-    }
+    void login(String username, String password);
+//    User changePassword(String newPassword);
 }
