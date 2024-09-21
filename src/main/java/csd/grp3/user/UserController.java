@@ -2,6 +2,7 @@ package csd.grp3.user;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,21 +11,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 public class UserController {
-    private UserRepository users;
+    private UserService userService;
 
-    public UserController(UserRepository users){
-        this.users = users;
+    @Autowired
+    public UserController(UserService userService){
+        this.userService = userService;
     }
 
-    @GetMapping("/users")
-    public List<User> getUsers() {
-        return users.findAll();
-    }
+//    @GetMapping("/users")
+//    public List<User> getUsers() {
+//        return user.findAll();
+//    }
 
     @PostMapping("/register")
     public User registerUser(@RequestBody User newUser) {
         System.out.println(newUser.getUsername() + ":" + newUser.getPassword());
-        users.save(newUser);
+        userService.createAccount(newUser);
         return newUser;
     }
     
