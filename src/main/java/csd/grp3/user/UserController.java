@@ -44,7 +44,11 @@ public class UserController {
     public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
         session.setAttribute("username", user.getUsername());
         model.addAttribute("username", user.getUsername());
-        model.addAttribute("userRole", "ROLE_USER");
+        if (user.getUsername().equals("user")) {
+            model.addAttribute("userRole", "ROLE_USER");
+        } else if (user.getUsername().equals("admin")) {
+            model.addAttribute("userRole", "ROLE_ADMIN");
+        }
         return "index";
     }
 
