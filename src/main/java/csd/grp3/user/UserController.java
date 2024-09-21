@@ -6,6 +6,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpSession;
+
+
 @Controller
 public class UserController {
     private UserService userService;
@@ -38,8 +41,23 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@ModelAttribute User user, Model model) {
-        model.addAttribute("message", "User Log In successfully!");
+    public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
+        session.setAttribute("username", user.getUsername());
+        model.addAttribute("username", user.getUsername());
+        model.addAttribute("userRole", "ROLE_USER");
         return "index";
     }
+
+    @GetMapping("/index")
+    public String homePage(Model model, HttpSession session) {
+        model.addAttribute("username", session.getAttribute("username"));
+        return "index";
+    }
+
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate(); // Invalidates the session and removes all attributes
+        return "redirect:/login"; // Redirect to the login page
+    }
+    
 }

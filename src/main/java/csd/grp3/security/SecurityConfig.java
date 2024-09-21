@@ -38,7 +38,7 @@ public class SecurityConfig {
             .anyRequest().permitAll()
             )
             // ensure that the application won’t create any session in our stateless REST APIs
-            .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .httpBasic(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable()) // CSRF protection is needed only for browser based attacks
             .formLogin(form -> form.disable())

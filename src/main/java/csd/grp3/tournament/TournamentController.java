@@ -3,11 +3,13 @@ package csd.grp3.tournament;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-@RestController
+@Controller
 public class TournamentController {
 
     @Autowired
@@ -19,19 +21,13 @@ public class TournamentController {
     }
 
     @GetMapping("/tournaments")
-    public ResponseEntity<List<Tournament>> getAllTournaments() {
-        try {
-            List<Tournament> tournamentList = new ArrayList<>();
-            tournamentRepo.findAll().forEach(tournamentList::add);
+    public String getAllTournaments(Model model) {
+        List<Tournament> tournamentList = tournamentRepo.findAll();
+        System.out.println(tournamentList);
 
-            if (tournamentList.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-
-            return new ResponseEntity<>(tournamentList, HttpStatus.OK);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        model.addAttribute("userRole", "ROLE_USER");
+        model.addAttribute("tournaments", tournamentList);
+        return "tournaments";
     }
 
     @GetMapping("/tournaments/{id}")

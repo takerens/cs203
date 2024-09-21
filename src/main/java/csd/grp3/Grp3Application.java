@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
 import csd.grp3.user.UserRepository;
+import csd.grp3.tournament.Tournament;
+import csd.grp3.tournament.TournamentRepository;
 import csd.grp3.user.User;
 
 @SpringBootApplication
@@ -15,7 +17,17 @@ public class Grp3Application {
 
 		// JPA User Repository init
 		UserRepository users = ctx.getBean(UserRepository.class);
-		System.out.println("[Add Admin]: " + users.save(new User("admin", "password", "ROLE_ADMIN")).getUsername());
+		System.out.println("[Add Admin]: " + users.save(new User("admin", "password123", "ROLE_ADMIN")).getUsername());
+		System.out.println("[Add Admin]: " + users.save(new User("user", "user1234", "ROLE_USER")).getUsername());
+
+		// JPA User Repository init
+		TournamentRepository ts = ctx.getBean(TournamentRepository.class);
+		Tournament t = new Tournament();
+		t.setTitle("Tournament A");
+		System.out.println("[Add Tournament]: " + ts.save(t).getTitle());
+		Tournament t1 = new Tournament();
+		t1.setTitle("Tournament B");
+		System.out.println("[Add Tournament]: " + ts.save(t1).getTitle());
 	}
 
 }
