@@ -26,7 +26,7 @@ public class UserController {
     @PostMapping("/register")
     public User registerUser(@RequestBody User newUser) {
         System.out.println(newUser.getUsername() + ":" + newUser.getPassword());
-        userService.createAccount(newUser);
+        userService.createNewUser(newUser.getUsername(), newUser.getPassword());
         return newUser;
     }
     
