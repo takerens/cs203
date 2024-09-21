@@ -9,6 +9,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import csd.grp3.user.User;
+
+import java.util.*;
+
 @Entity
 @Table(name="Tournaments")
 @Getter
@@ -26,6 +30,8 @@ public class Tournament {
     private int minElo;
     private int maxElo;
     private LocalDateTime date;
-    // private List<User> participants;
+    private int size;
+    private List<User> waitingList;
+    private List<User> participants;
     // private List<Match> matches;
 }

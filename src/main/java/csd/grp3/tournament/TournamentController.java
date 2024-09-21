@@ -75,6 +75,8 @@ public class TournamentController {
             updatedTournamentData.setMaxElo(newTournamentData.getMaxElo());
             // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
             updatedTournamentData.setMinElo(newTournamentData.getMinElo());
+            updatedTournamentData.setSize(newTournamentData.getSize());
+            updatedTournamentData.setWaitingList(newTournamentData.getWaitingList());
 
             Tournament tournamentObj = tournamentRepo.save(updatedTournamentData);
             return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
@@ -95,6 +97,8 @@ public class TournamentController {
             updatedTournamentData.setMaxElo(newTournamentData.getMaxElo());
             // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
             updatedTournamentData.setMinElo(newTournamentData.getMinElo());
+            updatedTournamentData.setSize(newTournamentData.getSize());
+            updatedTournamentData.setWaitingList(newTournamentData.getWaitingList());
 
             Tournament tournamentObj = tournamentRepo.save(updatedTournamentData);
             return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
