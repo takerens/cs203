@@ -1,16 +1,12 @@
 package csd.grp3.tournament;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import csd.grp3.match.Match;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import jakarta.persistence.*;
 import lombok.*;
-
-import csd.grp3.user.User;
 
 import java.util.*;
 
@@ -49,7 +45,7 @@ public class Tournament {
      * 
      */
     public void endTournament() {
-        for(User user : this.players) {
+        for(User user : this.participants) {
             List<Match> userMatches = new ArrayList<>();
 
             for (Round round : this.rounds) {
