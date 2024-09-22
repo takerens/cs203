@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import csd.grp3.tournament.TournamentService;
-import org.springframework.security.core.Authentication;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -27,6 +26,10 @@ public class UserController {
     public String registerForTournament(@PathVariable Long tournamentId, HttpSession session,
             RedirectAttributes redirectAttributes) {
         String username = (String) session.getAttribute("username");
+        if (username == null) {
+            System.out.println("[Error]: User is not authenticated. Please log in first");
+            return "redirect:/login?error=Please log in first";
+        }
         User user = userService.findByUsername(username);
 
         if (user == null) {
@@ -47,7 +50,11 @@ public class UserController {
     @PostMapping("/withdraw/{tournamentId}")
     public String withdrawfromTournament(@PathVariable Long tournamentId, HttpSession session,
             RedirectAttributes redirectAttributes) {
-                String username = (String) session.getAttribute("username");
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            System.out.println("[Error]: User is not authenticated. Please log in first");
+            return "redirect:/login?error=Please log in first";
+        }
         User user = userService.findByUsername(username);
 
         if (user == null) {
