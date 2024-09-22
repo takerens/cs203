@@ -4,7 +4,27 @@ Content-Type: application/json
 
 {
     "username": "user1",
-    "password": "pwd2",
+    "password": "pwd2aaaaaaa",
+    "authorities": "ROLE_USER"
+}
+
+### Register a user with a duplicated username
+POST http://localhost:8080/register
+Content-Type: application/json
+
+{
+    "username": "user1",
+    "password": "pwd2aaaaaaa",
+    "authorities": "ROLE_USER"
+}
+
+### Register a user with password too short
+POST http://localhost:8080/register
+Content-Type: application/json
+
+{
+    "username": "user",
+    "password": "pwdsalfdkjsdf1",
     "authorities": "ROLE_USER"
 }
 

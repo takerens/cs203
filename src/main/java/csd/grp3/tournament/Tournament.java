@@ -7,13 +7,12 @@ import java.util.List;
 import csd.grp3.match.Match;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+
+import csd.grp3.user.User;
+
+import java.util.*;
 
 @Entity
 @Table(name="Tournaments")
@@ -36,7 +35,11 @@ public class Tournament {
     private int minElo;
     private int maxElo;
     private LocalDateTime date;
-    private List<User> players;
+    private int size;
+    @ManyToMany
+    private List<User> waitingList;
+    @ManyToMany
+    private List<User> participants;
     // private List<Match> matches;
 
 

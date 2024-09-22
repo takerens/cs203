@@ -11,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
@@ -32,7 +33,8 @@ public class User implements UserDetails{
     @Id @NotNull(message = "Username should not be null")
     private String username;
 
-    @NotNull(message = "Password should not be null")
+    @NotNull (message = "Password should not be null")
+    @Size(min = 8, message = "Password should be at least 8 characters long")
     private String password;
 
     @NotNull(message = "Authorities should not be null")
