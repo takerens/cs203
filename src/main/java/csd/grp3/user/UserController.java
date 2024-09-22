@@ -81,7 +81,7 @@ public class UserController {
     @PostMapping("/login")
     public String loginUser(@ModelAttribute User user, Model model) {
         model.addAttribute("message", "User Log In successfully!");
-        return "index";
+        return "redirect:/tournament";
     }
 
     
