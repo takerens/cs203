@@ -31,6 +31,19 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
     
+    @PostMapping("/withdraw/{tournamentId}")
+    public ResponseEntity<Void> withdrawfromTournament(@PathVariable Long tournamentId, Authentication authentication) {
+        String username = authentication.getName(); // Get the currently authenticated user's name
+        User user = userService.findByUsername(username); // Find the user by username
+
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        tournamentService.withdrawPlayer(user, tournamentId); // Register the user for the tournament
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
 
      @GetMapping("/register")
     public String registerPage(Model model) {
