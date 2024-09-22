@@ -1,10 +1,5 @@
 package csd.grp3.user;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +10,9 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class UserController {
     private UserService userService;
-    private DaoAuthenticationProvider daoAuthenticationProvider;
 
-    public UserController(UserService userService, DaoAuthenticationProvider daoAuthenticationProvider){
+    public UserController(UserService userService){
         this.userService = userService;
-        this.daoAuthenticationProvider = daoAuthenticationProvider;
     }
 
     @GetMapping("/register")
@@ -76,5 +69,4 @@ public class UserController {
         session.invalidate(); // Invalidates the session and removes all attributes
         return "redirect:/login"; // Redirect to the login page
     }
-    
 }
