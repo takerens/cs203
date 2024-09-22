@@ -12,4 +12,5 @@ public interface TournamentService {
     void deleteTournament(Long id);
     void registerPlayer(User player, Long id);
     void withdrawPlayer(User player, Long id);
+    boolean tournamentExists(Long tournamentId);
 }

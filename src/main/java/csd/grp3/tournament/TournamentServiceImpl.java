@@ -86,6 +86,11 @@ public class TournamentServiceImpl implements TournamentService {
             }
         }
     }
+
+    @Override
+    public boolean tournamentExists(Long tournamentId) {
+        return tournamentId != null && tournaments.existsById(tournamentId);
+    }
 }
 
 

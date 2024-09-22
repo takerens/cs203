@@ -14,8 +14,9 @@ public class UserController {
 
     private TournamentService tournamentService;
 
-    public UserController(UserService userService){
+    public UserController(UserService userService, TournamentService tournamentService){
         this.userService = userService;
+        this.tournamentService = tournamentService;
     }
 
     @PostMapping("/register/{tournamentId}")
@@ -25,6 +26,10 @@ public class UserController {
 
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (!tournamentService.tournamentExists(tournamentId)) { // Check if the tournament exists
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Return 404 if tournament doesn't exist
         }
 
         tournamentService.registerPlayer(user, tournamentId); // Register the user for the tournament
@@ -39,6 +44,11 @@ public class UserController {
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        if (!tournamentService.tournamentExists(tournamentId)) { // Check if the tournament exists
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Return 404 if tournament doesn't exist
+        }
+
 
         tournamentService.withdrawPlayer(user, tournamentId); // Register the user for the tournament
         return new ResponseEntity<>(HttpStatus.OK);
