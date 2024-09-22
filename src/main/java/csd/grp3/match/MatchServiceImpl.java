@@ -1,8 +1,11 @@
 package csd.grp3.match;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import csd.grp3.round.Round;
 
+@Service
 public class MatchServiceImpl implements MatchService{
     private MatchRepository matches;
 
@@ -26,7 +29,7 @@ public class MatchServiceImpl implements MatchService{
     }
 
     @Override 
-    public Match updateMatch (Long id, Match newMatch) {
+    public Match updateMatch(Long id, Match newMatch) {
         return matches.findById(id).map(match -> {
             match.setResult(newMatch.getResult());
             match.setBYE(newMatch.isBYE());
