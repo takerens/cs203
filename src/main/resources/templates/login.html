@@ -23,7 +23,7 @@
             text-align: center;
         }
         h3 {
-            color:red;
+            color:rgb(49, 177, 49);
         }
         input[type="text"],
         input[type="password"] {
@@ -51,6 +51,7 @@
 
 <div class="container">
     <h3 th:if="${message}" th:text="${message}">Message here</h3>
+    <h3 th:if="${param.error}" th:text="${param.error}" style="color:red">Error Message here</h3>
     <h2>Login</h2>
     <form th:action="@{/login}" method="post">
         <div class="form-group">

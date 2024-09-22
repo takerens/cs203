@@ -41,26 +41,24 @@ public class UserController {
     }
 
     @PostMapping("/login")
-<<<<<<< HEAD
     public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
-        session.setAttribute("username", user.getUsername());
-        return "redirect:/index";
+        if (userService.login(user.getUsername(), user.getPassword())) {
+            session.setAttribute("username", user.getUsername());
+            return "redirect:/index";
+        }
+        return "redirect:/login?error=User does not exist";
     }
 
     @GetMapping("/index")
     public String homePage(Model model, HttpSession session) {
         String username = (String) session.getAttribute("username");
         User user = userService.getUser(username);
-
+        if (user == null) { // not authenticated
+            return "redirect:/login?error=Please Login First";
+        }
         model.addAttribute("username", username);
         model.addAttribute("userRole", user.getUserRole());
         return "index";
-        if (userService.login(user.getUsername(), user.getPassword())) {
-            model.addAttribute("message", "User Log In successfully!");
-            return "index";
-        } else {
-            model.addAttribute("message", "User Log In unsuccessful!");
-            return "login";
     }
 
     @PostMapping("/logout")
