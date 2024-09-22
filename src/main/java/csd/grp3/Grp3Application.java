@@ -15,7 +15,7 @@ public class Grp3Application {
 
 		// JPA User Repository init
 		UserRepository users = ctx.getBean(UserRepository.class);
-		System.out.println("[Add Admin]: " + users.save(new User("admin", "password", "ROLE_ADMIN")).getUsername());
+		System.out.println("[Add Admin]: " + users.save(new User(0, "admin", "password", "ROLE_ADMIN")).getUsername());
 	}
 
 }
