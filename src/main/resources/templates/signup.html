@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Signup Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,7 +23,7 @@
             text-align: center;
         }
         h3 {
-            color:rgb(49, 177, 49);
+            color:red;
         }
         input[type="text"],
         input[type="password"] {
@@ -34,7 +34,7 @@
             border-radius: 5px;
         }
         input[type="submit"] {
-            background: #007bff;
+            background: #5cb85c;
             color: white;
             border: none;
             padding: 10px;
@@ -43,34 +43,30 @@
             width: 100%;
         }
         input[type="submit"]:hover {
-            background: #0056b3;
+            background: #4cae4c;
         }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h3 th:if="${message}" th:text="${message}">Message here</h3>
-    <h3 th:if="${param.error}" th:text="${param.error}" style="color:red">Error Message here</h3>
-    <h2>Login</h2>
-    <form th:action="@{/verify}" method="post">
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" class="form-control" autocomplete="off" required>
-        </div>
-
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" class="form-control" required>
-        </div>
-
-        <input type="submit" class="btn btn-primary" value="Login">
-    </form>
-    <p>
-        Don't have an account? <a th:href="@{/signup}">Signup Here</a>
-    </p>
-</div>
-
-
+    <div class="container">
+        <h3 th:if="${errorMessage}" th:text="${errorMessage}">Error message here</h3>
+        <h2>User Registration</h2>
+        <form th:action="@{/signup}" method="post" th:object="${user}">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" th:field="*{username}" class="form-control" placeholder="Enter username" required />
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="Enter password" required />
+            </div>
+            
+            <input type="submit" class="btn btn-primary" value="signup">
+        </form>
+        <p>
+            Already have an account? <a th:href="@{/login}">Login here</a>
+        </p>
+    </div>
 </body>
 </html>

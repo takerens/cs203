@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import csd.grp3.user.User;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -16,6 +18,9 @@ public class TournamentController {
 
     @Autowired
     private TournamentRepository tournamentRepo;
+
+    @Autowired
+    private TournamentService tournamentService;
 
     @GetMapping("/")
     public String home() {
@@ -29,7 +34,7 @@ public class TournamentController {
 
         model.addAttribute("userRole", "ROLE_USER");
         model.addAttribute("tournaments", tournamentList);
-        return "tournaments";
+        return "tournament";
     }
 
     @GetMapping("/tournaments/{id}")
@@ -55,6 +60,7 @@ public class TournamentController {
     }
 
     @PostMapping("/tournaments")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Tournament> addTournament(@RequestBody Tournament tournament) {
         Tournament tournamentObj = tournamentRepo.save(tournament);
 
@@ -62,6 +68,7 @@ public class TournamentController {
     }
 
     @PostMapping("/tournaments/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Tournament> updateTournamentById(@PathVariable Long id, @RequestBody Tournament newTournamentData) {
         Optional<Tournament> oldTournamentData = tournamentRepo.findById(id);
 
@@ -84,6 +91,7 @@ public class TournamentController {
     }
 
     @PostMapping("/tournaments/{title}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Tournament> updateTournamentByTitle(@PathVariable String title, @RequestBody Tournament newTournamentData) {
         Tournament oldTournamentData = tournamentRepo.findByTitle(title);
 
@@ -106,14 +114,29 @@ public class TournamentController {
     }
 
     @DeleteMapping("/tournaments/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteTournamentById(@PathVariable Long id) {
         tournamentRepo.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/tournaments/{title}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteTournamentByTitle(@PathVariable String title) {
         tournamentRepo.deleteByTitle(title);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("/{id}/withdraw")
+    public ResponseEntity<Void> withdrawPlayer(@RequestBody User player, @PathVariable Long id) {
+        tournamentService.withdrawPlayer(player, id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/register")
+    public ResponseEntity<Void> registerPlayer(@RequestBody User player, @PathVariable Long id) {
+        tournamentService.registerPlayer(player, id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

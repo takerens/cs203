@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournaments Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn {
+            background: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background: #4cae4c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    <h2>Tournaments</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Max Elo</th>
+                <th>Min Elo</th>
+                <th>Size</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="tournament : ${tournaments}">
+                <td th:text="${tournament.id}"></td>
+                <td th:text="${tournament.title}"></td>
+                <td th:text="${tournament.date}"></td>
+                <td th:text="${tournament.maxElo}"></td>
+                <td th:text="${tournament.minElo}"></td>
+                <td th:text="${tournament.size}"></td>
+                <td>
+                    <a th:href="@{/tournaments/{id}(id=${tournament.id})}" class="btn">View</a>
+                    <a th:href="@{/register/{id}(id=${tournament.id})}" class="btn">Register</a>
+                    <a th:href="@{/withdraw/{id}(id=${tournament.id})}" class="btn">Withdraw</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <a href="/index" class="btn">Back to Home</a>
+</div>
+
+</body>
+</html>
