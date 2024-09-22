@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import csd.grp3.tournament.TournamentService;
 import org.springframework.security.core.Authentication;
 
@@ -14,48 +16,54 @@ public class UserController {
 
     private TournamentService tournamentService;
 
-    public UserController(UserService userService, TournamentService tournamentService){
+    public UserController(UserService userService, TournamentService tournamentService) {
         this.userService = userService;
         this.tournamentService = tournamentService;
     }
 
     @PostMapping("/register/{tournamentId}")
-    public ResponseEntity<Void> registerForTournament(@PathVariable Long tournamentId, Authentication authentication) {
-        String username = authentication.getName(); // Get the currently authenticated user's name
-        User user = userService.findByUsername(username); // Find the user by username
+    public String registerForTournament(@PathVariable Long tournamentId, Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
 
         if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            redirectAttributes.addFlashAttribute("errorMessage", "User not found.");
+            return "redirect:/tournaments"; // Redirect on failure
         }
 
-        if (!tournamentService.tournamentExists(tournamentId)) { // Check if the tournament exists
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Return 404 if tournament doesn't exist
+        if (!tournamentService.tournamentExists(tournamentId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Tournament not found.");
+            return "redirect:/tournaments"; // Redirect on failure
         }
 
-        tournamentService.registerPlayer(user, tournamentId); // Register the user for the tournament
-        return new ResponseEntity<>(HttpStatus.OK);
+        tournamentService.registerPlayer(user, tournamentId);
+        redirectAttributes.addFlashAttribute("message", "Successfully registered for the tournament!");
+        return "redirect:/tournaments"; // Redirect after successful registration
     }
-    
+
     @PostMapping("/withdraw/{tournamentId}")
-    public ResponseEntity<Void> withdrawfromTournament(@PathVariable Long tournamentId, Authentication authentication) {
-        String username = authentication.getName(); // Get the currently authenticated user's name
-        User user = userService.findByUsername(username); // Find the user by username
+    public String withdrawfromTournament(@PathVariable Long tournamentId, Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
 
         if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            redirectAttributes.addFlashAttribute("errorMessage", "User not found.");
+            return "redirect:/tournaments"; // Redirect on failure
         }
 
-        if (!tournamentService.tournamentExists(tournamentId)) { // Check if the tournament exists
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Return 404 if tournament doesn't exist
+        if (!tournamentService.tournamentExists(tournamentId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Tournament not found.");
+            return "redirect:/tournaments"; // Redirect on failure
         }
 
-
-        tournamentService.withdrawPlayer(user, tournamentId); // Register the user for the tournament
-        return new ResponseEntity<>(HttpStatus.OK);
+        tournamentService.withdrawPlayer(user, tournamentId);
+        redirectAttributes.addFlashAttribute("message", "Successfully withdrew from the tournament!");
+        return "redirect:/tournaments"; // Redirect after successful withdrawal
     }
-    
 
-     @GetMapping("/signup")
+    @GetMapping("/signup")
     public String registerPage(Model model) {
         model.addAttribute("user", new User());
         return "register";
@@ -84,5 +92,4 @@ public class UserController {
         return "redirect:/tournament";
     }
 
-    
 }
