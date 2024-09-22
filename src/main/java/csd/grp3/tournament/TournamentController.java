@@ -34,7 +34,7 @@ public class TournamentController {
 
         model.addAttribute("userRole", "ROLE_USER");
         model.addAttribute("tournaments", tournamentList);
-        return "tournament";
+        return "tournaments";
     }
 
     @GetMapping("/tournaments/{id}")

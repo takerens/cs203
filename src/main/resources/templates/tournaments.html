@@ -23,6 +23,8 @@
 </nav>
 
 <main>
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
     <h1>Tournament Registration</h1>
     <div class="user-view" th:if="${userRole == 'ROLE_USER'}">
         <p>Available Tournaments. Registration Period: Until Date of Tournament</p>
@@ -34,7 +36,7 @@
                     <th>Max Elo</th>
                     <th>Date</th>
                     <th>Vacancies</th>
-                    <th>Register</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,6 +49,9 @@
                     <td>
                         <form th:action="@{/register/{id}(id=${tournament.id})}" method="post">
                             <button type="submit">Register</button>
+                        </form>
+                        <form th:action="@{/withdraw/{id}(id=${tournament.id})}" method="post">
+                            <button type="submit">Withdraw</button>
                         </form>
                     </td>
                 </tr>

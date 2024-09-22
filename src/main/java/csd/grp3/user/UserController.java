@@ -24,9 +24,9 @@ public class UserController {
     }
 
     @PostMapping("/register/{tournamentId}")
-    public String registerForTournament(@PathVariable Long tournamentId, Authentication authentication,
+    public String registerForTournament(@PathVariable Long tournamentId, HttpSession session,
             RedirectAttributes redirectAttributes) {
-        String username = authentication.getName();
+        String username = (String) session.getAttribute("username");
         User user = userService.findByUsername(username);
 
         if (user == null) {
@@ -45,9 +45,9 @@ public class UserController {
     }
 
     @PostMapping("/withdraw/{tournamentId}")
-    public String withdrawfromTournament(@PathVariable Long tournamentId, Authentication authentication,
+    public String withdrawfromTournament(@PathVariable Long tournamentId, HttpSession session,
             RedirectAttributes redirectAttributes) {
-        String username = authentication.getName();
+                String username = (String) session.getAttribute("username");
         User user = userService.findByUsername(username);
 
         if (user == null) {
@@ -112,6 +112,7 @@ public class UserController {
         return "index";
     }
 
+    // Doesn't run
     @PostMapping("/logout")
     public String logout(HttpSession session) {
         String username = (String) session.getAttribute("username"); // debuggy
