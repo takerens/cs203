@@ -41,6 +41,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
+<<<<<<< HEAD
     public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
         session.setAttribute("username", user.getUsername());
         return "redirect:/index";
@@ -54,6 +55,12 @@ public class UserController {
         model.addAttribute("username", username);
         model.addAttribute("userRole", user.getUserRole());
         return "index";
+        if (userService.login(user.getUsername(), user.getPassword())) {
+            model.addAttribute("message", "User Log In successfully!");
+            return "index";
+        } else {
+            model.addAttribute("message", "User Log In unsuccessful!");
+            return "login";
     }
 
     @PostMapping("/logout")
