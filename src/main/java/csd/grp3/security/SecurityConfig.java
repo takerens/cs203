@@ -37,7 +37,7 @@ public class SecurityConfig {
             .authorizeHttpRequests((authz) -> authz
                     .requestMatchers( "/verify/**").permitAll()
                     .requestMatchers("/login", "/register").permitAll()
-                    .anyRequest().authenticated())
+                    .anyRequest().permitAll())
             // ensure that the application won’t create any session in our stateless REST
             // APIs
             // .sessionManagement(configurer ->
@@ -45,10 +45,10 @@ public class SecurityConfig {
             .httpBasic(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable()) // CSRF protection is needed only for browser based attacks
             .formLogin(form -> form.disable())
-            .exceptionHandling(handling -> handling
-                    .authenticationEntryPoint((request, response, authException) -> {
-                        response.sendRedirect("/login?error=Please Login First");
-                    }))
+            // .exceptionHandling(handling -> handling
+            //         .authenticationEntryPoint((request, response, authException) -> {
+            //             response.sendRedirect("/login?error=Please Login First");
+            //         }))
             .headers(header -> header.disable()) // disable the security headers, as we do not return HTML in our
                                                     // APIs
             .authenticationProvider(authenticationProvider());
