@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpSession;
+
 import java.util.*;
 
 @Controller
@@ -21,7 +23,7 @@ public class TournamentController {
     }
 
     @GetMapping("/tournaments")
-    public String getAllTournaments(Model model) {
+    public String getAllTournaments(Model model, HttpSession session) {
         List<Tournament> tournamentList = tournamentRepo.findAll();
         System.out.println(tournamentList);
 

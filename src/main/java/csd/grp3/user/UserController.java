@@ -1,7 +1,10 @@
 package csd.grp3.user;
 
-import java.util.List;
-
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +15,11 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class UserController {
     private UserService userService;
+    private DaoAuthenticationProvider daoAuthenticationProvider;
 
-    public UserController(UserService userService){
+    public UserController(UserService userService, DaoAuthenticationProvider daoAuthenticationProvider){
         this.userService = userService;
+        this.daoAuthenticationProvider = daoAuthenticationProvider;
     }
 
     @GetMapping("/register")
@@ -40,22 +45,25 @@ public class UserController {
         return "login";
     }
 
-    @PostMapping("/login")
+    @PostMapping("/verify")
     public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
         if (userService.login(user.getUsername(), user.getPassword())) {
             session.setAttribute("username", user.getUsername());
-            return "redirect:/index";
+            System.out.println("[User Login]: " + user.getUsername() + " logged in successfully");
+            return "redirect:/index"; // Redirect on successful login
         }
-        return "redirect:/login?error=User does not exist";
+        System.out.println("[User Login]: " + user.getUsername() + " failed to log in");
+        return "redirect:/login?error=Login Failed"; // Redirect on failure
     }
 
     @GetMapping("/index")
     public String homePage(Model model, HttpSession session) {
         String username = (String) session.getAttribute("username");
-        User user = userService.getUser(username);
-        if (user == null) { // not authenticated
-            return "redirect:/login?error=Please Login First";
+        if (username == null) {
+            System.out.println("[Error]: User is not authenticated. Please log in first");
+            return "redirect:/login?error=Please log in first";
         }
+        User user = userService.getUser(username);
         model.addAttribute("username", username);
         model.addAttribute("userRole", user.getUserRole());
         return "index";
@@ -63,6 +71,8 @@ public class UserController {
 
     @PostMapping("/logout")
     public String logout(HttpSession session) {
+        String username = (String) session.getAttribute("username"); // debuggy
+        System.out.println("[User Logout]: " + username + " has logged out"); // debugging
         session.invalidate(); // Invalidates the session and removes all attributes
         return "redirect:/login"; // Redirect to the login page
     }
