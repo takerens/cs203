@@ -2,6 +2,7 @@ package csd.grp3.user;
 
 import java.util.List;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -78,5 +79,9 @@ public class UserServiceImpl implements UserService{
     
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    public User getUser(String username) {
+        return userRepository.findByUsername(username).orElse(null);
     }
 }

@@ -40,6 +40,10 @@ public class User implements UserDetails{
         this.password = password;
         this.authorities = "ROLE_USER";
     }
+
+    public String getUserRole() {
+        return authorities;
+    }
   
     // Return a collection of authorities (roles) granted to the user.
     @Override

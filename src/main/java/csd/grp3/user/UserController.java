@@ -43,18 +43,16 @@ public class UserController {
     @PostMapping("/login")
     public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
         session.setAttribute("username", user.getUsername());
-        model.addAttribute("username", user.getUsername());
-        if (user.getUsername().equals("user")) {
-            model.addAttribute("userRole", "ROLE_USER");
-        } else if (user.getUsername().equals("admin")) {
-            model.addAttribute("userRole", "ROLE_ADMIN");
-        }
-        return "index";
+        return "redirect:/index";
     }
 
     @GetMapping("/index")
     public String homePage(Model model, HttpSession session) {
-        model.addAttribute("username", session.getAttribute("username"));
+        String username = (String) session.getAttribute("username");
+        User user = userService.getUser(username);
+
+        model.addAttribute("username", username);
+        model.addAttribute("userRole", user.getUserRole());
         return "index";
     }
 
