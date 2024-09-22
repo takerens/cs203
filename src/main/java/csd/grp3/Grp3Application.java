@@ -25,6 +25,7 @@ public class Grp3Application {
 		TournamentRepository ts = ctx.getBean(TournamentRepository.class);
 		Tournament t = new Tournament();
 		t.setTitle("Tournament A");
+		t.setSize(2);
 		System.out.println("[Add Tournament]: " + ts.save(t).getTitle());
 		Tournament t1 = new Tournament();
 		t1.setTitle("Tournament B");

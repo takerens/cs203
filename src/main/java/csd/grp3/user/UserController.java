@@ -1,10 +1,5 @@
 package csd.grp3.user;
 
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

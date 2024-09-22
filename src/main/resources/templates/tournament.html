@@ -81,8 +81,12 @@
                 <td th:text="${tournament.size}"></td>
                 <td>
                     <a th:href="@{/tournaments/{id}(id=${tournament.id})}" class="btn">View</a>
-                    <a th:href="@{/register/{id}(id=${tournament.id})}" class="btn">Register</a>
-                    <a th:href="@{/withdraw/{id}(id=${tournament.id})}" class="btn">Withdraw</a>
+                    <form th:action="@{/register/{id}(id=${tournament.id})}" method="post">
+                        <button type="submit">Register</button>
+                    </form>
+                    <form th:action="@{/withdraw/{id}(id=${tournament.id})}" method="post">
+                        <button type="submit">Withdraw</button>
+                    </form>
                 </td>
             </tr>
         </tbody>

@@ -50,4 +50,24 @@ public class User implements UserDetails{
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Arrays.asList(new SimpleGrantedAuthority(authorities));
     }
+    
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Implement as needed
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // Implement as needed
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Implement as needed
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // Implement as needed
+    }
 }

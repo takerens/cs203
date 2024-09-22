@@ -38,26 +38,27 @@ public class TournamentController {
     }
 
     @GetMapping("/tournaments/{id}")
-    public ResponseEntity<Tournament> getTournamentById(@PathVariable Long id) {
+    @ResponseBody
+    public String getTournamentById(@PathVariable Long id) {
         Optional<Tournament> tournamentData = tournamentRepo.findById(id);
 
         if (tournamentData.isPresent()) {
-            return new ResponseEntity<>(tournamentData.get(), HttpStatus.OK);
+            return tournamentData.get().getTitle();
         }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return "Tournament not found";
     }
 
-    @GetMapping("/tournaments/{title}")
-    public ResponseEntity<Tournament> getTournamentByTitle(@PathVariable String title) {
-        Tournament tournamentData = tournamentRepo.findByTitle(title);
+    // @GetMapping("/tournaments/{title}")
+    // public ResponseEntity<Tournament> getTournamentByTitle(@PathVariable String title) {
+    //     Tournament tournamentData = tournamentRepo.findByTitle(title);
         
-        if (tournamentData != null) {
-            return new ResponseEntity<>(tournamentData, HttpStatus.OK);
-        }
+    //     if (tournamentData != null) {
+    //         return new ResponseEntity<>(tournamentData, HttpStatus.OK);
+    //     }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    // }
 
     @PostMapping("/tournaments")
     @PreAuthorize("hasRole('ADMIN')")

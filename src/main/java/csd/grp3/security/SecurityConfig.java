@@ -17,17 +17,17 @@ public class SecurityConfig {
 
     private UserDetailsService userDetailsService;
 
-    public SecurityConfig(UserDetailsService userSvc){
+    public SecurityConfig(UserDetailsService userSvc) {
         this.userDetailsService = userSvc;
     }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-     
+
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(encoder());
- 
+
         return authProvider;
     }
 
@@ -35,23 +35,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authz) -> authz
-                            .requestMatchers( "/login", "/register").permitAll()
-                            .requestMatchers(HttpMethod.POST, "/verify").permitAll()
-                            .anyRequest().authenticated()
-            )
-            // ensure that the application won’t create any session in our stateless REST APIs
-            // .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .requestMatchers( "/verify/**").permitAll()
+                    .requestMatchers("/login", "/register").permitAll()
+                    .anyRequest().authenticated())
+            // ensure that the application won’t create any session in our stateless REST
+            // APIs
+            // .sessionManagement(configurer ->
+            // configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .httpBasic(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable()) // CSRF protection is needed only for browser based attacks
             .formLogin(form -> form.disable())
-                    // .loginProcessingUrl("/verify"))
-                    // .successForwardUrl("/index"))
-            // .exceptionHandling(handling -> handling
-            //     .authenticationEntryPoint((request, response, authException) -> {
-            //             response.sendRedirect("/login?error=Please Login First");
-            //         })
-            //     )
-            .headers(header -> header.disable()) // disable the security headers, as we do not return HTML in our APIs
+            .exceptionHandling(handling -> handling
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        response.sendRedirect("/login?error=Please Login First");
+                    }))
+            .headers(header -> header.disable()) // disable the security headers, as we do not return HTML in our
+                                                    // APIs
             .authenticationProvider(authenticationProvider());
         return http.build();
     }
