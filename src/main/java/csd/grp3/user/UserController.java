@@ -55,13 +55,13 @@ public class UserController {
     }
     
 
-     @GetMapping("/register")
+     @GetMapping("/signup")
     public String registerPage(Model model) {
         model.addAttribute("user", new User());
         return "register";
     }
 
-    @PostMapping("/register")
+    @PostMapping("/signup")
     public String registerUser(@ModelAttribute User user, Model model) {
         if (userService.createNewUser(user.getUsername(), user.getPassword()) == null) {
             model.addAttribute("errorMessage", "User registration failed.");
