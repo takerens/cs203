@@ -1,17 +1,14 @@
 package csd.grp3.user;
 
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import csd.grp3.tournament.TournamentService;
-import org.springframework.security.core.Authentication;
+
+import jakarta.servlet.http.HttpSession;
+
 
 @Controller
 public class UserController {
@@ -26,9 +23,13 @@ public class UserController {
     }
 
     @PostMapping("/register/{tournamentId}")
-    public String registerForTournament(@PathVariable Long tournamentId, Authentication authentication,
+    public String registerForTournament(@PathVariable Long tournamentId, HttpSession session,
             RedirectAttributes redirectAttributes) {
-        String username = authentication.getName();
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            System.out.println("[Error]: User is not authenticated. Please log in first");
+            return "redirect:/login?error=Please log in first";
+        }
         User user = userService.findByUsername(username);
 
         if (user == null) {
@@ -47,9 +48,13 @@ public class UserController {
     }
 
     @PostMapping("/withdraw/{tournamentId}")
-    public String withdrawfromTournament(@PathVariable Long tournamentId, Authentication authentication,
+    public String withdrawfromTournament(@PathVariable Long tournamentId, HttpSession session,
             RedirectAttributes redirectAttributes) {
-        String username = authentication.getName();
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            System.out.println("[Error]: User is not authenticated. Please log in first");
+            return "redirect:/login?error=Please log in first";
+        }
         User user = userService.findByUsername(username);
 
         if (user == null) {
@@ -90,9 +95,36 @@ public class UserController {
         return "login";
     }
 
-    @PostMapping("/login")
-    public String loginUser(@ModelAttribute User user, Model model) {
-        model.addAttribute("message", "User Log In successfully!");
-        return "redirect:/tournament";
+    @PostMapping("/verify")
+    public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
+        if (userService.login(user.getUsername(), user.getPassword())) {
+            session.setAttribute("username", user.getUsername());
+            System.out.println("[User Login]: " + user.getUsername() + " logged in successfully");
+            return "redirect:/index"; // Redirect on successful login
+        }
+        System.out.println("[User Login]: " + user.getUsername() + " failed to log in");
+        return "redirect:/login?error=Login Failed"; // Redirect on failure
+    }
+
+    @GetMapping("/index")
+    public String homePage(Model model, HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            System.out.println("[Error]: User is not authenticated. Please log in first");
+            return "redirect:/login?error=Please log in first";
+        }
+        User user = userService.findByUsername(username);
+        model.addAttribute("username", username);
+        model.addAttribute("userRole", user.getUserRole());
+        return "index";
+    }
+
+    // Doesn't run
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        String username = (String) session.getAttribute("username"); // debuggy
+        System.out.println("[User Logout]: " + username + " has logged out"); // debugging
+        session.invalidate(); // Invalidates the session and removes all attributes
+        return "redirect:/login"; // Redirect to the login page
     }
 }
