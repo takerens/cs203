@@ -7,6 +7,7 @@ import csd.grp3.player.Player;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.*;
@@ -28,11 +29,20 @@ public class Tournament {
     @OneToMany(mappedBy = "tournament", orphanRemoval = true)
     private List<Round> rounds;
 
+    @NotNull(message = "Title: not null")
     private String title;
+
+    @NotNull(message = "minElo: put a valid Elo")
     private int minElo;
+
+    @NotNull(message = "maxElo: put a valid Elo")
     private int maxElo;
+
     private LocalDateTime date;
+
+    @NotNull(message = "size: put a valid tournament size")
     private int size;
+
     @ManyToMany
     private List<Player> waitingList;
     @ManyToMany

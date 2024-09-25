@@ -100,28 +100,28 @@ public class TournamentController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping("/tournaments/{title}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Tournament> updateTournamentByTitle(@PathVariable String title, @RequestBody Tournament newTournamentData) {
-        Tournament oldTournamentData = tournamentRepo.findByTitle(title);
+    // @PostMapping("/tournaments/title/{title}")
+    // @PreAuthorize("hasRole('ADMIN')")
+    // public ResponseEntity<Tournament> updateTournamentByTitle(@PathVariable String title, @RequestBody Tournament newTournamentData) {
+    //     Tournament oldTournamentData = tournamentRepo.findByTitle(title);
 
-        if (oldTournamentData != null) {
-            Tournament updatedTournamentData = oldTournamentData;
-            updatedTournamentData.setTitle(newTournamentData.getTitle());
-            updatedTournamentData.setDate(newTournamentData.getDate());
-            // updatedTournamentData.setMatches(newTournamentData.getMatches());
-            updatedTournamentData.setMaxElo(newTournamentData.getMaxElo());
-            // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
-            updatedTournamentData.setMinElo(newTournamentData.getMinElo());
-            updatedTournamentData.setSize(newTournamentData.getSize());
-            updatedTournamentData.setWaitingList(newTournamentData.getWaitingList());
+    //     if (oldTournamentData != null) {
+    //         Tournament updatedTournamentData = oldTournamentData;
+    //         updatedTournamentData.setTitle(newTournamentData.getTitle());
+    //         updatedTournamentData.setDate(newTournamentData.getDate());
+    //         // updatedTournamentData.setMatches(newTournamentData.getMatches());
+    //         updatedTournamentData.setMaxElo(newTournamentData.getMaxElo());
+    //         // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
+    //         updatedTournamentData.setMinElo(newTournamentData.getMinElo());
+    //         updatedTournamentData.setSize(newTournamentData.getSize());
+    //         updatedTournamentData.setWaitingList(newTournamentData.getWaitingList());
 
-            Tournament tournamentObj = tournamentRepo.save(updatedTournamentData);
-            return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
-        }
+    //         Tournament tournamentObj = tournamentRepo.save(updatedTournamentData);
+    //         return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
+    //     }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    // }
 
     @DeleteMapping("/tournaments/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -130,12 +130,12 @@ public class TournamentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/tournaments/{title}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HttpStatus> deleteTournamentByTitle(@PathVariable String title) {
-        tournamentRepo.deleteByTitle(title);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+    // @DeleteMapping("/tournaments/{title}")
+    // @PreAuthorize("hasRole('ADMIN')")
+    // public ResponseEntity<HttpStatus> deleteTournamentByTitle(@PathVariable String title) {
+    //     tournamentRepo.deleteByTitle(title);
+    //     return new ResponseEntity<>(HttpStatus.OK);
+    // }
 
     @PostMapping("/{id}/withdraw")
     public ResponseEntity<Void> withdrawPlayer(@RequestBody User player, @PathVariable Long id) {
