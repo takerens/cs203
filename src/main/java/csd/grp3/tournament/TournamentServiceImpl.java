@@ -4,6 +4,9 @@ import csd.grp3.match.Match;
 import csd.grp3.match.MatchRepository;
 import csd.grp3.player.Player;
 import csd.grp3.user.User;
+import csd.grp3.round.Round;
+import csd.grp3.exception.MatchNotCompletedException;
+import csd.grp3.match.Match;
 
 
 import java.util.List;
@@ -57,7 +60,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void registerPlayer(User player, Long id) {
+    public void registerPlayer(User player, Long id) throws TournamentNotFoundException {
         // check if got tournament
         Optional<Tournament> tournament = tournaments.findById(id);
 
@@ -79,6 +82,8 @@ public class TournamentServiceImpl implements TournamentService {
 
             // we save the tournament data back to database
             tournaments.save(tournamentData);
+        } else {
+            throw new TournamentNotFoundException(id);
         }
     }
 
@@ -107,6 +112,34 @@ public class TournamentServiceImpl implements TournamentService {
     public boolean tournamentExists(Long tournamentId) {
         return tournamentId != null && tournaments.existsById(tournamentId);
     }
+  
+    @Override
+    public void updateResults(Round round) throws MatchNotCompletedException {
+        List<Match> matches = round.getMatches();
+
+        // check match ended
+        for (Match match : matches) {
+            // if match not complete
+            if (match.getResult() == 0) {
+                // throw exception that it's not complete
+                throw new MatchNotCompletedException(match.getId());
+            }
+            else {
+                // update player data with match results
+                double result = match.getResult();
+                User black = match.getBlack();
+                User white = match.getWhite();
+                if (result == -1) {
+                    
+                } else if (result == 1) {
+
+                } else if (result == 0.5) {
+                    
+                }
+            }
+        }
+        // update match results
+        
 
     /**
      * Checks if 2 players have played each other in the tournament before.
