@@ -36,47 +36,26 @@
 </nav>
 
 <main>
-    <p><strong>Date:</strong> <span th:text="${tournament.date.toLocalDate()}"></span></p>
-
-    <h3>Players</h3>
-    <div th:if="${#lists.isEmpty(tournament.participants)}"><p>No one has registered for this tournament yet.</div>
-    <table th:if="${tournament.participants.size() > 0}">
+    <h3>Standings</h3>
+    <table>
         <thead>
             <tr>
-                <th>No.</th>
-                <th>Username</th>
+                <th>Rank</th>
+                <th>Player</th>
                 <th>Rating</th>
+                <th>Points</th>
             </tr>
         </thead>
         <tbody>
-            <tr th:each="player, iterStat : ${tournament.participants}">
-                <td th:text="${iterStat.index + 1}"></td> <!-- Row number -->
-                <td th:text="${player.username}"></td> <!-- Username -->
-                <td th:text="${player.ELO}"></td> <!-- Rating -->
+            <!-- <tr th:each="player, iterStat : ${tournament.standings}">
+                <td th:text="${iterStat.index + 1}"></td>"
+                <td th:text="${player.username}"></td>
+                <td th:text="${player.rating}"></td>
+                <td th:text="${player.points}"></td> -->
             </tr>
         </tbody>
-    </table>        
-
-    <h3>Withdrawn</h3>
-    <!-- <div th:if="${#lists.isEmpty(tournament.dropOut)}"><p>No one has withdrawn from this tournament yet.</div>
-        <table th:if="${tournament.dropOut.size() > 0}">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>Username</th>
-                    <th>Rating</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="player, iterStat : ${tournament.participants}">
-                    <td th:text="${iterStat.index + 1}"></td> <!- Row number ->
-                    <td th:text="${player.username}"></td> <!- Username ->
-                    <td th:text="${player.ELO}"></td> <!- Rating ->
-                </tr>
-            </tbody>
-        </table>    -->
+    </table>
 </main>
-
 
 </body>
 </html>

@@ -5,9 +5,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import csd.grp3.tournament.Tournament;
 import csd.grp3.tournament.TournamentService;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @Controller
@@ -21,6 +25,16 @@ public class UserController {
         this.userService = userService;
         this.tournamentService = tournamentService;
     }
+    @GetMapping("/rounds")
+    public String getMethodName(Model model) {
+        Tournament t = new Tournament();
+        t.setTitle("tounr");
+        t.setId(3);
+        model.addAttribute("currentRound", 2);
+        model.addAttribute("tournament", t);
+        return "round";
+    }
+    
 
     @PostMapping("/register/{tournamentId}")
     public String registerForTournament(@PathVariable Long tournamentId, HttpSession session,
