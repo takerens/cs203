@@ -1,7 +1,8 @@
 package csd.grp3.match;
 
+import csd.grp3.player.Player;
 import csd.grp3.round.Round;
-import csd.grp3.user.*;
+import csd.grp3.tournament.Tournament;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,12 +30,16 @@ public class Match {
     @JoinColumn(name = "round_id", nullable = false)
     private Round round;
 
-    private User white;
-    private User black;
+    private Player white;
+    private Player black;
     private boolean isBYE = false;
 
     @Getter (AccessLevel.NONE)
     private Integer result = 0;
+
+    public Tournament getTournament() {
+        return this.round.getTournament();
+    }
 
     /**
      * Get result of match. Returns 
