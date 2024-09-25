@@ -15,6 +15,10 @@ body {
     background-color: #A3C1DA; /* Blue background */
     padding: 15px; /* Padding for the navbar */
 }
+.secondary-navbar {
+    background-color: lightgray; /* Blue background */
+    padding: 15px; /* Padding for the navbar */
+}
 
 .navbar-brand {
     color: black;

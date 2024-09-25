@@ -38,12 +38,13 @@ public class TournamentController {
     }
 
     @GetMapping("/tournaments/{id}")
-    @ResponseBody
-    public String getTournamentById(@PathVariable Long id) {
+    public String getTournamentById(@PathVariable Long id, Model model) {
         Optional<Tournament> tournamentData = tournamentRepo.findById(id);
 
         if (tournamentData.isPresent()) {
-            return tournamentData.get().getTitle();
+            System.out.println(tournamentData.get());
+            model.addAttribute("tournament", tournamentData.get());
+            return "tournament";
         }
 
         return "Tournament not found";

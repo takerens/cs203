@@ -24,6 +24,8 @@ import lombok.*;
 @Table(name = "AppUsers")
 
 public class User implements UserDetails{
+    private int elo;
+
     @Id
     @NotNull(message = "Username should not be null")
     private String username;

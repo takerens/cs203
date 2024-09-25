@@ -75,7 +75,7 @@ public class UserController {
     @GetMapping("/signup")
     public String registerPage(Model model) {
         model.addAttribute("user", new User());
-        return "register";
+        return "signup";
     }
 
     @PostMapping("/signup")
@@ -83,7 +83,7 @@ public class UserController {
         if (userService.createNewUser(user.getUsername(), user.getPassword()) == null) {
             model.addAttribute("errorMessage", "User registration failed.");
             System.out.println("[User Registration]: Failed");
-            return "register";
+            return "signup";
         }
         model.addAttribute("message", "User registered successfully.");
         System.out.println("[User Registration]: Successfully added: " + user.getUsername());

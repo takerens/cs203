@@ -14,7 +14,6 @@
         <ul class="navbar-nav">
             <li class="nav-item"><a class="nav-link" href="/tournaments">Tournaments</a></li>
             <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
-            
         </ul>
         <form action="#" th:action="@{/logout}" method="post" class="logout-form">
             <button type="submit" class="logout-button">Log Out</button>
@@ -23,9 +22,9 @@
 </nav>
 
 <main>
-    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
-    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-    <h1>Tournament Registration</h1>
+    <div th:if="${message}"><h3 style="color:green" th:text="${message}"></h3></div>
+    <div th:if="${errorMessage}"><h3 style="color:red" th:text="${errorMessage}"></h3></div>
+    <h1>Tournament Management</h1>
     <div class="user-view" th:if="${userRole == 'ROLE_USER'}">
         <p>Available Tournaments. Registration Period: Until Date of Tournament</p>
         <table>
@@ -44,9 +43,12 @@
                     <td th:text="${tournament.title}"></td>
                     <td th:text="${tournament.minElo}"></td>
                     <td th:text="${tournament.maxElo}"></td>
-                    <td th:text="${tournament.date}"></td>
+                    <td th:text="${tournament.date.toLocalDate()}"></td>
                     <td th:text="${tournament.size - #lists.size(tournament.participants)}"></td>
                     <td>
+                        <form th:action="@{/tournaments/{id}(id=${tournament.id})}" method="get">
+                            <button type="submit">View Details</button>
+                        </form>
                         <form th:action="@{/register/{id}(id=${tournament.id})}" method="post">
                             <button type="submit">Register</button>
                         </form>
@@ -58,6 +60,46 @@
             </tbody>
         </table>
     </div>
+
+    <div class="admin-view" th:if="${userRole == 'ROLE_ADMIN'}">
+        <p>Manage Tournament Here.</p>
+        <form th:action="@{/tournaments}" method="post">
+            <button type="submit">Add New Tournament</button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tournament</th>
+                    <th>Min Elo</th>
+                    <th>Max Elo</th>
+                    <th>Date</th>
+                    <th>Vacancies</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="tournament : ${tournaments}">
+                    <td th:text="${tournament.title}"></td>
+                    <td th:text="${tournament.minElo}"></td>
+                    <td th:text="${tournament.maxElo}"></td>
+                    <td th:text="${#dates.format(tournament.date.toLocalDate(), 'dd-MM-yyyy')}"></td>
+                    <td th:text="${tournament.size - #lists.size(tournament.participants)}"></td>
+                    <td>
+                        <form th:action="@{/tournaments/{id}(id=${tournament.id})}" method="post"></form>
+                            <button type="submit">Update Match Details</button>
+                        </form>
+                        <form th:action="@{/tournaments/{id}(id=${tournament.id})}" method="post"></form>
+                            <button type="submit">Update Tournament</button>
+                        </form>
+                        <form th:action="@{/register/{id}(id=${tournament.id})}" method="post">
+                            <button type="submit">Delete Tournament</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 </main>
 
 
