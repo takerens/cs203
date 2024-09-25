@@ -24,8 +24,13 @@ import lombok.*;
 @Table(name = "AppUsers")
 
 public class User implements UserDetails{
-    @Id
-    @NotNull(message = "Username should not be null")
+    /*
+     * TODO:
+     * Remove elo attribute after creation of player(?)
+     */
+    private Integer ELO;
+
+    @Id @NotNull(message = "Username should not be null")
     private String username;
 
     @NotNull (message = "Password should not be null")

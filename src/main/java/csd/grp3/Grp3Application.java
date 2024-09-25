@@ -18,7 +18,7 @@ public class Grp3Application {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		// JPA User Repository init
 		UserRepository users = ctx.getBean(UserRepository.class);
-		System.out.println("[Add Admin]: " + users.save(new User("Admin", encoder.encode("password123"), "ROLE_ADMIN")).getUsername());
+		System.out.println("[Add Admin]: " + users.save(new User(0, "Admin", encoder.encode("password123"), "ROLE_ADMIN")).getUsername());
 		System.out.println("[Add User]: " + users.save(new User("User", encoder.encode("user1234"), "ROLE_USER")).getUsername());
 
 		// JPA User Repository init
