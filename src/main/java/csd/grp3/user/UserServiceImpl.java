@@ -92,4 +92,11 @@ System.out.println("USERNAME DOES NOT EXIST");
     public List<User> findAll() {
         return userRepository.findAll();
     }
+
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+        .orElseThrow(() -> new RuntimeException("User not found")); // Throw an exception if not found
+    }
+    
 }
