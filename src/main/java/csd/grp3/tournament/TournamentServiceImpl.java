@@ -44,7 +44,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void registerPlayer(User player, Long id) {
+    public void registerPlayer(User player, Long id) throws TournamentNotFoundException {
         // check if got tournament
         Optional<Tournament> tournament = tournaments.findById(id);
 
@@ -66,6 +66,8 @@ public class TournamentServiceImpl implements TournamentService {
 
             // we save the tournament data back to database
             tournaments.save(tournamentData);
+        } else {
+            throw new TournamentNotFoundException(id);
         }
     }
 
