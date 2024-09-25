@@ -7,6 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import csd.grp3.match.MatchRepository;
+import csd.grp3.round.RoundRepository;
 import csd.grp3.user.User;
 
 import jakarta.servlet.http.HttpSession;
@@ -15,6 +18,12 @@ import java.util.*;
 
 @Controller
 public class TournamentController {
+
+    @Autowired
+    private MatchRepository matchRepo;
+
+    @Autowired 
+    private RoundRepository roundRepo;
 
     @Autowired
     private TournamentRepository tournamentRepo;
