@@ -1,6 +1,8 @@
 package csd.grp3.tournament;
 
+import csd.grp3.player.Player;
 import csd.grp3.user.User;
+import csd.grp3.round.Round;
 
 import java.util.List;
 
@@ -16,4 +18,6 @@ public interface TournamentService {
     void registerPlayer(User player, Long id);
     void withdrawPlayer(User player, Long id);
     boolean tournamentExists(Long tournamentId);
+    void updateResults(Round round);
+    String directEncounterResultInTournament(Tournament tournament, Player player1, Player player2);
 }
