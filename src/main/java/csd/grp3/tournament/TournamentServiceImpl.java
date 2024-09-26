@@ -63,16 +63,22 @@ public class TournamentServiceImpl implements TournamentService {
             // get tournament data & participant list from tournament
             Tournament tournamentData = tournament.get();
             List<Player> playerList = tournamentData.getPlayers();
+            List<Player> waitingList = tournamentData.getWaitingList();
 
-            // if tournament is full, we add to waitingList instead
-            if (playerList.size() == tournamentData.getSize()) {
-                List<Player> waitingList = tournamentData.getWaitingList();
-                waitingList.add((Player) player);
-                tournamentData.setWaitingList(waitingList);
-                // else, we want to add to normal playerList
+            // check if tournament already has that player data
+            if (playerList.contains(player) || waitingList.contains(player)) {
+                return;
             } else {
-                playerList.add((Player) player);
-                tournamentData.setPlayers(playerList);
+                // if player isn't inside tournament
+                // if tournament is full, we add to waitingList instead
+                if (playerList.size() == tournamentData.getSize()) {
+                    waitingList.add((Player) player);
+                    tournamentData.setWaitingList(waitingList);
+                // else, we want to add to normal playerList
+                } else {
+                    playerList.add((Player) player);
+                    tournamentData.setPlayers(playerList);
+                }
             }
 
             // we save the tournament data back to database
@@ -107,6 +113,20 @@ public class TournamentServiceImpl implements TournamentService {
     public boolean tournamentExists(Long tournamentId) {
         return tournamentId != null && tournaments.existsById(tournamentId);
     }
+
+    @Override
+    public void addRound(Long id) throws TournamentNotFoundException {
+        Optional<Tournament> tournament = tournaments.findById(id);
+
+        if (tournament.isPresent()) {
+            Tournament tournamentData = tournament.get();
+            List<Round> rounds = tournamentData.getRounds();
+            rounds.add(createPairings(tournamentData));
+            tournaments.save(tournamentData);
+        } else {
+            throw new TournamentNotFoundException(id);
+        }
+    }
   
     @Override
     public void updateResults(Round round) throws MatchNotCompletedException {
@@ -134,7 +154,38 @@ public class TournamentServiceImpl implements TournamentService {
                 }
             }
         }
-    // update match results
+
+        // update match results
+
+        // firstly, we update the round with all new match data.
+        round.setMatches(matches);
+
+        // next, we get tournament that the round is in.
+        Tournament tournament = round.getTournament();
+
+        // we get the list of rounds that tournament stores
+        List<Round> rounds = tournament.getRounds();
+
+        // now, we find the specific round that we want to update
+        Long id = round.getId();
+        int index = 0;
+
+        // we loop through each round in tournament round list
+        for (Round eachRound : rounds) {
+            // if the id of the rounds are the same, we can set it to the new round.
+            if (eachRound.getId() == id) {
+                // set it using the index we stored.
+                rounds.set(index, round);
+            }
+            // index to find location of round
+            index += 1;
+        }
+
+        // update tournament with updated list of rounds
+        tournament.setRounds(rounds);
+
+        // save tournament data back into database
+        tournaments.save(tournament);
     }   
 
     /**
