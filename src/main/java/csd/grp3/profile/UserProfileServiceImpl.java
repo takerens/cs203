@@ -34,4 +34,10 @@ public class UserProfileServiceImpl implements UserProfileService {
 	public List<Tournament> showRegistered() {
 		return profile.getRegistered();
 	}
+
+    // some add to tournament history function
+    // some add to tournament registered function
+
+    // some remove from tournament history function
+    // some remove from tournament registered function
 }

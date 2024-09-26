@@ -7,33 +7,44 @@ import csd.grp3.tournament.Tournament;
 import csd.grp3.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="UserProfiles")
 @Getter
 @Setter
+@NoArgsConstructor
+@Table(name="UserProfiles")
 
 public class UserProfile {
 
     @Id
+    @OneToOne // assuming a 1-to-1 relationship with User
+    @JoinColumn(name = "user_username")
     @NotNull(message = "profile must have a user tagged to it")
     private User profileOwner;
 
-    @NotNull(message = "profile must have a elo value")
+    @NotNull(message = "profile must have an elo value")
     private int elo;
 
     private String displayName;
-    private List<Tournament> history;
-    private List<Tournament> registered;
+
+    @OneToMany // assuming a 1-to-many relationship with Tournament
+    @JoinColumn(name = "tournament_id")
+    private List<Tournament> history = new ArrayList<>();
+
+    @OneToMany // assuming a 1-to-many relationship with Tournament
+    @JoinColumn(name = "tournament_id")
+    private List<Tournament> registered = new ArrayList<>();
 
     public UserProfile(User profileOwner) {
         this.profileOwner = profileOwner;
         this.elo = 100;
-        this.history = new ArrayList<>();
-        this.registered = new ArrayList<>();
     }
 }
