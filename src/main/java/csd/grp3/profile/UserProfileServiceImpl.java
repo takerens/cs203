@@ -35,9 +35,18 @@ public class UserProfileServiceImpl implements UserProfileService {
 		return profile.getRegistered();
 	}
 
-    // some add to tournament history function
-    // some add to tournament registered function
+    @Override
+    public void addHistory(Tournament tournament){
+        profile.addTournamentToHistory(tournament);
+    }
 
-    // some remove from tournament history function
-    // some remove from tournament registered function
+    @Override
+    public void addRegistered(Tournament tournament){
+        profile.addTournamentToRegistered(tournament);
+    }
+
+    @Override
+    public void removeRegistered(Tournament tournament){
+        profile.removeTournamentFromRegistered(tournament);
+    }
 }

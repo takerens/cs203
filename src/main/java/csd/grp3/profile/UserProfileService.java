@@ -12,4 +12,7 @@ public interface UserProfileService {
     public void modifyDisplayName(String displayName);
     public List<Tournament> showHistory();
     public List<Tournament> showRegistered();
+    public void addHistory(Tournament tournament);
+    public void addRegistered(Tournament tournament);
+    public void removeRegistered(Tournament tournament);
 }

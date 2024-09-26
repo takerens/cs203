@@ -47,4 +47,16 @@ public class UserProfile {
         this.profileOwner = profileOwner;
         this.elo = 100;
     }
+
+    public void addTournamentToHistory(Tournament tournament) {
+        this.history.add(tournament);
+    }
+    
+    public void addTournamentToRegistered(Tournament tournament) {
+        this.registered.add(tournament);
+    }
+
+    public void removeTournamentFromRegistered(Tournament tournament) {
+        this.registered.remove(tournament);
+    }
 }
