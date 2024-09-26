@@ -15,6 +15,10 @@ body {
     background-color: #A3C1DA; /* Blue background */
     padding: 15px; /* Padding for the navbar */
 }
+.secondary-navbar {
+    background-color: lightgray; /* Blue background */
+    padding: 15px; /* Padding for the navbar */
+}
 
 .navbar-brand {
     color: black;
@@ -131,3 +135,18 @@ h1, h2, p {
     margin-top: 20px;
 }
 
+.pagination {
+    margin-bottom: 20px;
+}
+.pagination a {
+    margin: 0 5px;
+    text-decoration: underline;
+    color: lightblue
+    (63, 63, 190);
+
+}
+.pagination a.active {
+    text-decoration: none;
+    font-weight: bold;
+    color: red;
+}

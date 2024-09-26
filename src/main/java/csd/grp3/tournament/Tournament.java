@@ -23,7 +23,7 @@ import java.util.*;
 public class Tournament {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @OneToMany(mappedBy = "tournament", orphanRemoval = true)
     private List<Round> rounds;

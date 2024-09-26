@@ -8,6 +8,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import csd.grp3.tournament.TournamentService;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 
 @Controller
@@ -21,6 +23,16 @@ public class UserController {
         this.userService = userService;
         this.tournamentService = tournamentService;
     }
+
+    // @GetMapping("/rounds")
+    // public String getMethodName(Model model) {
+    //     Tournament t = new Tournament();
+    //     t.setTitle("tounr");
+    //     t.setId(3);
+    //     model.addAttribute("currentRound", 2);
+    //     model.addAttribute("tournament", t);
+    //     return "round";
+    // }
 
     @PostMapping("/register/{tournamentId}")
     public String registerForTournament(@PathVariable Long tournamentId, HttpSession session,
@@ -75,18 +87,16 @@ public class UserController {
     @GetMapping("/signup")
     public String registerPage(Model model) {
         model.addAttribute("user", new User());
-        return "register";
+        return "signup";
     }
 
     @PostMapping("/signup")
     public String registerUser(@ModelAttribute User user, Model model) {
         if (userService.createNewUser(user.getUsername(), user.getPassword()) == null) {
             model.addAttribute("errorMessage", "User registration failed.");
-            System.out.println("[User Registration]: Failed");
-            return "register";
+            return "signup";
         }
         model.addAttribute("message", "User registered successfully.");
-        System.out.println("[User Registration]: Successfully added: " + user.getUsername());
         return "login";
     }
 
@@ -99,19 +109,18 @@ public class UserController {
     public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
         if (userService.login(user.getUsername(), user.getPassword())) {
             session.setAttribute("username", user.getUsername());
-            System.out.println("[User Login]: " + user.getUsername() + " logged in successfully");
             return "redirect:/index"; // Redirect on successful login
         }
-        System.out.println("[User Login]: " + user.getUsername() + " failed to log in");
-        return "redirect:/login?error=Login Failed"; // Redirect on failure
+        model.addAttribute("errorMessage", "Login Failed");
+        return "login"; // Redirect on failure
     }
 
     @GetMapping("/index")
     public String homePage(Model model, HttpSession session) {
         String username = (String) session.getAttribute("username");
         if (username == null) {
-            System.out.println("[Error]: User is not authenticated. Please log in first");
-            return "redirect:/login?error=Please log in first";
+            model.addAttribute("errorMessage", "Please login first");
+            return "login";
         }
         User user = userService.findByUsername(username);
         model.addAttribute("username", username);
@@ -122,9 +131,9 @@ public class UserController {
     // Doesn't run
     @PostMapping("/logout")
     public String logout(HttpSession session) {
-        String username = (String) session.getAttribute("username"); // debuggy
+        String username = (String) session.getAttribute("username"); // debugging
         System.out.println("[User Logout]: " + username + " has logged out"); // debugging
         session.invalidate(); // Invalidates the session and removes all attributes
-        return "redirect:/login"; // Redirect to the login page
+        return "login"; // Redirect to the login page
     }
 }
