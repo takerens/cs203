@@ -1,6 +1,6 @@
 package csd.grp3.tournament;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import csd.grp3.match.Match;
 import csd.grp3.player.Player;
@@ -38,7 +38,7 @@ public class Tournament {
     @NotNull(message = "maxElo: put a valid Elo")
     private int maxElo;
 
-    private LocalDateTime date;
+    private LocalDate date;
 
     @NotNull(message = "size: put a valid tournament size")
     private int size;
