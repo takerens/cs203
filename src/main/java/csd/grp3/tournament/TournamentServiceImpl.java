@@ -139,6 +139,7 @@ public class TournamentServiceImpl implements TournamentService {
             }
         }
         // update match results
+    }
         
 
     /**

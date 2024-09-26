@@ -1,18 +1,19 @@
 package csd.grp3.user;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import csd.grp3.tournament.TournamentService;
 
 import jakarta.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.GetMapping;
+import jakarta.validation.Valid;
 
 
 
-@Controller
+@RestController
 public class UserController {
     private UserService userService;
 
@@ -24,116 +25,39 @@ public class UserController {
         this.tournamentService = tournamentService;
     }
 
-    // @GetMapping("/rounds")
-    // public String getMethodName(Model model) {
-    //     Tournament t = new Tournament();
-    //     t.setTitle("tounr");
-    //     t.setId(3);
-    //     model.addAttribute("currentRound", 2);
-    //     model.addAttribute("tournament", t);
-    //     return "round";
-    // }
-
-    @PostMapping("/register/{tournamentId}")
-    public String registerForTournament(@PathVariable Long tournamentId, HttpSession session,
-            RedirectAttributes redirectAttributes) {
-        String username = (String) session.getAttribute("username");
-        if (username == null) {
-            System.out.println("[Error]: User is not authenticated. Please log in first");
-            return "redirect:/login?error=Please log in first";
+    @PostMapping("/signup")
+    public ResponseEntity<HttpStatus> registerUser(@Valid @RequestBody User user) {
+        if (userService.createNewUser(user.getUsername(), user.getPassword()) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        User user = userService.findByUsername(username);
-
-        if (user == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "User not found.");
-            return "redirect:/tournaments"; // Redirect on failure
-        }
-
-        if (!tournamentService.tournamentExists(tournamentId)) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Tournament not found.");
-            return "redirect:/tournaments"; // Redirect on failure
-        }
-
-        tournamentService.registerPlayer(user, tournamentId);
-        redirectAttributes.addFlashAttribute("message", "Successfully registered for the tournament!");
-        return "redirect:/tournaments"; // Redirect after successful registration
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/withdraw/{tournamentId}")
-    public String withdrawfromTournament(@PathVariable Long tournamentId, HttpSession session,
-            RedirectAttributes redirectAttributes) {
-        String username = (String) session.getAttribute("username");
-        if (username == null) {
-            System.out.println("[Error]: User is not authenticated. Please log in first");
-            return "redirect:/login?error=Please log in first";
+    @PostMapping("/login")
+    public ResponseEntity<HttpStatus> loginUser(@RequestBody User user) {
+        if (userService.login(user.getUsername(), user.getPassword())) {
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        User user = userService.findByUsername(username);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 
-        if (user == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "User not found.");
-            return "redirect:/tournaments"; // Redirect on failure
-        }
-
-        if (!tournamentService.tournamentExists(tournamentId)) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Tournament not found.");
-            return "redirect:/tournaments"; // Redirect on failure
+    @PostMapping("/register/{tournamentId}")
+    public ResponseEntity<HttpStatus> registerForTournament(@PathVariable Long tournamentId, @RequestBody User user) {
+        if (user == null || !tournamentService.tournamentExists(tournamentId)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         tournamentService.withdrawPlayer(user, tournamentId);
-        redirectAttributes.addFlashAttribute("message", "Successfully withdrew from the tournament!");
-        return "redirect:/tournaments"; // Redirect after successful withdrawal
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/signup")
-    public String registerPage(Model model) {
-        model.addAttribute("user", new User());
-        return "signup";
-    }
-
-    @PostMapping("/signup")
-    public String registerUser(@ModelAttribute User user, Model model) {
-        if (userService.createNewUser(user.getUsername(), user.getPassword()) == null) {
-            model.addAttribute("errorMessage", "User registration failed.");
-            return "signup";
+    @PostMapping("/withdraw/{tournamentId}")
+    public ResponseEntity<HttpStatus> withdrawfromTournament(@PathVariable Long tournamentId, @RequestBody User user) {
+        if (user == null || !tournamentService.tournamentExists(tournamentId)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        model.addAttribute("message", "User registered successfully.");
-        return "login";
-    }
 
-    @GetMapping("/login")
-    public String loginPage(Model model) {
-        return "login";
-    }
-
-    @PostMapping("/verify")
-    public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
-        if (userService.login(user.getUsername(), user.getPassword())) {
-            session.setAttribute("username", user.getUsername());
-            return "redirect:/index"; // Redirect on successful login
-        }
-        model.addAttribute("errorMessage", "Login Failed");
-        return "login"; // Redirect on failure
-    }
-
-    @GetMapping("/index")
-    public String homePage(Model model, HttpSession session) {
-        String username = (String) session.getAttribute("username");
-        if (username == null) {
-            model.addAttribute("errorMessage", "Please login first");
-            return "login";
-        }
-        User user = userService.findByUsername(username);
-        model.addAttribute("username", username);
-        model.addAttribute("userRole", user.getUserRole());
-        return "index";
-    }
-
-    // Doesn't run
-    @PostMapping("/logout")
-    public String logout(HttpSession session) {
-        String username = (String) session.getAttribute("username"); // debugging
-        System.out.println("[User Logout]: " + username + " has logged out"); // debugging
-        session.invalidate(); // Invalidates the session and removes all attributes
-        return "login"; // Redirect to the login page
+        tournamentService.withdrawPlayer(user, tournamentId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

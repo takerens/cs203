@@ -3,8 +3,6 @@ package csd.grp3.tournament;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +14,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.util.*;
 
-@Controller
+@RestController
 public class TournamentController {
 
     @Autowired
@@ -37,26 +35,30 @@ public class TournamentController {
     }
 
     @GetMapping("/tournaments")
-    public String getAllTournaments(Model model, HttpSession session) {
-        List<Tournament> tournamentList = tournamentRepo.findAll();
-        System.out.println(tournamentList);
+    public ResponseEntity<List<Tournament>> getAllTournaments() {
+        try {
+            List<Tournament> tournamentList = new ArrayList<>();
+            tournamentRepo.findAll().forEach(tournamentList::add);
 
-        model.addAttribute("userRole", "ROLE_USER");
-        model.addAttribute("tournaments", tournamentList);
-        return "tournaments";
+            if (tournamentList.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+            return new ResponseEntity<>(tournamentList, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/tournaments/{id}")
-    public String getTournamentById(@PathVariable Long id, Model model) {
+    public ResponseEntity<Tournament> getTournamentById(@PathVariable Long id) {
         Optional<Tournament> tournamentData = tournamentRepo.findById(id);
 
         if (tournamentData.isPresent()) {
-            System.out.println(tournamentData.get());
-            model.addAttribute("tournament", tournamentData.get());
-            return "tournament";
+            return new ResponseEntity<>(tournamentData.get(), HttpStatus.OK);
         }
 
-        return "Tournament not found";
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     // @GetMapping("/tournaments/{title}")

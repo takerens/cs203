@@ -53,7 +53,7 @@
     <h3 th:if="${message}" th:text="${message}"></h3>
     <h3 th:if="${errorMessage}" th:text="${errorMessage}" style="color:red"></h3>
     <h2>Login</h2>
-    <form th:action="@{/verify}" method="post">
+    <form th:action="@{/login}" method="post">
         <div class="form-group">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" class="form-control" autocomplete="off" required>
