@@ -1,14 +1,11 @@
 package csd.grp3.user;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import csd.grp3.tournament.TournamentService;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 
@@ -30,7 +27,7 @@ public class UserController {
         if (userService.createNewUser(user.getUsername(), user.getPassword()) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
