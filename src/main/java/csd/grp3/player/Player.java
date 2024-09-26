@@ -26,7 +26,7 @@ public class Player extends User{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int gamePoints = 0;
+    private double gamePoints = 0;
 
     @OneToMany(mappedBy = "player1")
     private List<Match> matches;
