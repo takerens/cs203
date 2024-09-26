@@ -5,9 +5,13 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import csd.grp3.tournament.Tournament;
+import csd.grp3.user.User;
 
 @Service
 public interface UserProfileService {
+
+    public UserProfile getProfileByUser(User user);
+
     public void modifyElo(int newElo);
     public void modifyDisplayName(String displayName);
     public List<Tournament> showHistory();

@@ -1,13 +1,24 @@
 package csd.grp3.profile;
 
-import java.util.List;
+import java.util.*;
 
 import org.springframework.stereotype.Service;
 
 import csd.grp3.tournament.Tournament;
+import csd.grp3.user.User;
 
 @Service
 public class UserProfileServiceImpl implements UserProfileService {
+
+    private UserProfileRepository userProfiles;
+
+    public UserProfileServiceImpl(UserProfileRepository userProfiles) {
+        this.userProfiles = userProfiles;
+    }
+
+    public UserProfile getProfileByUser(User user) {
+        return userProfiles.findByUser(user).orElse(null);
+    }
 
     private UserProfile profile;
 
