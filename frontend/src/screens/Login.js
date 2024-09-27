@@ -34,11 +34,8 @@ const Login = () => {
                 }
                 throw new Error(errorMessage);
             }
-
-            const responseText = await response.json();
-            const role = responseText.authorities[0].authority;
-            console.log(role);
-            navigate('/tournaments', { state: { role } });
+            // 200 ok -> User Logged In
+            navigate('/tournaments');
         } catch (error) {
             setErrorMessage(error.message);
             console.error('Error:', error);

@@ -16,7 +16,7 @@ const Registration = () => {
     const userData = { // requestbody
       username:username,
       password:password,
-      authorities:'ROLE_USER', // only users can create account
+      authorities:"ROLE_USER", // account creation only for user
     };
 
     try {
@@ -45,7 +45,6 @@ const Registration = () => {
 
     } catch (error) {
       setErrorMessage(error.message);
-      console.error('Error:', error);
     }
   };
 

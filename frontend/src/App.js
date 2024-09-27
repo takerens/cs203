@@ -3,7 +3,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Registration from './screens/Registration';
 import Login from './screens/Login'; 
-import Navbar from './components/NavBar';
 import TournamentManagement from './screens/Tournaments';
 
 const App = () => {

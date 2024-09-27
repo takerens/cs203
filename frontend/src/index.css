@@ -62,10 +62,11 @@ input[type="submit"].register-button:hover {
   background-color: lightgray; /* Gray background */
   padding: 15px; /* Padding for the navbar */
 }
-/*Used*/.navbar-brand {
+.navbar-brand {
   color: black;
   text-decoration: none;
   font-size: 24px;
+  cursor: pointer; /* Change cursor to pointer */
 }
 /*Used*/.navbar-nav {
   list-style-type: none; /* Remove bullets from list */
@@ -155,7 +156,7 @@ main {
 h1, h2, p {
   margin: 10px 0; /* Margin for spacing */
 }
-.user-view, .admin-view {
+.view {
   display: block; /* Ensure these sections are block elements */
   width: 100%; /* Take the full width */
   margin-top: 20px;

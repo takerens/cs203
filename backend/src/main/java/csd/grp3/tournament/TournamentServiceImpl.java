@@ -1,40 +1,40 @@
-// package csd.grp3.tournament;
+package csd.grp3.tournament;
 
 // import csd.grp3.match.Match;
 // import csd.grp3.match.MatchRepository;
 // import csd.grp3.player.Player;
-// import csd.grp3.user.User;
+import csd.grp3.user.User;
 // import csd.grp3.round.Round;
 // import csd.grp3.exception.MatchNotCompletedException;
 // import csd.grp3.match.Match;
 
 
-// import java.util.List;
-// import java.util.ArrayList;
-// import java.util.Optional;
-// import java.util.Collections;
-// import java.util.stream.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.Collections;
+import java.util.stream.*;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-// @Service
-// public class TournamentServiceImpl implements TournamentService {
+@Service
+public class TournamentServiceImpl implements TournamentService {
 
-//     @Autowired    
-//     private TournamentRepository tournaments;
+    @Autowired    
+    private TournamentRepository tournaments;
 
 //     @Autowired
 //     private MatchRepository matches;
 
-//     public TournamentServiceImpl(TournamentRepository tournaments) {
-//         this.tournaments = tournaments;
-//     }
+    public TournamentServiceImpl(TournamentRepository tournaments) {
+        this.tournaments = tournaments;
+    }
 
-//     @Override
-//     public List<Tournament> listTournaments() {
-//         return tournaments.findAll();
-//     }
+    @Override
+    public List<Tournament> listTournaments() {
+        return tournaments.findAll();
+    }
 
 //     @Override
 //     public Tournament addTournament(Tournament tournament) {
@@ -49,69 +49,69 @@
 //         }).orElse(null);
 //     }
 
-//     @Override
-//     public Tournament getTournament(Long id) {
-//         return tournaments.findById(id).orElse(null);
-//     }
+    @Override
+    public Tournament getTournament(Long id) {
+        return tournaments.findById(id).orElse(null);
+    }
 
 //     @Override
 //     public void deleteTournament(Long id) {
 //         tournaments.deleteById(id);
 //     }
 
-//     @Override
-//     public void registerPlayer(User player, Long id) throws TournamentNotFoundException {
-//         // check if got tournament
-//         Optional<Tournament> tournament = tournaments.findById(id);
+    @Override
+    public void registerPlayer(User player, Long id) throws TournamentNotFoundException {
+        // check if got tournament
+        Optional<Tournament> tournament = tournaments.findById(id);
 
-//         if (tournament.isPresent()) {
-//             // get tournament data & participant list from tournament
-//             Tournament tournamentData = tournament.get();
-//             List<User> participantList = tournamentData.getParticipants();
+        if (tournament.isPresent()) {
+            // get tournament data & participant list from tournament
+            Tournament tournamentData = tournament.get();
+            List<User> participantList = tournamentData.getParticipants();
 
-//             // if tournament is full, we add to waitingList instead
-//             if (participantList.size() == tournamentData.getSize()) {
-//                 List<User> waitingList = tournamentData.getWaitingList();
-//                 waitingList.add(player);
-//                 tournamentData.setWaitingList(waitingList);
-//                 // else, we want to add to normal participantList
-//             } else {
-//                 participantList.add(player);
-//                 tournamentData.setParticipants(participantList);
-//             }
+            // if tournament is full, we add to waitingList instead
+            if (participantList.size() == tournamentData.getSize()) {
+                List<User> waitingList = tournamentData.getWaitingList();
+                waitingList.add(player);
+                tournamentData.setWaitingList(waitingList);
+                // else, we want to add to normal participantList
+            } else {
+                participantList.add(player);
+                tournamentData.setParticipants(participantList);
+            }
 
-//             // we save the tournament data back to database
-//             tournaments.save(tournamentData);
-//         } else {
-//             throw new TournamentNotFoundException(id);
-//         }
-//     }
+            // we save the tournament data back to database
+            tournaments.save(tournamentData);
+        } else {
+            throw new TournamentNotFoundException(id);
+        }
+    }
 
-//     @Override
-//     public void withdrawPlayer(User player, Long id) {
-//         Optional<Tournament> tournament = tournaments.findById(id);
-//         if (tournament.isPresent()) {
-//             Tournament tournamentData = tournament.get();
-//             List<User> participantList = tournamentData.getParticipants();
-//             List<User> waitingList = tournamentData.getWaitingList();
+    @Override
+    public void withdrawPlayer(User player, Long id) {
+        Optional<Tournament> tournament = tournaments.findById(id);
+        if (tournament.isPresent()) {
+            Tournament tournamentData = tournament.get();
+            List<User> participantList = tournamentData.getParticipants();
+            List<User> waitingList = tournamentData.getWaitingList();
 
-//             // Remove from participants
-//             if (participantList.remove(player)) {
-//                 // If removed from participants, check waiting list
-//                 if (!waitingList.isEmpty()) {
-//                     participantList.add(waitingList.remove(0)); // Move next from waiting list to participants
-//                 }
-//                 tournamentData.setParticipants(participantList);
-//                 tournamentData.setWaitingList(waitingList);
-//                 tournaments.save(tournamentData);
-//             }
-//         }
-//     }
+            // Remove from participants
+            if (participantList.remove(player)) {
+                // If removed from participants, check waiting list
+                if (!waitingList.isEmpty()) {
+                    participantList.add(waitingList.remove(0)); // Move next from waiting list to participants
+                }
+                tournamentData.setParticipants(participantList);
+                tournamentData.setWaitingList(waitingList);
+                tournaments.save(tournamentData);
+            }
+        }
+    }
 
-//     @Override
-//     public boolean tournamentExists(Long tournamentId) {
-//         return tournamentId != null && tournaments.existsById(tournamentId);
-//     }
+    @Override
+    public boolean tournamentExists(Long tournamentId) {
+        return tournamentId != null && tournaments.existsById(tournamentId);
+    }
   
 //     @Override
 //     public void updateResults(Round round) throws MatchNotCompletedException {
@@ -205,6 +205,6 @@
 
 //         return opponentScores.stream().mapToInt(Integer::intValue).sum();
 //     }
-// }
+}
 
 

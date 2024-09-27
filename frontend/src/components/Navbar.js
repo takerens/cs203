@@ -15,21 +15,20 @@ const Navbar = ({ userRole }) => {
     return (
         <nav className="navbar">
             <div className="nav-container">
-                <Link className="navbar-brand" to={{
-                    pathname: "/tournaments",
-                    state: { userRole: { userRole } }
-                }}>
+                <Link className="navbar-brand" to="/tournaments">
                     Chess Tournament Manager
                 </Link>
                 
-                {userRole === 'ROLE_USER' && (
-                    <><ul className="navbar-nav">
-                        <li className="nav-item"><Link className="nav-link" to="/tournaments">Tournaments</Link></li>
-                        <li className="nav-item"><Link className="nav-link" to="/profile">Profile</Link></li>
-                    </ul></>
-                )};
                 
-                <form action="/logout" method="post" className="logout-form">
+                <ul className="navbar-nav">
+                    <li className="nav-item"><Link className="nav-link" to="/tournaments">Tournaments</Link></li>
+                    {userRole === 'ROLE_USER' && (
+                        <li className="nav-item"><Link className="nav-link" to="/profile">Profile</Link></li>
+                    )}
+                </ul>
+                
+                
+                <form onSubmit={handleLogout} method="post" className="logout-form">
                     <button type="submit" className="logout-button">Log Out</button>
                 </form>
             </div>

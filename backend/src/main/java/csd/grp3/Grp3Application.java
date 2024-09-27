@@ -8,8 +8,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import csd.grp3.user.UserRepository;
-// import csd.grp3.tournament.Tournament;
-// import csd.grp3.tournament.TournamentRepository;
+import csd.grp3.tournament.Tournament;
+import csd.grp3.tournament.TournamentRepository;
 import csd.grp3.user.User;
 
 @SpringBootApplication
@@ -24,17 +24,17 @@ public class Grp3Application {
 		System.out.println("[Add User]: " + users.save(new User( "User", encoder.encode("user1234"))).getUsername()); // , "ROLE_USER", 100
 
 
-		// // JPA User Repository init
-		// TournamentRepository ts = ctx.getBean(TournamentRepository.class);
-		// Tournament t = new Tournament();
-		// t.setTitle("Tournament A");
-		// t.setSize(2);
-		// t.setDate(LocalDateTime.of(2024, 9, 30, 15, 45));
-		// System.out.println("[Add Tournament]: " + ts.save(t).getTitle());
-		// Tournament t1 = new Tournament();
-		// t1.setTitle("Tournament B");
-		// t1.setDate(LocalDateTime.of(2024, 10, 20, 15, 0));
-		// System.out.println("[Add Tournament]: " + ts.save(t1).getTitle());
+		// JPA User Repository init
+		TournamentRepository ts = ctx.getBean(TournamentRepository.class);
+		Tournament t = new Tournament();
+		t.setTitle("Tournament A");
+		t.setSize(2);
+		t.setDate(LocalDateTime.of(2024, 9, 30, 15, 45));
+		System.out.println("[Add Tournament]: " + ts.save(t).getTitle());
+		Tournament t1 = new Tournament();
+		t1.setTitle("Tournament B");
+		t1.setDate(LocalDateTime.of(2024, 10, 20, 15, 0));
+		System.out.println("[Add Tournament]: " + ts.save(t1).getTitle());
 	}
 
 }

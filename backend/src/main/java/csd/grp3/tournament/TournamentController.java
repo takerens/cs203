@@ -1,21 +1,19 @@
-// package csd.grp3.tournament;
+package csd.grp3.tournament;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.http.HttpStatus;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
-// import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 // import csd.grp3.match.MatchRepository;
 // import csd.grp3.round.RoundRepository;
-// import csd.grp3.user.User;
+import csd.grp3.user.User;
 
-// import jakarta.servlet.http.HttpSession;
+import java.util.*;
 
-// import java.util.*;
-
-// @RestController
-// public class TournamentController {
+@RestController
+public class TournamentController {
 
 //     @Autowired
 //     private MatchRepository matchRepo;
@@ -23,54 +21,54 @@
 //     @Autowired 
 //     private RoundRepository roundRepo;
 
-//     @Autowired
-//     private TournamentRepository tournamentRepo;
+    @Autowired
+    private TournamentRepository tournamentRepo;
 
-//     @Autowired
-//     private TournamentService tournamentService;
+    @Autowired
+    private TournamentService tournamentService;
 
 //     @GetMapping("/")
 //     public String home() {
 //         return "This is tournament system";
 //     }
 
-//     @GetMapping("/tournaments")
-//     public ResponseEntity<List<Tournament>> getAllTournaments() {
-//         try {
-//             List<Tournament> tournamentList = new ArrayList<>();
-//             tournamentRepo.findAll().forEach(tournamentList::add);
+    @GetMapping("/tournaments")
+    public ResponseEntity<List<Tournament>> getAllTournaments() {
+        try {
+            List<Tournament> tournamentList = new ArrayList<>();
+            tournamentRepo.findAll().forEach(tournamentList::add);
 
-//             if (tournamentList.isEmpty()) {
-//                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//             }
+            if (tournamentList.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+            }
 
-//             return new ResponseEntity<>(tournamentList, HttpStatus.OK);
-//         } catch (Exception ex) {
-//             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//         }
-//     }
+            return ResponseEntity.status(HttpStatus.OK).body(tournamentList);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-//     @GetMapping("/tournaments/{id}")
-//     public ResponseEntity<Tournament> getTournamentById(@PathVariable Long id) {
-//         Optional<Tournament> tournamentData = tournamentRepo.findById(id);
+    @GetMapping("/tournaments/{id}")
+    public ResponseEntity<Tournament> getTournamentById(@PathVariable Long id) {
+        Optional<Tournament> tournamentData = tournamentRepo.findById(id);
 
-//         if (tournamentData.isPresent()) {
-//             return new ResponseEntity<>(tournamentData.get(), HttpStatus.OK);
-//         }
+        if (tournamentData.isPresent()) {
+            return new ResponseEntity<>(tournamentData.get(), HttpStatus.OK);
+        }
 
-//         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//     }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 
-//     // @GetMapping("/tournaments/{title}")
-//     // public ResponseEntity<Tournament> getTournamentByTitle(@PathVariable String title) {
-//     //     Tournament tournamentData = tournamentRepo.findByTitle(title);
+    // @GetMapping("/tournaments/{title}")
+    // public ResponseEntity<Tournament> getTournamentByTitle(@PathVariable String title) {
+    //     Tournament tournamentData = tournamentRepo.findByTitle(title);
         
-//     //     if (tournamentData != null) {
-//     //         return new ResponseEntity<>(tournamentData, HttpStatus.OK);
-//     //     }
+    //     if (tournamentData != null) {
+    //         return new ResponseEntity<>(tournamentData, HttpStatus.OK);
+    //     }
 
-//     //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//     // }
+    //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    // }
 
 //     @PostMapping("/tournaments")
 //     @PreAuthorize("hasRole('ADMIN')")
@@ -140,16 +138,16 @@
 //     //     return new ResponseEntity<>(HttpStatus.OK);
 //     // }
 
-//     @PostMapping("/{id}/withdraw")
-//     public ResponseEntity<Void> withdrawPlayer(@RequestBody User player, @PathVariable Long id) {
-//         tournamentService.withdrawPlayer(player, id);
-//         return new ResponseEntity<>(HttpStatus.OK);
-//     }
+    @PostMapping("/withdraw/{id}")
+    public ResponseEntity<Void> withdrawPlayer(@RequestBody User player, @PathVariable Long id) {
+        tournamentService.withdrawPlayer(player, id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
-//     @PostMapping("/{id}/register")
-//     public ResponseEntity<Void> registerPlayer(@RequestBody User player, @PathVariable Long id) {
-//         tournamentService.registerPlayer(player, id);
-//         return new ResponseEntity<>(HttpStatus.OK);
-//     }
+    @PostMapping("/register/{id}")
+    public ResponseEntity<Void> registerPlayer(@RequestBody User player, @PathVariable Long id) {
+        tournamentService.registerPlayer(player, id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
-// }
+}
