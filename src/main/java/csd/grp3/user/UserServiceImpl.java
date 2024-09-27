@@ -58,10 +58,10 @@ public class UserServiceImpl implements UserService{
     public User createNewUser(String username, String password) {
 
         if (userRepository.findByUsername(username).isPresent()) {
-            System.out.println("Username already exists. Please choose another username");
+System.out.println("Username already exists. Please choose another username");
             return null;
         } else if (!checkPasswordRequirement(password)) {
-            System.out.println("Does not meet password requirements");
+System.out.println("Does not meet password requirements");
             return null;
         }
 
@@ -72,11 +72,31 @@ public class UserServiceImpl implements UserService{
         return userRepository.save(new User(username, encodedPassword));
     }
 
-    public void login(String username, String password) {
+    public boolean login(String username, String password) {
 
+        //If user does not exist, immediately return false
+        if (userRepository.findByUsername(username).isEmpty()) {
+System.out.println("USERNAME DOES NOT EXIST");
+            return false;
+        }
+
+        //Get the password associated with the searched username
+        User user = userRepository.findByUsername(username).get();
+        String encodedPassword = user.getPassword();
+
+        //Return if the password matches
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.matches(password, encodedPassword);
     }
     
     public List<User> findAll() {
         return userRepository.findAll();
     }
+
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+        .orElseThrow(() -> new RuntimeException("User not found")); // Throw an exception if not found
+    }
+    
 }

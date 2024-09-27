@@ -24,8 +24,13 @@ import lombok.*;
 @Table(name = "AppUsers")
 
 public class User implements UserDetails{
-    @Id
-    @NotNull(message = "Username should not be null")
+    /*
+     * TODO:
+     * Remove elo attribute after creation of player(?)
+     */
+    private Integer ELO;
+
+    @Id @NotNull(message = "Username should not be null")
     private String username;
 
     @NotNull (message = "Password should not be null")
@@ -40,10 +45,34 @@ public class User implements UserDetails{
         this.password = password;
         this.authorities = "ROLE_USER";
     }
+
+    public String getUserRole() {
+        return authorities;
+    }
   
     // Return a collection of authorities (roles) granted to the user.
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Arrays.asList(new SimpleGrantedAuthority(authorities));
+    }
+    
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Implement as needed
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // Implement as needed
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Implement as needed
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // Implement as needed
     }
 }
