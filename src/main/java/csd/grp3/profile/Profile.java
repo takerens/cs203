@@ -20,9 +20,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name="UserProfiles")
-
-public class UserProfile {
+@Table(name = "profiles")
+public class Profile {
 
     @Id
     @OneToOne // assuming a 1-to-1 relationship with User
@@ -43,7 +42,7 @@ public class UserProfile {
     @JoinColumn(name = "tournament_id")
     private List<Tournament> registered = new ArrayList<>();
 
-    public UserProfile(User profileOwner) {
+    public Profile(User profileOwner) {
         this.profileOwner = profileOwner;
         this.elo = 100;
     }
@@ -51,7 +50,7 @@ public class UserProfile {
     public void addTournamentToHistory(Tournament tournament) {
         this.history.add(tournament);
     }
-    
+
     public void addTournamentToRegistered(Tournament tournament) {
         this.registered.add(tournament);
     }

@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import csd.grp3.user.User;
 
 @Repository
-public interface UserProfileRepository extends JpaRepository<UserProfile, User> {
-        Optional<UserProfile> findByUser(User user);
+public interface ProfileRepository extends JpaRepository<Profile, User> {
+    Optional<Profile> findByUser(User user);
 }

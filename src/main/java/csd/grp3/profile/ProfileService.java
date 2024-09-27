@@ -5,9 +5,8 @@ import org.springframework.stereotype.Service;
 import csd.grp3.user.User;
 
 @Service
-public interface UserProfileService {
-
-    public UserProfile getProfileByUser(User user);
+public interface ProfileService {
+    public Profile getProfileByUser(User user);
     public void modifyElo(User user, int newElo);
     public void modifyDisplayName(User user, String displayName);
     public void addHistory(User user, Long id);
