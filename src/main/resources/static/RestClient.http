@@ -35,3 +35,23 @@ GET http://localhost:8080/users
 GET http://localhost:8080/tournaments
 Content-Type: application/json
 Authorization: Basic VXNlcjp1c2VyMTIzNA==
+
+### Withdraw User from Tournament
+DELETE http://localhost:8080/withdraw/1
+Content-Type: application/json
+
+{
+    "username":"User",
+    "password":"user1234",
+    "userRole":"ROLE_USER"
+}
+
+### Withdraw User from Tournament
+POST http://localhost:8080/register/1
+Content-Type: application/json
+
+{
+    "username":"User",
+    "password":"user1234",
+    "userRole":"ROLE_USER"
+}

@@ -1,4 +1,3 @@
-// src/components/Login.js
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
@@ -14,36 +13,35 @@ const Login = () => {
         setErrorMessage('');
 
         const userData = {
-            username:username,
-            password:password,
+            username,
+            password,
         };
 
         try {
             const response = await fetch('http://localhost:8080/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData),
             });
 
             if (!response.ok) {
-                const errorMessage = await response.text();
-                if (response.status === 404) {
-                    throw new Error("Login Failed. Try Again.")
-                }
-                throw new Error(errorMessage);
+                const errorResponse = await response.json(); // Get error message from response
+                console.error('Trying to Login:', errorResponse); // Log error for debugging
+                throw new Error(errorResponse.message); // General error message
             }
-            // 200 ok -> User Logged In
+
+            // User login successfully (200)
+            // Redirect to the login page
             navigate('/tournaments');
+
         } catch (error) {
-            setErrorMessage("Login Error: " + error.message);
+            setErrorMessage(error.message); // Display error message
         }
     };
 
     return (
         <div className="container">
-            <ErrorMessage message={errorMessage}></ErrorMessage>
+            <ErrorMessage message={errorMessage} />
             <h1>Login</h1>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">

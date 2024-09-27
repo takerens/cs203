@@ -2,13 +2,13 @@ package csd.grp3.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import csd.grp3.tournament.TournamentService;
 
 import jakarta.validation.Valid;
-import jakarta.servlet.http.HttpSession;
 
 @RestController
 public class UserController {
@@ -33,17 +33,16 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<Object> getUserDetails() {
-        return ResponseEntity.status(HttpStatus.OK).body(getUser());
+    public ResponseEntity<User> getUserDetails() {
+        if (getUser() != null) {
+            return ResponseEntity.ok(getUser());    
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Object> registerUser(@Valid @RequestBody User user) {
-        // User createdUser = userService.createNewUser(user.getUsername(), user.getPassword()); // use this w/ exception handling
+    public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
         User createdUser = userService.createNewUser(user.getUsername(), user.getPassword());
-        if (createdUser == null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-        }
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 

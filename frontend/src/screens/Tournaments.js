@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 import ErrorMessage from '../components/ErrorMessage';
 
@@ -7,35 +7,33 @@ const TournamentManagement = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [tournaments, setTournaments] = useState([]);
     const [user, setUser] = useState({});
-    // const [credentials, setCredentials] = useState('');
 
+    // When page loaded, fetch user data
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                // Fetch User data
-                const userResponse = await fetch("http://localhost:8080/user", {
-                    method: 'GET',
-                });
+                const response = await fetch("http://localhost:8080/user", { method: 'GET' });
 
-                if (!userResponse.ok) {
-                    throw new Error("Failed to fetch user.");
+                if (!response.ok) {
+                    const errorResponse = await response.json(); // Get error message from response
+                    console.error('Fetching User:', errorResponse); // Log error for debugging
+                    throw new Error(errorResponse.message); // General error message
                 }
 
-                // Construct a new user object with only the needed properties
-                const userData = await userResponse.json();
+                const userData = await response.json();
+                console.log("User Data: " + userData); // View Data for Debugging
                 const { username, password, userRole } = userData; // Destructure to get the needed properties
-                const filteredUserData = { username, password, userRole }; // Create a new object
-
-                setUser(filteredUserData); // Set the state with the filtered user data
+                setUser({ username, password, userRole }); // Set user state
             } catch (error) {
-                setErrorMessage("Fetch User Error: " + error.message);
+                setErrorMessage(error.message);
             }
         };
 
         fetchUserData();
-    }, []); // Runs only once
+    }, []);
 
-    useEffect(() => { // after successfully getting userdata
+    // Fetch tournament data after user data is fetched
+    useEffect(() => {
         if (user.username && user.password) {
             fetchTournamentData();
         }
@@ -43,28 +41,21 @@ const TournamentManagement = () => {
 
     const fetchTournamentData = async () => {
         try {
-            // // Encode the credentials for Basic Authentication
-            // const credentials = btoa(`${user.username}:user1234`); // PASSWORD HARDCODED FOR NOW
-            // setCredentials(credentials);
-
-            // Fetch Tournaments Data
             const response = await fetch("http://localhost:8080/tournaments", {
                 method: 'GET',
-                headers: {
-                    // 'Authorization': `Basic ${credentials}`, // If you have a token to include
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
             });
 
             if (!response.ok) {
-                const errorDetails = await response.json(); // Assuming the server returns JSON
-                throw new Error(errorDetails.message || 'Failed to fetch tournaments');
+                const errorResponse = await response.json(); // Get error message from response
+                console.error('Fetching Tournament Data:', errorResponse); // Log error for debugging
+                throw new Error(errorResponse.message); // General error message
             }
-    
-            // Ensure the response is valid JSON
+
             const tournamentData = await response.json();
+            console.log("Tournament Data: " + tournamentData); // View Data for Debugging
             setTournaments(tournamentData);
-            console.log(tournamentData);
+
         } catch (error) {
             setErrorMessage("Fetch Tournament Data Error: " + error.message);
         }
@@ -72,125 +63,132 @@ const TournamentManagement = () => {
 
     const formatDate = (dateString) => {
         const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-        return new Date(dateString).toLocaleDateString('en-GB', options); // 'en-GB' for dd/mm/yyyy format
+        return new Date(dateString).toLocaleDateString('en-GB', options); // Format to dd/mm/yyyy
     };
 
     const handleRegister = async (e, tournamentId) => {
-        e.preventDefault();
-        setErrorMessage('');
+        e.preventDefault(); // Stop default form submission
+        setErrorMessage(''); // Clear previous error message
 
         try {
-            console.log(user);
             const response = await fetch(`http://localhost:8080/register/${tournamentId}`, {
                 method: 'POST',
-                headers: {
-                    // 'Authorization': `Basic ${credentials}`, // If you have a token to include
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(user), 
-            });
-
-            if (!response.ok) {
-                const errorDetails = await response.json(); // Assuming the server returns JSON
-                throw new Error(errorDetails.message || 'Registration Failed.');
-            }
-
-            // Succeful registration
-            alert('Successfully Registered for Tournament.');
-            fetchTournamentData();
-        } catch (error) {
-            setErrorMessage(error.message);
-            console.log("Registration Error: " + error.message)
-        }
-    };
-
-    const handleWithdraw = async (e, tournamentId) => {
-        e.preventDefault();
-        setErrorMessage('');
-
-        try {
-            const response = await fetch(`http://localhost:8080/withdraw/${tournamentId}`, {
-                method: 'DELETE',
-                headers: {
-                    // 'Authorization': `Basic ${credentials}`, // If you have a token to include
-                    'Content-Type': 'application/json',
-                }, 
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(user),
             });
 
             if (!response.ok) {
-            
-                const errorDetails = await response.json(); // Assuming the server returns JSON
-                throw new Error(errorDetails.message || 'Withdrawal Failed.');
+                const errorResponse = await response.json(); // Get error message from response
+                console.error('Trying to Register:', errorResponse); // Log error for debugging
+                throw new Error(errorResponse.message); // General error message
             }
 
-            // Succeful withdrawal
-            alert('Successfully Withdrawn from Tournament.');
-            fetchTournamentData();
+            // User registered successfully (200)
+            const responseData = await response.json(); // Tournament
+            alert(`${user.username} has registered for ${responseData.title}.`); // Success message
+            fetchTournamentData(); // Refresh Page
         } catch (error) {
             setErrorMessage(error.message);
-            console.log("Withdrawal Error: " + error.message)
+        }
+    };
+
+    const handleWithdraw = async (e, tournamentId) => {
+        e.preventDefault(); // Stop default form submission
+        setErrorMessage(''); // Clear previous error message
+
+        try {
+            const response = await fetch(`http://localhost:8080/withdraw/${tournamentId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(user),
+            });
+
+            if (!response.ok) {
+                const errorResponse = await response.json(); // Get error message from response
+                console.error('Trying to Withdraw:', errorResponse); // Log error for debugging
+                throw new Error(errorResponse.message); // General error message
+            }
+
+            // User withdrawn successfully (200)
+            const responseData = await response.json(); // Tournament
+            alert(`${user.username} has withdrawn from ${responseData.title}.`); // Success message
+            fetchTournamentData(); // Refresh Page
+
+        } catch (error) {
+            setErrorMessage(error.message);
         }
     };
 
     return (
-        <><Navbar userRole={ user.userRole } />
-        <main>
-            <ErrorMessage message={errorMessage} />
-            <h1>Tournament Management</h1>
-            
-            <div className="view">
-                <p>Available Tournaments.</p>
-                { user.userRole === 'ROLE_ADMIN' && (
-                <p>Add New Tournament: <form onSubmit={`/tournaments`}>
-                                                <button type="submit">Register</button>
-                                        </form></p>
-                ) }
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tournament</th>
-                            <th>Min Elo</th>
-                            <th>Max Elo</th>
-                            <th>Date</th>
-                            <th>Vacancies</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {tournaments.map((tournament) => (
-                            <tr ey={tournament.id}> 
-                                <td>{tournament.title}</td>
-                                <td>{tournament.minElo}</td>
-                                <td>{tournament.maxElo}</td>
-                                <td>{formatDate(tournament.date)}</td>
-                                <td>{tournament.size - tournament.participants.length}</td>
-                                <td>
-                                    { user.userRole === 'ROLE_USER' && (
-                                        <><Link to={`/tournaments/${tournament.id}`}>
-                                            <button>View Details</button>
-                                        </Link><form onSubmit={(e) => handleRegister(e, tournament.id)}>
-                                                <button type="submit">Register</button>
-                                        </form><form onSubmit={(e) => handleWithdraw(e, tournament.id)}>
-                                            <button type="submit">Withdraw</button>
-                                        </form></>
-                                    ) }
-                                    { user.userRole === 'ROLE_ADMIN' && (
-                                        <><Link to={`/tournaments/${tournament.id}/1`}>
-                                            <button>Update Match Details</button>
-                                        </Link><form action={`/tournaments/${tournament.id}`} method="post">
-                                                <button type="submit">Update Tournament</button>
-                                        </form><form action={`/tournaments/${tournament.id}`} method="post">
-                                            <button type="submit">Delete Tournament</button>
-                                        </form></>
-                                    ) }
-                                </td>
+        <>
+            <Navbar userRole={user.userRole} />
+            <main>
+                <ErrorMessage message={errorMessage} />
+                <h1>Tournament Management</h1>
+                
+                <div className="view">
+                    <p>Available Tournaments.</p>
+                    {user.userRole === 'ROLE_ADMIN' && (
+                        <p>
+                            Add New Tournament: 
+                            <form onSubmit={`/tournaments`}>
+                                <button type="submit">Register</button>
+                            </form>
+                        </p>
+                    )}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tournament</th>
+                                <th>Min Elo</th>
+                                <th>Max Elo</th>
+                                <th>Date</th>
+                                <th>Vacancies</th>
+                                <th>Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </main>
+                        </thead>
+                        <tbody>
+                            {tournaments.map((tournament) => (
+                                <tr key={tournament.id}> 
+                                    <td>{tournament.title}</td>
+                                    <td>{tournament.minElo}</td>
+                                    <td>{tournament.maxElo}</td>
+                                    <td>{formatDate(tournament.date)}</td>
+                                    <td>{tournament.size - tournament.participants.length}</td>
+                                    <td>
+                                        {user.userRole === 'ROLE_USER' && (
+                                            <>
+                                                <Link to={`/tournaments/${tournament.id}`}>
+                                                    <button>View Details</button>
+                                                </Link>
+                                                <form onSubmit={(e) => handleRegister(e, tournament.id)}>
+                                                    <button type="submit">Register</button>
+                                                </form>
+                                                <form onSubmit={(e) => handleWithdraw(e, tournament.id)}>
+                                                    <button type="submit">Withdraw</button>
+                                                </form>
+                                            </>
+                                        )}
+                                        {user.userRole === 'ROLE_ADMIN' && (
+                                            <>
+                                                <Link to={`/tournaments/${tournament.id}/1`}>
+                                                    <button>Update Match Details</button>
+                                                </Link>
+                                                <form action={`/tournaments/${tournament.id}`} method="post">
+                                                    <button type="submit">Update Tournament</button>
+                                                </form>
+                                                <form action={`/tournaments/${tournament.id}`} method="post">
+                                                    <button type="submit">Delete Tournament</button>
+                                                </form>
+                                            </>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </main>
         </>
     );
 };

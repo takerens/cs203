@@ -1,4 +1,3 @@
-// src/components/Registration.js
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage'; 
@@ -10,41 +9,37 @@ const Registration = () => {
   const navigate = useNavigate(); // Initialize useNavigate
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // stop default form submission
-    setErrorMessage(''); // clear error message
+    e.preventDefault(); // Stop default form submission
+    setErrorMessage(''); // Clear previous error message
 
-    const userData = { // requestbody
-      username:username,
-      password:password,
-      authorities:"ROLE_USER", // account creation only for user
+    const userData = {
+      username,
+      password,
+      authorities: "ROLE_USER", // Account creation only for user
     };
 
     try {
       const response = await fetch('http://localhost:8080/signup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
       });
 
-    if (!response.ok) { // 409 Conflict || 400 Bad Request
-        const errorMessage = await response.text(); // null
-        if (response.status === 409) {
-          throw new Error("Username already taken"); // Error from controller not security
-        }
-        throw new Error(errorMessage);
-    }
+      if (!response.ok) {
+        const errorResponse = await response.json(); // Get error message from response
+        console.error('Trying to Signup:', errorResponse); // Log error for debugging
+        throw new Error(errorResponse.message); // General error message
+      }
 
-    // User Created -> 201 
-    const responseText = await response.json(); // User Created
-    alert(responseText["username"] + " has successfully created an account."); // Handle success message
+      // User created successfully (201)
+      const responseData = await response.json(); // User
+      alert(`${responseData.username} has successfully created an account.`); // Success message
 
-    // Redirect to the login page
-    navigate('/login');
+      // Redirect to the login page
+      navigate('/login');
 
     } catch (error) {
-      setErrorMessage("Account Creation Error: " + error.message);
+      setErrorMessage(error.message); // Display error message
     }
   };
 

@@ -1,15 +1,14 @@
-// src/components/Navbar.js
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = ({ userRole }) => {
     const navigate = useNavigate();
     
-    const handleLogout = (e) => {
-        e.preventDefault();
-        alert("You have logged out");
+    const handleLogout = async (e) => {
+        e.preventDefault(); // Stop default form submission
+
+        // Redirect to the login page
         navigate("/login");
-        // Add your logout logic here (e.g., clearing user data, redirecting, etc.)
     };
 
     return (
@@ -19,16 +18,18 @@ const Navbar = ({ userRole }) => {
                     Chess Tournament Manager
                 </Link>
                 
-                
                 <ul className="navbar-nav">
-                    <li className="nav-item"><Link className="nav-link" to="/tournaments">Tournaments</Link></li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/tournaments">Tournaments</Link>
+                    </li>
                     {userRole === 'ROLE_USER' && (
-                        <li className="nav-item"><Link className="nav-link" to="/profile">Profile</Link></li>
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/profile">Profile</Link>
+                        </li>
                     )}
                 </ul>
                 
-                
-                <form onSubmit={handleLogout} method="post" className="logout-form">
+                <form onSubmit={handleLogout} className="logout-form">
                     <button type="submit" className="logout-button">Log Out</button>
                 </form>
             </div>

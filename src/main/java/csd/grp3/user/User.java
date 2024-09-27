@@ -49,6 +49,14 @@ public class User implements UserDetails{
     public String getUserRole() {
         return authorities;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true; // Check for reference equality
+        if (obj == null || getClass() != obj.getClass()) return false; // Check for null and class match
+        User user = (User) obj; // Cast to User
+        return username.equals(user.username); // Compare usernames
+    }
   
     // Return a collection of authorities (roles) granted to the user.
     @Override
