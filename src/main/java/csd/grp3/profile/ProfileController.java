@@ -72,7 +72,7 @@ public class ProfileController {
     }
 
     @DeleteMapping("/registered")
-    ResponseEntity<HttpStatus> removeFromRegistered(@PathVariable String username, @RequestParam Tournament tournament) {
+    public ResponseEntity<HttpStatus> removeFromRegistered(@PathVariable String username, @RequestParam Tournament tournament) {
         User user = userService.findByUsername(username);
         Profile profile = profileService.getProfileByUser(user);
         profile.removeTournamentFromRegistered(tournament);
