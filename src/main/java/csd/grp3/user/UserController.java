@@ -10,26 +10,31 @@ import csd.grp3.tournament.TournamentService;
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpSession;
 
-
-
 @RestController
 public class UserController {
     private UserService userService;
 
     private TournamentService tournamentService;
 
-    public UserController(UserService userService, TournamentService tournamentService) {
+    private User user;
 
+    private void setUser(User user) {
+        this.user = user;
+    }
+
+    private User getUser() {
+        return this.user;
+    }
+
+    public UserController(UserService userService, TournamentService tournamentService) {
         this.userService = userService;
         this.tournamentService = tournamentService;
+        this.user = null;
     }
 
     @GetMapping("/user")
-    public ResponseEntity<Object> getUser(HttpSession session) {
-        // String username = (String) session.getAttribute("username");
-        // System.out.println(username);
-        User user = userService.findByUsername("User");
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+    public ResponseEntity<Object> getUserDetails() {
+        return ResponseEntity.status(HttpStatus.OK).body(getUser());
     }
 
     @PostMapping("/signup")
@@ -43,33 +48,32 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody User user, HttpSession session) {
+    public ResponseEntity<User> loginUser(@RequestBody User user) {
         if (userService.login(user.getUsername(), user.getPassword())) {
-            // session.setAttribute("username", user.getUsername());
-            System.out.println(session.getAttribute("username"));
+            setUser(userService.findByUsername(user.getUsername()));
             return ResponseEntity.status(HttpStatus.OK).body(userService.findByUsername(user.getUsername()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // null is needed
     }
 
     @PostMapping("/register/{tournamentId}")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    // @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<HttpStatus> registerForTournament(@PathVariable Long tournamentId, @RequestBody User user) {
         if (user == null || !tournamentService.tournamentExists(tournamentId)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        tournamentService.withdrawPlayer(user, tournamentId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        tournamentService.registerPlayer(user, tournamentId);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    @PostMapping("/withdraw/{tournamentId}")
+    @DeleteMapping("/withdraw/{tournamentId}")
     public ResponseEntity<HttpStatus> withdrawfromTournament(@PathVariable Long tournamentId, @RequestBody User user) {
         if (user == null || !tournamentService.tournamentExists(tournamentId)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
         tournamentService.withdrawPlayer(user, tournamentId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }

@@ -44,7 +44,7 @@ const Registration = () => {
     navigate('/login');
 
     } catch (error) {
-      setErrorMessage(error.message);
+      setErrorMessage("Account Creation Error: " + error.message);
     }
   };
 

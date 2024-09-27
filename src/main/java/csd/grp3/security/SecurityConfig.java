@@ -36,7 +36,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authz) -> authz
-                    .requestMatchers(HttpMethod.GET, "/tournaments").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/tournaments").permitAll()
                     .anyRequest().permitAll())
             // ensure that the application won’t create any session in our stateless REST
             // APIs

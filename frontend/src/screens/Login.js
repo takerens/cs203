@@ -37,8 +37,7 @@ const Login = () => {
             // 200 ok -> User Logged In
             navigate('/tournaments');
         } catch (error) {
-            setErrorMessage(error.message);
-            console.error('Error:', error);
+            setErrorMessage("Login Error: " + error.message);
         }
     };
 

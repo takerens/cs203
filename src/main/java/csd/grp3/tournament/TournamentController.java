@@ -138,13 +138,13 @@ public class TournamentController {
 //     //     return new ResponseEntity<>(HttpStatus.OK);
 //     // }
 
-    @PostMapping("/withdraw/{id}")
+    @PostMapping("/{id}/withdraw")
     public ResponseEntity<Void> withdrawPlayer(@RequestBody User player, @PathVariable Long id) {
         tournamentService.withdrawPlayer(player, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/register/{id}")
+    @PostMapping("/{id}/register")
     public ResponseEntity<Void> registerPlayer(@RequestBody User player, @PathVariable Long id) {
         tournamentService.registerPlayer(player, id);
         return new ResponseEntity<>(HttpStatus.OK);

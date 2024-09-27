@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 import ErrorMessage from '../components/ErrorMessage';
 
@@ -7,7 +7,7 @@ const TournamentManagement = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [tournaments, setTournaments] = useState([]);
     const [user, setUser] = useState({});
-    const [credentials, setCredentials] = useState('');
+    // const [credentials, setCredentials] = useState('');
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -21,10 +21,14 @@ const TournamentManagement = () => {
                     throw new Error("Failed to fetch user.");
                 }
 
+                // Construct a new user object with only the needed properties
                 const userData = await userResponse.json();
-                setUser(userData);
+                const { username, password, userRole } = userData; // Destructure to get the needed properties
+                const filteredUserData = { username, password, userRole }; // Create a new object
+
+                setUser(filteredUserData); // Set the state with the filtered user data
             } catch (error) {
-                setErrorMessage(error.message);
+                setErrorMessage("Fetch User Error: " + error.message);
             }
         };
 
@@ -33,37 +37,38 @@ const TournamentManagement = () => {
 
     useEffect(() => { // after successfully getting userdata
         if (user.username && user.password) {
-            const fetchTournamentData = async () => {
-                try {
-                    // Encode the credentials for Basic Authentication
-                    const credentials = btoa(`${user.username}:user1234`); // PASSWORD HARDCODED FOR NOW
-                    setCredentials(credentials);
-
-                    // Fetch Tournaments Data
-                    const response = await fetch("http://localhost:8080/tournaments", {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Basic ${credentials}`, // If you have a token to include
-                            'Content-Type': 'application/json',
-                        },
-                    });
-        
-                    if (!response.ok) {
-                        const errorDetails = await response.text(); // Get more details about the error
-                        throw new Error(`Failed to fetch tournaments: ${errorDetails}`);
-                    }
-            
-                    // Ensure the response is valid JSON
-                    const tournamentData = await response.json();
-                    setTournaments(tournamentData);
-                } catch (error) {
-                    setErrorMessage(error.message);
-                }
-            };
-        
             fetchTournamentData();
         }
     }, [user]);
+
+    const fetchTournamentData = async () => {
+        try {
+            // // Encode the credentials for Basic Authentication
+            // const credentials = btoa(`${user.username}:user1234`); // PASSWORD HARDCODED FOR NOW
+            // setCredentials(credentials);
+
+            // Fetch Tournaments Data
+            const response = await fetch("http://localhost:8080/tournaments", {
+                method: 'GET',
+                headers: {
+                    // 'Authorization': `Basic ${credentials}`, // If you have a token to include
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                const errorDetails = await response.json(); // Assuming the server returns JSON
+                throw new Error(errorDetails.message || 'Failed to fetch tournaments');
+            }
+    
+            // Ensure the response is valid JSON
+            const tournamentData = await response.json();
+            setTournaments(tournamentData);
+            console.log(tournamentData);
+        } catch (error) {
+            setErrorMessage("Fetch Tournament Data Error: " + error.message);
+        }
+    };
 
     const formatDate = (dateString) => {
         const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
@@ -75,23 +80,27 @@ const TournamentManagement = () => {
         setErrorMessage('');
 
         try {
+            console.log(user);
             const response = await fetch(`http://localhost:8080/register/${tournamentId}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Basic ${credentials}`, // If you have a token to include
+                    // 'Authorization': `Basic ${credentials}`, // If you have a token to include
                     'Content-Type': 'application/json',
-                }, 
+                },
+                body: JSON.stringify(user), 
             });
 
             if (!response.ok) {
-                const errorMessage = await response.text();
-                throw new Error(errorMessage);
+                const errorDetails = await response.json(); // Assuming the server returns JSON
+                throw new Error(errorDetails.message || 'Registration Failed.');
             }
 
             // Succeful registration
             alert('Successfully Registered for Tournament.');
+            fetchTournamentData();
         } catch (error) {
             setErrorMessage(error.message);
+            console.log("Registration Error: " + error.message)
         }
     };
 
@@ -103,20 +112,24 @@ const TournamentManagement = () => {
             const response = await fetch(`http://localhost:8080/withdraw/${tournamentId}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Basic ${credentials}`, // If you have a token to include
+                    // 'Authorization': `Basic ${credentials}`, // If you have a token to include
                     'Content-Type': 'application/json',
                 }, 
+                body: JSON.stringify(user),
             });
 
             if (!response.ok) {
-                const errorMessage = await response.text();
-                throw new Error(errorMessage);
+            
+                const errorDetails = await response.json(); // Assuming the server returns JSON
+                throw new Error(errorDetails.message || 'Withdrawal Failed.');
             }
 
-            // Succeful registration
+            // Succeful withdrawal
             alert('Successfully Withdrawn from Tournament.');
+            fetchTournamentData();
         } catch (error) {
             setErrorMessage(error.message);
+            console.log("Withdrawal Error: " + error.message)
         }
     };
 
@@ -146,7 +159,7 @@ const TournamentManagement = () => {
                     </thead>
                     <tbody>
                         {tournaments.map((tournament) => (
-                            <tr key={tournament.id}>
+                            <tr ey={tournament.id}> 
                                 <td>{tournament.title}</td>
                                 <td>{tournament.minElo}</td>
                                 <td>{tournament.maxElo}</td>
