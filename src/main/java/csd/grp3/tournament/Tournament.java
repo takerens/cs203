@@ -3,6 +3,7 @@ package csd.grp3.tournament;
 import java.time.LocalDateTime;
 
 import csd.grp3.match.Match;
+import csd.grp3.player.Player;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import jakarta.persistence.*;
@@ -43,9 +44,9 @@ public class Tournament {
     private int size;
 
     @ManyToMany
-    private List<User> waitingList;
+    private List<Player> waitingList;
     @ManyToMany
-    private List<User> participants;
+    private List<Player> players;
     // private List<Match> matches;
 
 
@@ -55,7 +56,7 @@ public class Tournament {
      * 
      */
     public void endTournament() {
-        for(User user : this.participants) {
+        for(User user : this.players) {
             List<Match> userMatches = new ArrayList<>();
 
             for (Round round : this.rounds) {
