@@ -1,51 +1,94 @@
+/* LOGIN & REGISTRATION */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f4f4f4;
 }
+.container {
+  width: 300px;
+  margin: 50px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+input[type="text"],
+input[type="password"] {
+    width: 300px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+/* LOGIN BUTTON */
+input[type="submit"].login-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 300px;
+}
+input[type="submit"].login-button:hover {
+    background: #0056b3;
+}
+/* REGISTER BUTTON */
+input[type="submit"].register-button {
+  background: #5cb85c;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+}
+input[type="submit"].register-button:hover {
+  background: #4cae4c;
+}
 
 /* NAVIGATION */
-.nav-container {
+/*Used*/.nav-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.navbar {
+/*Used*/.navbar {
   background-color: #A3C1DA; /* Blue background */
   padding: 15px; /* Padding for the navbar */
 }
-.secondary-navbar {
-  background-color: lightgray; /* Blue background */
+/*Used*/.secondary-navbar {
+  background-color: lightgray; /* Gray background */
   padding: 15px; /* Padding for the navbar */
 }
-.navbar-brand {
+/*Used*/.navbar-brand {
   color: black;
   text-decoration: none;
   font-size: 24px;
 }
-.navbar-nav {
+/*Used*/.navbar-nav {
   list-style-type: none; /* Remove bullets from list */
   margin: 0;
   padding: 0;
   display: flex; /* Flexbox for horizontal layout */
 }
-.nav-item {
+/*Used*/.nav-item {
   margin: 0 15px; /* Spacing between nav items */
 }
-.nav-link {
+/*Used*/.nav-link {
   color: black;
   text-decoration: none; /* Remove underline */
   padding: 10px; /* Padding for clickable area */
   border-radius: 5px; /* Rounded corners */
 }
-.nav-link:hover {
+/*Used*/.nav-link:hover {
   background-color: #45a049; /* Darker green on hover */
 }
-.logout-form {
+/*Used*/.logout-form {
   display: inline; /* Keep the form inline */
 }
-.logout-button {
+/*Used*/.logout-button {
   background-color: #f44336; /* Red background for logout */
   color: white;
   border: none; /* Remove border */
@@ -53,7 +96,7 @@ body {
   border-radius: 5px; /* Rounded corners */
   cursor: pointer; /* Pointer cursor on hover */
 }
-.logout-button:hover {
+/*Used*/.logout-button:hover {
   background-color: #d32f2f; /* Darker red on hover */
 }
 
@@ -64,6 +107,7 @@ h1 {
 }
 h2 {
   color: #4CAF50; /* Green for subheadings */
+  text-align: center;
 }
 .button {
   display: inline-block;
@@ -118,17 +162,17 @@ h1, h2, p {
 }
 
 /* PAGINATION */
-.pagination {
+/*Used*/.pagination {
   margin-bottom: 20px;
 }
-.pagination a {
+/*Used*/.pagination Link {
   margin: 0 5px;
   text-decoration: underline;
   color: lightblue
   (63, 63, 190);
 
 }
-.pagination a.active {
+/*Used*/.pagination Link.current {
   text-decoration: none;
   font-weight: bold;
   color: red;

@@ -1,13 +1,13 @@
 // src/components/Login.js
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
-import './Login.css'; // Create a separate CSS file for styles if needed
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,14 +27,18 @@ const Login = () => {
                 body: JSON.stringify(userData),
             });
 
-            const responseText = await response.text();
-
             if (!response.ok) {
-                throw new Error(responseText);
+                const errorMessage = await response.text();
+                if (response.status === 404) {
+                    throw new Error("Login Failed. Try Again.")
+                }
+                throw new Error(errorMessage);
             }
-            alert("Login succesful");
 
-            // navigate('/index');
+            const responseText = await response.json();
+            const role = responseText.authorities[0].authority;
+            console.log(role);
+            navigate('/tournaments', { state: { role } });
         } catch (error) {
             setErrorMessage(error.message);
             console.error('Error:', error);
@@ -44,7 +48,7 @@ const Login = () => {
     return (
         <div className="container">
             <ErrorMessage message={errorMessage}></ErrorMessage>
-            <h2>Login</h2>
+            <h1>Login</h1>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="username">Username:</label>
@@ -69,7 +73,7 @@ const Login = () => {
                     />
                 </div>
 
-                <input type="submit" value="Login" />
+                <input className='login-button' type="submit" value="Login" />
             </form>
             <p>
                 Don't have an account? <Link to="/signup">Signup Here</Link>

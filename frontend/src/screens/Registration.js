@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage'; 
-import './Registration.css'
 
 const Registration = () => {
   const [username, setUsername] = useState('');
@@ -31,8 +30,8 @@ const Registration = () => {
 
     if (!response.ok) { // 409 Conflict || 400 Bad Request
         const errorMessage = await response.text(); // null
-        if (errorMessage == null) {
-          errorMessage.setErrorMessage("Username already taken"); // Error from controller not security
+        if (response.status === 409) {
+          throw new Error("Username already taken"); // Error from controller not security
         }
         throw new Error(errorMessage);
     }
@@ -53,7 +52,7 @@ const Registration = () => {
   return (
     <div className="container">
       <ErrorMessage message={errorMessage} />
-      <h2>User Registration</h2>
+      <h1>Account Registration</h1>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="username">Username:</label>
@@ -80,7 +79,7 @@ const Registration = () => {
           />
         </div>
 
-        <input type="submit" value="Register" />
+        <input className='register-button' type="submit" value="Register" />
       </form>
       <p>
         Already have an account? <Link to="/login">Login here</Link>

@@ -33,14 +33,15 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<HttpStatus> loginUser(@RequestBody User user) {
+    public ResponseEntity<User> loginUser(@RequestBody User user) {
         if (userService.login(user.getUsername(), user.getPassword())) {
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.OK).body(userService.findByUsername(user.getUsername()));
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // null is needed
     }
 
     // @PostMapping("/register/{tournamentId}")
+    // @PreAuthorize("hasRole('ROLE_USER')")
     // public ResponseEntity<HttpStatus> registerForTournament(@PathVariable Long tournamentId, @RequestBody User user) {
     //     if (user == null || !tournamentService.tournamentExists(tournamentId)) {
     //         return new ResponseEntity<>(HttpStatus.NOT_FOUND);

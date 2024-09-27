@@ -3,16 +3,18 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Registration from './screens/Registration';
 import Login from './screens/Login'; 
-import Navbar from './components/Navbar';
+import Navbar from './components/NavBar';
+import TournamentManagement from './screens/Tournaments';
 
 const App = () => {
   return (
     <Router>
-      <Navbar />
+      {/* <Navbar userRole={"ROLE_ADMIN"}/> */}
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} /> 
         <Route path="/signup" element={<Registration />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/tournaments" element={<TournamentManagement />} />
         {/* Add more routes here as needed */}
       </Routes>
     </Router>

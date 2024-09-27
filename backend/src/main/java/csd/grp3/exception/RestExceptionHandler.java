@@ -2,6 +2,8 @@ package csd.grp3.exception;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,11 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error: " + ex.getMessage());
+        List<String> errorList = new ArrayList<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            errorList.add(error.getDefaultMessage()); // Extract default message
+        }); // only works with one error?
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorList.get(0));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
