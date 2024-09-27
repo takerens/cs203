@@ -8,7 +8,6 @@ import csd.grp3.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -33,13 +32,7 @@ public class Profile {
     private int elo;
 
     private String displayName;
-
-    @OneToMany // assuming a 1-to-many relationship with Tournament
-    @JoinColumn(name = "tournament_id")
     private List<Tournament> history = new ArrayList<>();
-
-    @OneToMany // assuming a 1-to-many relationship with Tournament
-    @JoinColumn(name = "tournament_id")
     private List<Tournament> registered = new ArrayList<>();
 
     public Profile(User profileOwner) {

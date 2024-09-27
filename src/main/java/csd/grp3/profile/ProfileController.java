@@ -30,52 +30,49 @@ public class ProfileController {
     @PutMapping("/profile/{username}/elo")
     public ResponseEntity<HttpStatus> updateElo(@PathVariable String username, @RequestParam int elo) {
         User user = userService.findByUsername(username);
-        profileService.modifyElo(user, elo);
+        profileService.modifyElo(user, elo);                        // might throw ProfileNotFoundException - handle in controller advice
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/profile/{username}/display-name")
     public ResponseEntity<HttpStatus> updateDisplayName(@PathVariable String username, @RequestParam String displayName) {
         User user = userService.findByUsername(username);
-        profileService.modifyDisplayName(user, displayName);
+        profileService.modifyDisplayName(user, displayName);        // might throw ProfileNotFoundException - handle in controller advice
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/history")
+    @GetMapping("/profile/{username}/history")
     public ResponseEntity<List<Tournament>> getHistory(@PathVariable String username) {
         User user = userService.findByUsername(username);
-        Profile profile = profileService.getProfileByUser(user);
-        return new ResponseEntity<>(profile.getHistory(), HttpStatus.OK);     // how to handle exception??
+        Profile profile = profileService.getProfileByUser(user);    // might throw ProfileNotFoundException - handle in controller advice
+        return new ResponseEntity<>(profile.getHistory(), HttpStatus.OK);
     }
 
-    @GetMapping("/history")
+    @GetMapping("/profile/{username}/registered")
     public ResponseEntity<List<Tournament>> getRegistered(@PathVariable String username) {
-        User user = userService.findByUsername(username);
+        User user = userService.findByUsername(username);           // might throw ProfileNotFoundException - handle in controller advice
         Profile profile = profileService.getProfileByUser(user);
-        return new ResponseEntity<>(profile.getRegistered(), HttpStatus.OK);     // how to handle exception??
+        return new ResponseEntity<>(profile.getRegistered(), HttpStatus.OK);
     }
 
-    @PostMapping("/history")
-    public ResponseEntity<HttpStatus> addToHistory(@PathVariable String username, @RequestParam Tournament tournament) {
+    @PostMapping("/profile/{username}/history")
+    public ResponseEntity<HttpStatus> addToHistory(@PathVariable String username, @RequestParam Long id) {
         User user = userService.findByUsername(username);
-        Profile profile = profileService.getProfileByUser(user);
-        profile.addTournamentToHistory(tournament);
-        return new ResponseEntity<>(HttpStatus.OK);     // how to handle exception??
+        profileService.addHistory(user, id);        // might throw ProfileNotFoundException or TournamentNotFoundException - handle in controller advice
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/registered")
-    public ResponseEntity<HttpStatus> addToRegistered(@PathVariable String username, @RequestParam Tournament tournament) {
+    @PostMapping("/profile/{username}/registered")
+    public ResponseEntity<String> addToRegistered(@PathVariable String username, @RequestParam Long id) {
         User user = userService.findByUsername(username);
-        Profile profile = profileService.getProfileByUser(user);
-        profile.addTournamentToRegistered(tournament);
-        return new ResponseEntity<>(HttpStatus.OK);     // how to handle exception??
+        profileService.addRegistered(user, id);     // might throw ProfileNotFoundException or TournamentNotFoundException - handle in controller advice
+        return new ResponseEntity<>("tournament added", HttpStatus.OK);
     }
 
-    @DeleteMapping("/registered")
-    public ResponseEntity<HttpStatus> removeFromRegistered(@PathVariable String username, @RequestParam Tournament tournament) {
+    @DeleteMapping("/profile/{username}/registered")
+    public ResponseEntity<HttpStatus> removeFromRegistered(@PathVariable String username, @RequestParam Long id) {
         User user = userService.findByUsername(username);
-        Profile profile = profileService.getProfileByUser(user);
-        profile.removeTournamentFromRegistered(tournament);
-        return new ResponseEntity<>(HttpStatus.OK);     // how to handle exception??
+        profileService.removeRegistered(user, id);  // might throw ProfileNotFoundException or TournamentNotFoundException - handle in controller advice
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
