@@ -1,63 +1,52 @@
 package csd.grp3.profile;
 
-import java.util.*;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import csd.grp3.tournament.Tournament;
 import csd.grp3.user.User;
 
 @Service
 public class UserProfileServiceImpl implements UserProfileService {
 
-    private UserProfileRepository userProfiles;
+    private UserProfileRepository userProfileRepository;
 
-    public UserProfileServiceImpl(UserProfileRepository userProfiles) {
-        this.userProfiles = userProfiles;
+    public UserProfileServiceImpl(UserProfileRepository userProfileRepository) {
+        this.userProfileRepository = userProfileRepository;
     }
 
+    @Override
     public UserProfile getProfileByUser(User user) {
-        return userProfiles.findByUser(user).orElse(null);
-    }
-
-    private UserProfile profile;
-
-    public UserProfileServiceImpl(UserProfile profile){
-        this.profile = profile;
-    }
-
-	@Override
-	public void modifyElo(int elo) {
-		profile.setElo(elo);
-	}
-
-	@Override
-	public void modifyDisplayName(String displayName) {
-		profile.setDisplayName(displayName);
-	}
-
-	@Override
-	public List<Tournament> showHistory() {
-		return profile.getHistory();
-	}
-
-	@Override
-	public List<Tournament> showRegistered() {
-		return profile.getRegistered();
-	}
-
-    @Override
-    public void addHistory(Tournament tournament){
-        profile.addTournamentToHistory(tournament);
+        return userProfileRepository.findByUser(user).orElse(null);
     }
 
     @Override
-    public void addRegistered(Tournament tournament){
-        profile.addTournamentToRegistered(tournament);
+    public void modifyElo(User user, int newElo){
+        Optional<UserProfile> userProfile = userProfileRepository.findByUser(user);
+        if(userProfile.isPresent()){
+            userProfile.get().setElo(newElo);
+        } else {
+            // throw profile not found exception
+        }
     }
 
     @Override
-    public void removeRegistered(Tournament tournament){
-        profile.removeTournamentFromRegistered(tournament);
+    public void modifyDisplayName(User user, String displayName){
+
+    }
+    
+    @Override
+    public void addHistory(User user, Long id){
+
+    }
+    
+    @Override
+    public void addRegistered(User user, Long id){
+
+    }
+    
+    @Override
+    public void removeRegistered(User user, Long id){
+
     }
 }

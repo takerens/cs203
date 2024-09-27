@@ -9,6 +9,5 @@ import csd.grp3.user.User;
 
 @Repository
 public interface UserProfileRepository extends JpaRepository<UserProfile, User> {
-        // define a derived query to find user-profile by username (or one to one map with user obj?)
         Optional<UserProfile> findByUser(User user);
 }
