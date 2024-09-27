@@ -9,7 +9,6 @@ import csd.grp3.exception.MatchNotCompletedException;
 
 import java.util.*;
 import java.util.stream.*;
-import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,15 +65,10 @@ public class TournamentServiceImpl implements TournamentService {
             List<Player> playerList = tournamentData.getPlayers();
             List<Player> waitingList = tournamentData.getWaitingList();
 
-            // find current time
-            LocalDate now = LocalDate.now();
-
             // check if tournament already has that player data
             if (playerList.contains(player) || waitingList.contains(player)) {
-                return;
+                throw new PlayerAlreadyRegisteredException();
             // if tournament registration is after tournament day, we reject as well.
-            } else if (now.isAfter(tournamentData.getDate())) {
-                return;
             } else {
                 // if player isn't inside tournament
                 // if tournament is full, we add to waitingList instead
