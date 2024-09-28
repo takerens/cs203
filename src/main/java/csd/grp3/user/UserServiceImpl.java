@@ -65,10 +65,10 @@ public class UserServiceImpl implements UserService{
     public User createNewUser(String username, String password) {
 
         if (userRepository.findByUsername(username).isPresent()) {
-            System.out.println("Username already exists. Please choose another username");
+System.out.println("Username already exists. Please choose another username");
             return null;
         } else if (!checkPasswordRequirement(password)) {
-            System.out.println("Does not meet password requirements");
+System.out.println("Does not meet password requirements");
             return null;
         }
 
@@ -92,6 +92,7 @@ public class UserServiceImpl implements UserService{
         String encodedPassword = user.getPassword();
 
         //Return if the password matches
+        // removed instantiation in method use constructor-based dependency injection
         return encoder.matches(password, encodedPassword);
     }
     

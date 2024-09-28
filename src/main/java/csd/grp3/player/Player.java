@@ -1,38 +1,41 @@
-package csd.grp3.round;
+package csd.grp3.player;
 
 import java.util.List;
 
 import csd.grp3.match.Match;
-import csd.grp3.tournament.Tournament;
+import csd.grp3.user.User;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
 
+
 @Entity
-@Table(name="Rounds")
+@Table(name="Players")
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 
-public class Round {
+public class Player extends User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "tournament_id", nullable = false)
-    private Tournament tournament;
+    private double gamePoints = 0;
 
-    @OneToMany(mappedBy = "round", orphanRemoval = true)
+    @OneToMany(mappedBy = "player1")
     private List<Match> matches;
-    
+
+    public boolean equals(Player player2){
+        return super.equals(player2);
+    }
+
+    public Integer getELO() {
+        return super.getELO();
+    }
 }

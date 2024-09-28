@@ -36,47 +36,43 @@
 </nav>
 
 <main>
-    <p><strong>Date:</strong> <span th:text="${tournament.date.toLocalDate()}"></span></p>
-
-    <h3>Players</h3>
-    <div th:if="${#lists.isEmpty(tournament.participants)}"><p>No one has registered for this tournament yet.</div>
-    <table th:if="${tournament.participants.size() > 0}">
+    <h3>Round</h3>
+    <div class="pagination">
+        <span>Rounds:</span>
+        <span th:each="roundIndex : ${#numbers.sequence(1, 5)}"> <!-- 5 is the no of rounds currently-->
+            <a th:href="@{/tournaments/{id}/rounds/{rid}(id=${tournament.id}, rid=${roundIndex})}" 
+               th:text="${roundIndex}" 
+               th:class="${roundIndex == currentRound} ? 'active' : ''"></a>
+        </span>
+    </div>
+    
+    <table>
         <thead>
             <tr>
-                <th>No.</th>
-                <th>Username</th>
+                <th>No.</th> <!-- Match Number -->
+                <th>White Player</th>
                 <th>Rating</th>
+                <th>Points</th>
+                <th th:text="'Round '+ ${currentRound}"></th> <!-- Round Number : Score --> 
+                <th>Black Player</th>
+                <th>Rating</th>
+                <th>Points</th>
             </tr>
         </thead>
         <tbody>
-            <tr th:each="player, iterStat : ${tournament.participants}">
-                <td th:text="${iterStat.index + 1}"></td> <!-- Row number -->
-                <td th:text="${player.username}"></td> <!-- Username -->
-                <td th:text="${player.ELO}"></td> <!-- Rating -->
+            <!-- <tr th:each="match, iterStat : ${tournament.matches}">
+                <td th:text="${iterStat.index + 1}"></td>"
+                <td th:text="${match.white.username}"></td>
+                <td th:text="${match.white.rating}"></td>
+                <td th:text="${match.white.points}"></td>
+                <td th:text="${match.result == 1 ? '1:0' : (match.result == -1 ? '0:1' : (match.result == 0.5 ? '0.5:0.5' : 'N/A'))}"></td>
+                <td th:text="${match.white.username}"></td>
+                <td th:text="${match.white.rating}"></td>
+                <td th:text="${match.white.points}"></td>  -->
             </tr>
         </tbody>
-    </table>        
-
-    <h3>Withdrawn</h3>
-    <!-- <div th:if="${#lists.isEmpty(tournament.dropOut)}"><p>No one has withdrawn from this tournament yet.</div>
-        <table th:if="${tournament.dropOut.size() > 0}">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>Username</th>
-                    <th>Rating</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="player, iterStat : ${tournament.participants}">
-                    <td th:text="${iterStat.index + 1}"></td> <!- Row number ->
-                    <td th:text="${player.username}"></td> <!- Username ->
-                    <td th:text="${player.ELO}"></td> <!- Rating ->
-                </tr>
-            </tbody>
-        </table>    -->
+    </table>
 </main>
-
 
 </body>
 </html>

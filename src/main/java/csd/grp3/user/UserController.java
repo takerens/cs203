@@ -7,9 +7,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import csd.grp3.tournament.TournamentService;
 
+
 import java.util.Optional;
 import org.springframework.security.core.Authentication;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class UserController {
@@ -61,6 +64,7 @@ public class UserController {
         return "redirect:/tournaments"; // Redirect after successful registration
     }
 
+
     @DeleteMapping("/withdraw/{tournamentId}")
     public String withdrawfromTournament(@PathVariable Long tournamentId, HttpSession session,
             RedirectAttributes redirectAttributes) {
@@ -69,7 +73,9 @@ public class UserController {
             System.out.println("[Error]: User is not authenticated. Please log in first");
             return "redirect:/login?error=Please log in first";
         }
+      
         Optional<User> user = userService.findByUsername(username);
+
 
         if (user == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "User not found.");
@@ -118,7 +124,7 @@ public class UserController {
         model.addAttribute("errorMessage", "Login Failed");
         return "login"; // Redirect on failure
     }
-
+  
     // Doesn't run
     @PostMapping("/logout")
     public String logout(HttpSession session) {
