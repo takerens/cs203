@@ -4,14 +4,19 @@ import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService{
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder encoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder ) {
         this.userRepository = userRepository;
+        this.encoder = encoder;
     }
 
     //This function checks if password is alphanumeric and is 8 chars long
@@ -55,6 +60,8 @@ public class UserServiceImpl implements UserService{
         return false;
     }
 
+    @Override
+    @Transactional
     public User createNewUser(String username, String password) {
 
         if (userRepository.findByUsername(username).isPresent()) {
@@ -66,24 +73,36 @@ public class UserServiceImpl implements UserService{
         }
 
         //Encode password given by user to store
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(password);
 
         return userRepository.save(new User(username, encodedPassword));
     }
 
+    @Override
     public void login(String username, String password) {
-
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            System.out.println("User not found.");
+            throw new RuntimeException("User not found");
+        }
+        User user = userOpt.get();
+        if (encoder.matches(password, user.getPassword())) {
+            System.out.println("Login successful.");
+        } else {
+            System.out.println("Invalid password.");
+            throw new RuntimeException("Invalid password");
+        }
     }
+
+    
     
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
     @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-        .orElseThrow(() -> new RuntimeException("User not found")); // Throw an exception if not found
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
     
 }

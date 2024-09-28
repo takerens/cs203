@@ -129,7 +129,7 @@ public class TournamentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/withdraw")
+    @DeleteMapping("/{id}/withdraw")
     public ResponseEntity<Void> withdrawPlayer(@RequestBody User player, @PathVariable Long id) {
         tournamentService.withdrawPlayer(player, id);
         return new ResponseEntity<>(HttpStatus.OK);
