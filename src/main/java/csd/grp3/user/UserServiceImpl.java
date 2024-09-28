@@ -79,20 +79,22 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void login(String username, String password) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isEmpty()) {
-            System.out.println("User not found.");
-            throw new RuntimeException("User not found");
+    public boolean login(String username, String password) {
+
+        //If user does not exist, immediately return false
+        if (userRepository.findByUsername(username).isEmpty()) {
+            System.out.println("USERNAME DOES NOT EXIST");
+            return false;
         }
-        User user = userOpt.get();
-        if (encoder.matches(password, user.getPassword())) {
-            System.out.println("Login successful.");
-        } else {
-            System.out.println("Invalid password.");
-            throw new RuntimeException("Invalid password");
-        }
+
+        //Get the password associated with the searched username
+        User user = userRepository.findByUsername(username).get();
+        String encodedPassword = user.getPassword();
+
+        //Return if the password matches
+        return encoder.matches(password, encodedPassword);
     }
+    
 
     
     

@@ -27,6 +27,7 @@ public class UserServicetest {
     @InjectMocks
     private UserServiceImpl userService;
 
+    @Mock
     private BCryptPasswordEncoder encoder;
 
     @BeforeEach
@@ -43,6 +44,7 @@ public class UserServicetest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+    
 
         User newUser = userService.createNewUser(username, password);
         assertNotNull(newUser);
@@ -73,52 +75,47 @@ public class UserServicetest {
         User newUser = userService.createNewUser(username, invalidPassword);
         assertNull(newUser, "Should return null when password doesn't meet the requirements.");
     }
-
     @Test
     void testLogin_successful() {
         String username = "testUser";
         String rawPassword = "Password123";
         String encodedPassword = encoder.encode(rawPassword);
-
+    
         User user = new User(username, encodedPassword);
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
-
-        assertDoesNotThrow(() -> {
-            userService.login(username, rawPassword);
-        }, "Login should be successful if the password matches.");
+    
+        boolean result = userService.login(username, rawPassword);
+    
+        assertTrue(result, "Login should be successful if the password matches.");
     }
-
-    // Test for login with non-existent username (should throw 'User not found' exception)
+    
+    // Test for login with non-existent username (should return false)
     @Test
     void testLogin_usernameNotFound() {
         String username = "unknownUser";
         String password = "Password123";
-
+    
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            userService.login(username, password);
-        });
-
-        assertEquals("User not found", exception.getMessage());
+    
+        boolean result = userService.login(username, password);
+    
+        assertFalse(result, "Login should return false for non-existent username.");
     }
-
-    // Test for login with incorrect password (should throw 'Invalid password' exception)
+    
+    // Test for login with incorrect password (should return false)
     @Test
     void testLogin_invalidPassword() {
         String username = "testUser";
         String rawPassword = "Password123";
         String wrongPassword = "WrongPassword";
         String encodedPassword = encoder.encode(rawPassword);
-
+    
         User user = new User(username, encodedPassword);
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
-
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            userService.login(username, wrongPassword);
-        });
-
-        assertEquals("Invalid password", exception.getMessage());
+    
+        boolean result = userService.login(username, wrongPassword);
+    
+        assertFalse(result, "Login should return false for incorrect password.");
     }
 
 
