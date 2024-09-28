@@ -2,8 +2,9 @@ package csd.grp3.tournament;
 
 import java.time.LocalDateTime;
 
-// import csd.grp3.match.Match;
-// import csd.grp3.round.Round;
+import csd.grp3.match.Match;
+import csd.grp3.player.Player;
+import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -25,8 +26,8 @@ public class Tournament {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    // @OneToMany(mappedBy = "tournament", orphanRemoval = true)
-    // private List<Round> rounds;
+    @OneToMany(mappedBy = "tournament", orphanRemoval = true)
+    private List<Round> rounds;
 
     @NotNull(message = "Title: not null")
     private String title;
@@ -43,30 +44,30 @@ public class Tournament {
     private int size;
 
     @ManyToMany
-    private List<User> waitingList;
+    private List<Player> waitingList;
     @ManyToMany
-    private List<User> participants;
-    // private List<Match> matches;
+    private List<Player> players;
+    private List<Match> matches;
 
 
-//     /**
-//      * Iterates through Users and find the matches played by each user.
-//      * Calls CalculateElo.update for each user
-//      * 
-//      */
-//     public void endTournament() {
-//         for(User user : this.participants) {
-//             List<Match> userMatches = new ArrayList<>();
+    /**
+     * Iterates through Users and find the matches played by each user.
+     * Calls CalculateElo.update for each user
+     * 
+     */
+    public void endTournament() {
+        for(User user : this.players) {
+            List<Match> userMatches = new ArrayList<>();
 
-//             for (Round round : this.rounds) {
-//                 for (Match match : round.getMatches()) {
-//                     if (user.equals(match.getWhite()) || user.equals(match.getBlack()) ) {
-//                         userMatches.add(match);
-//                     }
-//                 }
-//             }
+            for (Round round : this.rounds) {
+                for (Match match : round.getMatches()) {
+                    if (user.equals(match.getWhite()) || user.equals(match.getBlack()) ) {
+                        userMatches.add(match);
+                    }
+                }
+            }
 
-//             CalculateELO.update(userMatches, user);
-//         }
-//     }
+            CalculateELO.update(userMatches, user);
+        }
+    }
 }
