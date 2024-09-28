@@ -55,16 +55,15 @@ public class UserServiceImpl implements UserService{
         return false;
     }
 
-    public User createNewUser(String username, String password) {
+    public User createNewUser(String username, String password) throws UsernameAlreadyTakenException, WeakPasswordException{
 
         if (userRepository.findByUsername(username).isPresent()) {
-System.out.println("Username already exists. Please choose another username");
-            return null;
+            throw new UsernameAlreadyTakenException("Username already taken");
+//System.out.println("Username already exists. Please choose another username");
         } else if (!checkPasswordRequirement(password)) {
-System.out.println("Does not meet password requirements");
-            return null;
+            throw new WeakPasswordException("Password has to contain both characters and numbers and be at least 8 characters long");
+//System.out.println("Does not meet password requirements");
         }
-
         //Encode password given by user to store
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(password);
@@ -72,21 +71,24 @@ System.out.println("Does not meet password requirements");
         return userRepository.save(new User(username, encodedPassword));
     }
 
-    public boolean login(String username, String password) {
+    public boolean login(String username, String password) throws InvalidCredentialsException{
 
-        //If user does not exist, immediately return false
+        //If user does not exist, throw exception
         if (userRepository.findByUsername(username).isEmpty()) {
-System.out.println("USERNAME DOES NOT EXIST");
-            return false;
+//System.out.println("USERNAME DOES NOT EXIST");
+            throw new InvalidCredentialsException("Username does not exist");
         }
 
         //Get the password associated with the searched username
         User user = userRepository.findByUsername(username).get();
         String encodedPassword = user.getPassword();
 
-        //Return if the password matches
+        //Throw exception if password does not match
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.matches(password, encodedPassword);
+        if (!encoder.matches(password, encodedPassword)) {
+            throw new InvalidCredentialsException("Password does not match");
+        }
+        return true;
     }
     
     public List<User> findAll() {
@@ -94,9 +96,9 @@ System.out.println("USERNAME DOES NOT EXIST");
     }
 
     @Override
-    public User findByUsername(String username) {
+    public User findByUsername(String username) throws UserNotFoundException{
         return userRepository.findByUsername(username)
-        .orElseThrow(() -> new RuntimeException("User not found")); // Throw an exception if not found
+        .orElseThrow(() -> new UserNotFoundException(username)); // Throw an exception if not found
     }
     
 }
