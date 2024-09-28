@@ -1,7 +1,5 @@
-// src/components/Pagination.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Pagination.css'; // Optional: Import a CSS file for styles
 
 const Pagination = ({ tournamentId, inProgressRounds, currentRound }) => {
     return (

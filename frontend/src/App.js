@@ -4,17 +4,24 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Registration from './screens/Registration';
 import Login from './screens/Login'; 
 import TournamentManagement from './screens/Tournaments';
+import TournamentRounds from './screens/Rounds';
+import TournamentStandings from './screens/Standings';
 
 const App = () => {
   return (
     <Router>
-      {/* <Navbar userRole={"ROLE_ADMIN"}/> */}
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} /> 
         <Route path="/signup" element={<Registration />} />
         <Route path="/login" element={<Login />} />
         <Route path="/tournaments" element={<TournamentManagement />} />
-        {/* Add more routes here as needed */}
+        {/* User */}
+        <Route path="/tournaments/:tournamentId/rounds/:roundNumber" element={<TournamentRounds />} />
+        <Route path="/tournaments/:tournamentId/standings" element={<TournamentStandings />} />
+        {/* Admin */}
+        <Route path='/addTournament' element={<AddTournament />}/>
+        <Route path='/updateTournament/:tournamentId' element={<UpdateTournament />}/>
+        <Route />
       </Routes>
     </Router>
   );

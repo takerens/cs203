@@ -1,12 +1,13 @@
 // src/components/SecondaryNavbar.js
 import React from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-const SecondaryNavbar = ({ tournament }) => {
+const SecondaryNavbar = ({ tournament, userRole }) => {
     const navigate = useNavigate(); // For programmatic navigation
 
-    const handleBack = (e) => {
+    const handleBack = async (e) => {
         e.preventDefault();
+
         navigate('/tournaments'); // Navigate back to tournaments
     };
 
@@ -16,14 +17,13 @@ const SecondaryNavbar = ({ tournament }) => {
                 <h1 className="navbar-brand">{tournament.title}</h1>
                 <ul className="navbar-nav">
                     <li className="nav-item">
-                        <Link className="nav-link" to={`/tournaments/${tournament.id}`}>Players</Link>
-                    </li>
-                    <li className="nav-item">
                         <Link className="nav-link" to={`/tournaments/${tournament.id}/rounds/1`}>Rounds</Link>
                     </li>
-                    <li className="nav-item">
-                        <Link className="nav-link" to={`/tournaments/${tournament.id}/standings/1`}>Standings</Link>
-                    </li>
+                    {userRole === 'ROLE_USER' && (
+                        <li className="nav-item">
+                            <Link className="nav-link" to={`/tournaments/${tournament.id}/standings/1`}>Standings</Link>
+                        </li>
+                    ) }
                 </ul>
                 <button onClick={handleBack}>Back</button>
             </div>

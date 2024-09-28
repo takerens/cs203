@@ -30,14 +30,8 @@ const TournamentManagement = () => {
         };
 
         fetchUserData();
+        fetchTournamentData();
     }, []);
-
-    // Fetch tournament data after user data is fetched
-    useEffect(() => {
-        if (user.username && user.password) {
-            fetchTournamentData();
-        }
-    }, [user]);
 
     const fetchTournamentData = async () => {
         try {
@@ -57,7 +51,7 @@ const TournamentManagement = () => {
             setTournaments(tournamentData);
 
         } catch (error) {
-            setErrorMessage("Fetch Tournament Data Error: " + error.message);
+            setErrorMessage(error.message);
         }
     };
 
@@ -119,6 +113,15 @@ const TournamentManagement = () => {
         }
     };
 
+    // ToDo: Requests for these reference above
+    const handleUpdate = async (e, tournamentId) => {
+        // Put to (check tournament controller)
+    };
+
+    const handleDelete = async (e, tournamentId) => {
+        // Delete to (check tournament controller)
+    };
+
     return (
         <>
             <Navbar userRole={user.userRole} />
@@ -131,8 +134,8 @@ const TournamentManagement = () => {
                     {user.userRole === 'ROLE_ADMIN' && (
                         <p>
                             Add New Tournament: 
-                            <form onSubmit={`/tournaments`}>
-                                <button type="submit">Register</button>
+                            <form onSubmit={`/addTournament`}>
+                                <button type="submit">Add Tournament</button>
                             </form>
                         </p>
                     )}
@@ -158,7 +161,7 @@ const TournamentManagement = () => {
                                     <td>
                                         {user.userRole === 'ROLE_USER' && (
                                             <>
-                                                <Link to={`/tournaments/${tournament.id}`}>
+                                                <Link to={`/tournaments/${tournament.id}/rounds/1`}>
                                                     <button>View Details</button>
                                                 </Link>
                                                 <form onSubmit={(e) => handleRegister(e, tournament.id)}>
@@ -171,13 +174,13 @@ const TournamentManagement = () => {
                                         )}
                                         {user.userRole === 'ROLE_ADMIN' && (
                                             <>
-                                                <Link to={`/tournaments/${tournament.id}/1`}>
-                                                    <button>Update Match Details</button>
+                                                <Link to={`/tournaments/${tournament.id}/rounds/1`}>
+                                                    <button>View Match Details</button>
                                                 </Link>
-                                                <form action={`/tournaments/${tournament.id}`} method="post">
+                                                <Link to={`/updateTournament/${tournament.id}`}>
                                                     <button type="submit">Update Tournament</button>
-                                                </form>
-                                                <form action={`/tournaments/${tournament.id}`} method="post">
+                                                </Link>
+                                                <form onSubmit={(e) => handleDelete(e, tournament.id)}>
                                                     <button type="submit">Delete Tournament</button>
                                                 </form>
                                             </>
