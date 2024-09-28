@@ -1,38 +1,38 @@
-// package csd.grp3.round;
+package csd.grp3.round;
 
-// import java.util.List;
+import java.util.List;
 
-// import csd.grp3.match.Match;
-// import csd.grp3.tournament.Tournament;
-// import jakarta.persistence.Entity;
-// import jakarta.persistence.Id;
-// import jakarta.persistence.JoinColumn;
-// import jakarta.persistence.ManyToOne;
-// import jakarta.persistence.GeneratedValue;
-// import jakarta.persistence.GenerationType;
-// import jakarta.persistence.OneToMany;
-// import jakarta.persistence.Table;
-// import lombok.*;
+import csd.grp3.match.Match;
+import csd.grp3.tournament.Tournament;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.*;
 
-// @Entity
-// @Table(name="Rounds")
-// @Getter
-// @Setter
-// @ToString
-// @AllArgsConstructor
-// @NoArgsConstructor
-// @EqualsAndHashCode
+@Entity
+@Table(name="Rounds")
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
 
-// public class Round {
-//     @Id
-//     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//     private Long id;
+public class Round {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-//     @ManyToOne
-//     @JoinColumn(name = "tournament_id", nullable = false)
-//     private Tournament tournament;
+    @ManyToOne
+    @JoinColumn(name = "tournament_id", nullable = false)
+    private Tournament tournament;
 
-//     @OneToMany(mappedBy = "round", orphanRemoval = true)
-//     private List<Match> matches;
+    @OneToMany(mappedBy = "round", orphanRemoval = true)
+    private List<Match> matches;
     
-// }
+}

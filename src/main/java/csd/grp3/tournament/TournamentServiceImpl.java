@@ -19,8 +19,8 @@ public class TournamentServiceImpl implements TournamentService {
     @Autowired
     private TournamentRepository tournaments;
 
-//     @Autowired
-//     private MatchRepository matches;
+    @Autowired
+    private MatchRepository matches;
 
     public TournamentServiceImpl(TournamentRepository tournaments) {
         this.tournaments = tournaments;
@@ -31,28 +31,28 @@ public class TournamentServiceImpl implements TournamentService {
         return tournaments.findAll();
     }
 
-//     @Override
-//     public Tournament addTournament(Tournament tournament) {
-//         return tournaments.save(tournament);
-//     }
+    @Override
+    public Tournament addTournament(Tournament tournament) {
+        return tournaments.save(tournament);
+    }
 
-//     @Override
-//     public Tournament updateTournament(Long id, Tournament newTournamentInfo) {
-//         return tournaments.findById(id).map(tournament -> {
-//             tournament.setTitle(newTournamentInfo.getTitle());
-//             return tournaments.save(tournament);
-//         }).orElse(null);
-//     }
+    @Override
+    public Tournament updateTournament(Long id, Tournament newTournamentInfo) {
+        return tournaments.findById(id).map(tournament -> {
+            tournament.setTitle(newTournamentInfo.getTitle());
+            return tournaments.save(tournament);
+        }).orElse(null);
+    }
 
     @Override
     public Tournament getTournament(Long id) {
         return tournaments.findById(id).orElse(null);
     }
 
-//     @Override
-//     public void deleteTournament(Long id) {
-//         tournaments.deleteById(id);
-//     }
+    @Override
+    public void deleteTournament(Long id) {
+        tournaments.deleteById(id);
+    }
 
     @Override
     public void registerPlayer(User player, Long id) throws TournamentNotFoundException {
@@ -108,9 +108,9 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentId != null && tournaments.existsById(tournamentId);
     }
   
-//     @Override
-//     public void updateResults(Round round) throws MatchNotCompletedException {
-//         List<Match> matches = round.getMatches();
+    @Override
+    public void updateResults(Round round) throws MatchNotCompletedException {
+        List<Match> matches = round.getMatches();
 
         // check match ended
         for (Match match : matches) {
@@ -154,20 +154,20 @@ public class TournamentServiceImpl implements TournamentService {
                 .filter(match -> match.getTournament().equals(tournament))
                 .collect(Collectors.toList());
 
-//         if (directEncounters.size() == 0) {
-//             return "no direct encounter";
-//         }
+        if (directEncounters.size() == 0) {
+            return "no direct encounter";
+        }
 
-//         Match directEncounter = directEncounters.get(0);
+        Match directEncounter = directEncounters.get(0);
 
-//         if (directEncounter.getResult() == -1) {
-//             return directEncounter.getBlack().getUsername();
-//         } else if (directEncounter.getResult() == 1) {
-//             return directEncounter.getWhite().getUsername();
-//         } else {
-//             return "draw";
-//         }
-//     }
+        if (directEncounter.getResult() == -1) {
+            return directEncounter.getBlack().getUsername();
+        } else if (directEncounter.getResult() == 1) {
+            return directEncounter.getWhite().getUsername();
+        } else {
+            return "draw";
+        }
+    }
 
     // Calculate Buchholz score for a player in a specific tournament (sum of
     // opponents' match points)

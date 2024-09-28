@@ -114,10 +114,6 @@ const TournamentManagement = () => {
     };
 
     // ToDo: Requests for these reference above
-    const handleUpdate = async (e, tournamentId) => {
-        // Put to (check tournament controller)
-    };
-
     const handleDelete = async (e, tournamentId) => {
         // Delete to (check tournament controller)
     };
