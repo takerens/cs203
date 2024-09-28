@@ -30,14 +30,14 @@ public class UserServicetest {
     private BCryptPasswordEncoder encoder;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
         encoder = new BCryptPasswordEncoder();
     }
 
     // Test for creating a new user with valid credentials
     @Test
-    public void testCreateNewUser_successful() {
+    void testCreateNewUser_successful() {
         String username = "testUser";
         String password = "Password123";
 
@@ -52,7 +52,7 @@ public class UserServicetest {
 
     // Test for creating a new user with an existing username
     @Test
-    public void testCreateNewUser_existingUsername() {
+    void testCreateNewUser_existingUsername() {
         String username = "existingUser";
         String password = "Password123";
 
@@ -64,7 +64,7 @@ public class UserServicetest {
 
     // Test for creating a new user with an invalid password
     @Test
-    public void testCreateNewUser_invalidPassword() {
+    void testCreateNewUser_invalidPassword() {
         String username = "newUser";
         String invalidPassword = "Pwd1";
 
@@ -75,7 +75,7 @@ public class UserServicetest {
     }
 
     @Test
-    public void testLogin_successful() {
+    void testLogin_successful() {
         String username = "testUser";
         String rawPassword = "Password123";
         String encodedPassword = encoder.encode(rawPassword);
@@ -90,7 +90,7 @@ public class UserServicetest {
 
     // Test for login with non-existent username (should throw 'User not found' exception)
     @Test
-    public void testLogin_usernameNotFound() {
+    void testLogin_usernameNotFound() {
         String username = "unknownUser";
         String password = "Password123";
 
@@ -105,7 +105,7 @@ public class UserServicetest {
 
     // Test for login with incorrect password (should throw 'Invalid password' exception)
     @Test
-    public void testLogin_invalidPassword() {
+    void testLogin_invalidPassword() {
         String username = "testUser";
         String rawPassword = "Password123";
         String wrongPassword = "WrongPassword";
@@ -124,7 +124,7 @@ public class UserServicetest {
 
     // Test for finding all users
     @Test
-    public void testFindAll() {
+    void testFindAll() {
         List<User> userList = List.of(
             new User("user1", "encodedPassword1"),
             new User("user2", "encodedPassword2")
@@ -137,7 +137,7 @@ public class UserServicetest {
 
     // Test for finding a user by username successfully
     @Test
-    public void testFindByUsername_successful() {
+    void testFindByUsername_successful() {
         String username = "testUser";
         User user = new User(username, "encodedPassword");
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
@@ -152,7 +152,7 @@ public class UserServicetest {
 
     // Test for finding a user by username when user is not found
     @Test
-    public void testFindByUsername_userNotFound() {
+    void testFindByUsername_userNotFound() {
         String username = "unknownUser";
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
