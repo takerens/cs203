@@ -1,7 +1,7 @@
 package csd.grp3.Testing;
 
 import csd.grp3.round.Round;
-import csd.grp3.user.User;
+import csd.grp3.player.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -15,7 +15,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
 import csd.grp3.match.*;
 
 public class MatchServiceTest {
@@ -28,26 +27,24 @@ public class MatchServiceTest {
 
     private Match match;
     private Round round;
-    private User whitePlayer;
-    private User blackPlayer;
+    private Player player;
 
     @BeforeEach
     void setUp() {
+
         MockitoAnnotations.openMocks(this);
 
-        round = new Round(); // Assuming Round has a default constructor
-        round.setId(1L); // Set an example ID if necessary
+        round = new Round();
+        round.setId(1L);
 
-        whitePlayer = new User("whiteUser", "whitePassword");
-        blackPlayer = new User("blackUser", "blackPassword");
-        whitePlayer.setAuthorities("ROLE_PLAYER");
-        blackPlayer.setAuthorities("ROLE_PLAYER");
+        player = new Player();
+        player.setUsername("playerUser");
+        player.setPassword("password");
+        player.setAuthorities("ROLE_PLAYER");
 
         match = new Match();
         match.setId(1L);
         match.setRound(round);
-        match.setWhite(whitePlayer);
-        match.setBlack(blackPlayer);
         match.setBYE(false);
     }
 
@@ -91,7 +88,7 @@ public class MatchServiceTest {
         when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
 
         Match newMatchInfo = new Match();
-        newMatchInfo.setResult(1); // Simulate a win for white
+        newMatchInfo.setResult(1);
         newMatchInfo.setBYE(true);
 
         Match updatedMatch = matchService.updateMatch(1L, newMatchInfo);
@@ -111,4 +108,3 @@ public class MatchServiceTest {
         verify(matchRepository, times(1)).deleteById(1L);
     }
 }
-
