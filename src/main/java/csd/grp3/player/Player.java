@@ -21,7 +21,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class Player extends User{
+public class Player{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,9 +33,5 @@ public class Player extends User{
 
     public boolean equals(Player player2){
         return super.equals(player2);
-    }
-
-    public Integer getELO() {
-        return super.getELO();
     }
 }

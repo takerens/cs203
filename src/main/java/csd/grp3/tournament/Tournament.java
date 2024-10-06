@@ -56,7 +56,7 @@ public class Tournament {
      * 
      */
     public void endTournament() {
-        for(User user : this.players) {
+        for(Player user : this.players) {
             List<Match> userMatches = new ArrayList<>();
 
             for (Round round : this.rounds) {

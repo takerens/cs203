@@ -402,4 +402,13 @@ public class TournamentServiceImpl implements TournamentService {
         matches.save(match);
         return match;
     }
+
+    private Match handleBYE(Player worst, String color, Round round) { // color is color of worst player
+        Player bot = new Player();
+        Match match = createMatchWithPlayerColour(worst, color, bot, round);
+        match.setBYE(true);
+        match.setResult(color.equals("white") ? 1 : -1);
+        matches.save(match); // is this necessary
+        return match;
+    }
 }
