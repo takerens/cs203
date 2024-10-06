@@ -75,7 +75,7 @@ public class UserController {
         Optional<User> user = userService.findByUsername(username);
 
 
-        if (user == null) {
+        if (user.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "User not found.");
             return "redirect:/tournaments"; // Redirect on failure
         }

@@ -19,47 +19,6 @@ public class UserServiceImpl implements UserService{
         this.encoder = encoder;
     }
 
-    //This function checks if password is alphanumeric and is 8 chars long
-    private boolean checkPasswordRequirement(String password) {
-    
-        //Initialise booleans for password requirements
-        boolean hasChar = false;
-        boolean hasNum = false;
-        boolean isAtLeast8Char = false;
-
-        //Make password lowercase
-        String tmpPassword = password.toLowerCase();
-
-        //Check if password has char and num
-        for (int i = 0; i < password.length(); i++) {
-            char c = tmpPassword.charAt(i);
-            if (c >= '0' && c <= '9') {
-                hasNum = true;
-            } else if (c >= 'a' && c <= 'z'){
-                hasChar = true;
-            }
-        }
-
-        //Check if password is at least 8 char long
-        if (password.length() >= 8) {
-            isAtLeast8Char = true;
-        }
-    
-        //Print out error message
-        if ((!hasChar || !hasNum) && isAtLeast8Char) {
-            System.out.println("Password must contain both numbers and characters");
-        } else if ((hasChar && hasNum) && !isAtLeast8Char) {
-            System.out.println("Password must be at least 8 characters long");
-        } else if ((!hasChar || !hasNum) && !isAtLeast8Char) {
-            System.out.println("Password must contain both numbers and characters and be at least 8 characters long");
-        } else {
-            System.out.println("Password requirements met");
-            return true;
-        }
-
-        return false;
-    }
-
     @Override
     @Transactional
     public User createNewUser(String username, String password) {
@@ -67,10 +26,11 @@ public class UserServiceImpl implements UserService{
         if (userRepository.findByUsername(username).isPresent()) {
             throw new UsernameAlreadyTakenException("Username already taken");
 //System.out.println("Username already exists. Please choose another username");
-        } else if (!checkPasswordRequirement(password)) {
-            throw new WeakPasswordException("Password has to contain both characters and numbers and be at least 8 characters long");
-//System.out.println("Does not meet password requirements");
         }
+//        else if (password.length() < 8) {
+//            throw new WeakPasswordException("Password has to be at least 8 characters long");
+////System.out.println("Does not meet password requirements");
+//        }
         //Encode password given by user to store
         String encodedPassword = encoder.encode(password);
 
@@ -78,12 +38,11 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public boolean login(String username, String password) {
+    public User login(String username, String password) {
 
         //If user does not exist, throw exception
         if (userRepository.findByUsername(username).isEmpty()) {
-            System.out.println("USERNAME DOES NOT EXIST");
-            return false;
+            throw new InvalidCredentialsException("User does not exist");
         }
 
         //Get the password associated with the searched username
@@ -91,20 +50,24 @@ public class UserServiceImpl implements UserService{
         String encodedPassword = user.getPassword();
 
         //Return if the password matches
-        // removed instantiation in method use constructor-based dependency injection
-        return encoder.matches(password, encodedPassword);
+        if (!encoder.matches(password, encodedPassword)) {
+            throw new InvalidCredentialsException("Password does not match");
+        }
+
+        return user;
     }
     
 
     
     
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
+    // public List<User> findAll() {
+    //     return userRepository.findAll();
+    // }
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User findByUsername(String username) throws UserNotFoundException {
+        return userRepository.findByUsername(username)
+        .orElseThrow(() -> new UserNotFoundException(username));
     }
     
 }
