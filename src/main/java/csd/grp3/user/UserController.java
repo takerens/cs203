@@ -9,8 +9,6 @@ import csd.grp3.tournament.TournamentService;
 
 
 import java.util.Optional;
-import org.springframework.security.core.Authentication;
-import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.GetMapping;
 
