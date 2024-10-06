@@ -22,6 +22,9 @@ public class TournamentServiceImpl implements TournamentService {
     @Autowired
     private MatchRepository matches;
 
+    @Autowired
+    private PlayerManager playerManager;
+
     public TournamentServiceImpl(TournamentRepository tournaments) {
         this.tournaments = tournaments;
     }
@@ -56,52 +59,28 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void registerPlayer(User player, Long id) throws TournamentNotFoundException {
-        // check if got tournament
         Optional<Tournament> tournament = tournaments.findById(id);
 
         if (tournament.isPresent()) {
-            // get tournament data & participant list from tournament
             Tournament tournamentData = tournament.get();
-            List<Player> playerList = tournamentData.getPlayers();
-
-            // if tournament is full, we add to waitingList instead
-            if (playerList.size() == tournamentData.getSize()) {
-                List<Player> waitingList = tournamentData.getWaitingList();
-                waitingList.add((Player) player);
-                tournamentData.setWaitingList(waitingList);
-                // else, we want to add to normal playerList
-            } else {
-                playerList.add((Player) player);
-                tournamentData.setPlayers(playerList);
-            }
-
-            // we save the tournament data back to database
+            playerManager.addPlayer((Player) player, tournamentData);
             tournaments.save(tournamentData);
         } else {
             throw new TournamentNotFoundException(id);
         }
     }
 
+    // Use PlayerManager to handle player withdrawal and manage bot replacement if necessary
     @Override
     public void withdrawPlayer(User player, Long id) {
         Optional<Tournament> tournament = tournaments.findById(id);
         if (tournament.isPresent()) {
             Tournament tournamentData = tournament.get();
-            List<Player> playerList = tournamentData.getPlayers();
-            List<Player> waitingList = tournamentData.getWaitingList();
-
-            // Remove from participants
-            if (playerList.remove(player)) {
-                // If removed from participants, check waiting list
-                if (!waitingList.isEmpty()) {
-                    playerList.add(waitingList.remove(0)); // Move next from waiting list to participants
-                }
-                tournamentData.setPlayers(playerList);
-                tournamentData.setWaitingList(waitingList);
-                tournaments.save(tournamentData);
-            }
+            playerManager.handleWithdrawal((Player) player, tournamentData);
+            tournaments.save(tournamentData);
         }
     }
+
 
     @Override
     public boolean tournamentExists(Long tournamentId) {
