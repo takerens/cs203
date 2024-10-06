@@ -4,7 +4,6 @@
     import csd.grp3.match.Match;
     import csd.grp3.player.Player;
     import csd.grp3.round.Round;
-    import csd.grp3.user.User;
 
     import java.time.LocalDateTime;
     import java.util.List;
