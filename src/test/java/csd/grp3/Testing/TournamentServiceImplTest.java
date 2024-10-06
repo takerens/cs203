@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import csd.grp3.player.Player;
 import csd.grp3.tournament.Tournament;
 import csd.grp3.tournament.TournamentRepository;
 import csd.grp3.tournament.TournamentServiceImpl;;
@@ -116,7 +117,7 @@ public class TournamentServiceImplTest {
 
     @Test
     void testWithdrawPlayer() {
-        tournament.getPlayers().add(player);
+        tournament.getPlayers().add((Player) player);
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
 
         tournamentService.withdrawPlayer(player, 1L);

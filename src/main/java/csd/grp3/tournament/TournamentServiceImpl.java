@@ -7,7 +7,6 @@ import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import csd.grp3.exception.MatchNotCompletedException;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.*;
 
