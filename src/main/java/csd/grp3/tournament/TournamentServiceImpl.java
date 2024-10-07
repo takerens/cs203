@@ -348,4 +348,37 @@ public class TournamentServiceImpl implements TournamentService {
         matches.save(match);
         return match;
     }
+
+    public void handleWithdrawal(Player player, Tournament tournament) {
+        List<Player> playerList = tournament.getPlayers();
+        List<Player> waitingList = tournament.getWaitingList();
+
+        LocalDateTime now = LocalDateTime.now();
+        if (tournament.getDate() != null && now.isAfter(tournament.getDate().minusDays(1))) {
+            Player bot = new Player();
+            bot.setUsername("Bot_" + UUID.randomUUID().toString().substring(0, 5));
+            bot.setELO(player.getELO());
+            playerList.remove(player);
+            playerList.add(bot);
+            tournament.setPlayers(playerList);
+
+            // Mark the bot to always lose in matches
+            for (Round round : tournament.getRounds()) {
+                for (Match match : round.getMatches()) {
+                    if (match.getWhite().equals(bot)) {
+                        match.setResult(-1);  // Black wins
+                    } else if (match.getBlack().equals(bot)) {
+                        match.setResult(1);  // White wins
+                    }
+                }
+            }
+        } else {
+            playerList.remove(player);
+            if (!waitingList.isEmpty()) {
+                playerList.add(waitingList.remove(0));
+            }
+            tournament.setPlayers(playerList);
+            tournament.setWaitingList(waitingList);
+        }
+    }
 }

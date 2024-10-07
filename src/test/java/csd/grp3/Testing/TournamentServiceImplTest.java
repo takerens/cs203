@@ -37,7 +37,7 @@ public class TournamentServiceImplTest {
         tournament.setId(1L);
         tournament.setTitle("Test Tournament");
         tournament.setSize(2);
-        tournament.setParticipants(new ArrayList<>());
+        tournament.setPlayers(new ArrayList<>());
         tournament.setWaitingList(new ArrayList<>());
         
         player = new User("testUser", "testPassword123");  // Username and password
@@ -109,19 +109,19 @@ public class TournamentServiceImplTest {
 
         tournamentService.registerPlayer(player, 1L);
 
-        assertEquals(1, tournament.getParticipants().size());
-        assertEquals(player, tournament.getParticipants().get(0));
+        assertEquals(1, tournament.getPlayers().size());
+        assertEquals(player, tournament.getPlayers().get(0));
         verify(tournamentRepository, times(1)).save(tournament);
     }
 
     @Test
     void testWithdrawPlayer() {
-        tournament.getParticipants().add(player);
+        tournament.getPlayers().add(player);
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
 
         tournamentService.withdrawPlayer(player, 1L);
 
-        assertFalse(tournament.getParticipants().contains(player));
+        assertFalse(tournament.getPlayers().contains(player));
         verify(tournamentRepository, times(1)).save(tournament);
     }
 
