@@ -117,7 +117,7 @@ public class TournamentServiceImplTest {
 
     @Test
     void testWithdrawPlayer() {
-        tournament.getPlayers().add((Player) player);
+        tournament.getPlayers().add(player);
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
 
         tournamentService.withdrawPlayer(player, 1L);
