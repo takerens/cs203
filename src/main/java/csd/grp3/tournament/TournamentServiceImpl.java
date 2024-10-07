@@ -73,12 +73,30 @@ public class TournamentServiceImpl implements TournamentService {
 
     // Use PlayerManager to handle player withdrawal and manage bot replacement if necessary
     @Override
-    public void withdrawPlayer(User player, Long id) {
+    public void withdrawPlayer(User user, Long id) {
         Optional<Tournament> tournament = tournaments.findById(id);
         if (tournament.isPresent()) {
             Tournament tournamentData = tournament.get();
-            playerManager.handleWithdrawal((Player) player, tournamentData);
+            Player playerToWithdraw = null;
+    
+            // Find the Player object associated with the User
+            for (Player player : tournamentData.getPlayers()) {
+                if (player.getUser().equals(user)) {
+                    playerToWithdraw = player;
+                    break;
+                }
+            }
+    
+            // If no matching player is found, throw an exception
+            if (playerToWithdraw == null) {
+                throw new PlayerNotRegisteredException("Player is not registered in this tournament.");
+            }
+    
+            // Proceed with the withdrawal
+            handleWithdrawal(playerToWithdraw, tournamentData);
             tournaments.save(tournamentData);
+        } else {
+            throw new TournamentNotFoundException(id);
         }
     }
 

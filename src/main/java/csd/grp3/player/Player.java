@@ -8,9 +8,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.*;
+
+import jakarta.persistence.*;
 
 
 @Entity
@@ -31,6 +35,14 @@ public class Player extends User{
     @OneToMany(mappedBy = "player1")
     private List<Match> matches;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;  
+
+    public Player(User user) {
+        super(user.getUsername(), null); 
+        this.gamePoints = 0; // 
+    }
     public boolean equals(Player player2){
         return super.equals(player2);
     }
