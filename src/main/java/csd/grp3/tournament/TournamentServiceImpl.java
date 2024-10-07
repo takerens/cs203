@@ -7,6 +7,7 @@ import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import csd.grp3.exception.MatchNotCompletedException;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.*;
 
@@ -22,6 +23,8 @@ public class TournamentServiceImpl implements TournamentService {
     @Autowired
     private MatchRepository matches;
 
+
+
     public TournamentServiceImpl(TournamentRepository tournaments) {
         this.tournaments = tournaments;
     }
@@ -36,10 +39,12 @@ public class TournamentServiceImpl implements TournamentService {
         return tournaments.save(tournament);
     }
 
+    // TODO Do this function properly accourding to baseline()
     @Override
     public Tournament updateTournament(Long id, Tournament newTournamentInfo) {
         return tournaments.findById(id).map(tournament -> {
             tournament.setTitle(newTournamentInfo.getTitle());
+            tournament.setDate(newTournamentInfo.getDate());
             return tournaments.save(tournament);
         }).orElse(null);
     }
@@ -56,11 +61,9 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void registerPlayer(User player, Long id) throws TournamentNotFoundException {
-        // check if got tournament
         Optional<Tournament> tournament = tournaments.findById(id);
 
         if (tournament.isPresent()) {
-            // get tournament data & participant list from tournament
             Tournament tournamentData = tournament.get();
             List<Player> playerList = tournamentData.getPlayers();
             List<Player> waitingList = tournamentData.getWaitingList();
@@ -68,7 +71,6 @@ public class TournamentServiceImpl implements TournamentService {
             // check if tournament already has that player data
             if (playerList.contains(player) || waitingList.contains(player)) {
                 throw new PlayerAlreadyRegisteredException();
-            // if tournament registration is after tournament day, we reject as well.
             } else {
                 // if player isn't inside tournament
                 // if tournament is full, we add to waitingList instead
@@ -83,30 +85,21 @@ public class TournamentServiceImpl implements TournamentService {
             }
 
             // we save the tournament data back to database
+            addPlayer((Player) player, tournamentData);
             tournaments.save(tournamentData);
         } else {
             throw new TournamentNotFoundException(id);
         }
     }
 
+
     @Override
     public void withdrawPlayer(User player, Long id) {
         Optional<Tournament> tournament = tournaments.findById(id);
         if (tournament.isPresent()) {
             Tournament tournamentData = tournament.get();
-            List<Player> playerList = tournamentData.getPlayers();
-            List<Player> waitingList = tournamentData.getWaitingList();
-
-            // Remove from participants
-            if (playerList.remove(player)) {
-                // If removed from participants, check waiting list
-                if (!waitingList.isEmpty()) {
-                    playerList.add(waitingList.remove(0)); // Move next from waiting list to participants
-                }
-                tournamentData.setPlayers(playerList);
-                tournamentData.setWaitingList(waitingList);
-                tournaments.save(tournamentData);
-            }
+            handleWithdrawal((Player) player, tournamentData);
+            tournaments.save(tournamentData);
         }
     }
 
@@ -139,8 +132,7 @@ public class TournamentServiceImpl implements TournamentService {
             if (match.getResult() == 0) {
                 // throw exception that it's not complete
                 throw new MatchNotCompletedException(match.getId());
-            }
-            else {
+            } else {
                 // update player data with match results
                 double result = match.getResult();
                 Player black = match.getBlack();
@@ -155,7 +147,7 @@ public class TournamentServiceImpl implements TournamentService {
                 }
             }
         }
-
+      
         // update match results
 
         // firstly, we update the round with all new match data.
@@ -291,7 +283,8 @@ public class TournamentServiceImpl implements TournamentService {
                 if (!isColourSuitable(player2, tournament, isPlayer1White ? "black" : "white"))
                     continue;
 
-                Match newPair = createMatchWithPlayerColour(player1, isPlayer1White ? "white" : "black", player2, nextRound);
+                Match newPair = createMatchWithPlayerColour(player1, isPlayer1White ? "white" : "black", player2,
+                        nextRound);
                 pairings.add(newPair);
             }
         }
@@ -303,7 +296,7 @@ public class TournamentServiceImpl implements TournamentService {
     /**
      * Checks previous match to determine next match colour (for colour priority)
      * 
-     * @param player - priority player
+     * @param player     - priority player
      * @param tournament - Tournament matches to consider
      * @return - true if next colour is white
      */
@@ -343,7 +336,8 @@ public class TournamentServiceImpl implements TournamentService {
 
     /**
      * Checks if player is able to play the nextColour
-     * If player hill play same colour three time (including nextColour), returns false
+     * If player hill play same colour three time (including nextColour), returns
+     * false
      * If less than 2 games played, returns true
      * 
      * @param player
@@ -356,7 +350,8 @@ public class TournamentServiceImpl implements TournamentService {
                 .filter(match -> match.getTournament().equals(tournament))
                 .collect(Collectors.toList());
 
-        // Sort in order of increasing round id, since most recent 2 rounds will be largest
+        // Sort in order of increasing round id, since most recent 2 rounds will be
+        // largest
         matchList.sort(Comparator.comparing(Match::getId));
 
         // If less than 2 games played, can accept any colour
@@ -401,5 +396,38 @@ public class TournamentServiceImpl implements TournamentService {
 
         matches.save(match);
         return match;
+    }
+
+    private void handleWithdrawal(Player player, Tournament tournament) {
+        List<Player> playerList = tournament.getPlayers();
+        List<Player> waitingList = tournament.getWaitingList();
+
+        LocalDateTime now = LocalDateTime.now();
+        if (tournament.getDate() != null && now.isAfter(tournament.getDate().minusDays(1))) {
+            Player bot = new Player();
+            bot.setUsername("Bot_" + UUID.randomUUID().toString().substring(0, 5));
+            bot.setELO(player.getELO());
+            playerList.remove(player);
+            playerList.add(bot);
+            tournament.setPlayers(playerList);
+
+            // Mark the bot to always lose in matches
+            for (Round round : tournament.getRounds()) {
+                for (Match match : round.getMatches()) {
+                    if (match.getWhite().equals(bot)) {
+                        match.setResult(-1); // Black wins
+                    } else if (match.getBlack().equals(bot)) {
+                        match.setResult(1); // White wins
+                    }
+                }
+            }
+        } else {
+            playerList.remove(player);
+            if (!waitingList.isEmpty()) {
+                playerList.add(waitingList.remove(0));
+            }
+            tournament.setPlayers(playerList);
+            tournament.setWaitingList(waitingList);
+        }
     }
 }
