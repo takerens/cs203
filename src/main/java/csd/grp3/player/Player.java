@@ -41,7 +41,7 @@ public class Player extends User{
 
     public Player(User user) {
         super(user.getUsername(), null); 
-        this.gamePoints = 0; // 
+        this.user = user;
     }
     public boolean equals(Player player2){
         return super.equals(player2);
