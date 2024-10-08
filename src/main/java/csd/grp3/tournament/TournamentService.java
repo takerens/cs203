@@ -16,6 +16,8 @@ public interface TournamentService {
     void deleteTournament(Long id);
     void registerUser(User user, Long id);
     void withdrawUser(User user, Long id);
+    boolean tournamentExists(Long tournamentId);
+    void addRound(Long id);
     void updateResults(Round round);
     String directEncounterResultInTournament(Tournament tournament, User user1, User user2);
     void endTournament(Long id);

@@ -56,21 +56,76 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void registerUser(User user, Long id) {
-        // TODO TR CODE 1
-        // Tournament tournament = getTournament(id);
-        // tournament.addUser(user, tournament);
-        // tournaments.save(tournament);
+    public void registerUser(User user, Long id) throws TournamentNotFoundException {
+        Tournament tournament = getTournament(id);
+        List<User> userList = tournament.getUsers();
+        List<User> waitingList = tournament.getWaitingList();
+
+        // check if tournament already has that user data
+        if (userList.contains(user) || waitingList.contains(user)) {
+            throw new PlayerAlreadyRegisteredException();
+        } else {
+            // if user isn't inside tournament
+            // if tournament is full, we add to waitingList instead
+            if (userList.size() == tournament.getSize()) {
+                waitingList.add(user);
+                tournament.setWaitingList(waitingList);
+            // else, we want to add to normal userList
+            } else {
+                userList.add(user);
+                tournament.setUsers(userList);
+            }
+        }
+
+        tournaments.save(tournament);
+    }
+
+
+    @Override
+    public void withdrawPlayer(User user, Long id) {
+        Optional<Tournament> tournament = tournaments.findById(id);
+        if (tournament.isPresent()) {
+            Tournament tournamentData = tournament.get();
+            Player playerToWithdraw = null;
+    
+            // Find the Player object associated with the User
+            for (Player player : tournamentData.getPlayers()) {
+                if (player.getUser().equals(user)) {
+                    playerToWithdraw = player;
+                    break;
+                }
+            }
+    
+            // If no matching player is found, throw an exception
+            if (playerToWithdraw == null) {
+                throw new PlayerNotRegisteredException("Player is not registered in this tournament.");
+            }
+    
+            // Proceed with the withdrawal
+            handleWithdrawal(playerToWithdraw, tournamentData);
+            tournaments.save(tournamentData);
+        } else {
+            throw new TournamentNotFoundException(id);
+        }
     }
 
     @Override
-    public void withdrawUser(User user, Long id) {
-        // TODO TR CODE 2
-        // Tournament tournament = getTournament(id);
+    public boolean tournamentExists(Long tournamentId) {
+        return tournamentId != null && tournaments.existsById(tournamentId);
+    }
 
-        // // Proceed with the withdrawal
-        // handleWithdrawal(user, tournamentData);
-        // tournaments.save(tournament);
+    @Override
+    public void addRound(Long id) throws TournamentNotFoundException {
+        Optional<Tournament> tournament = tournaments.findById(id);
+
+        if (tournament.isPresent()) {
+            Tournament tournamentData = tournament.get();
+            List<Round> rounds = tournamentData.getRounds();
+            rounds.add(createPairings(tournamentData));
+            tournaments.save(tournamentData);
+        } else {
+            throw new TournamentNotFoundException(id);
+        }
     }
 
     @Override
@@ -98,7 +153,39 @@ public class TournamentServiceImpl implements TournamentService {
                 }
             }
         }
+      
         // update match results
+
+        // firstly, we update the round with all new match data.
+        round.setMatches(matches);
+
+        // next, we get tournament that the round is in.
+        Tournament tournament = round.getTournament();
+
+        // we get the list of rounds that tournament stores
+        List<Round> rounds = tournament.getRounds();
+
+        // now, we find the specific round that we want to update
+        Long id = round.getId();
+        int index = 0;
+
+        // we loop through each round in tournament round list
+        for (Round eachRound : rounds) {
+            // if the id of the rounds are the same, we can set it to the new round.
+            if (eachRound.getId() == id) {
+                // set it using the index we stored.
+                rounds.set(index, round);
+            }
+            // index to find location of round
+            index += 1;
+        }
+
+        // update tournament with updated list of rounds
+        tournament.setRounds(rounds);
+
+        // save tournament data back into database
+        tournaments.save(tournament);
+    }   
     }
 
     public List<Tournament> getTournamentAboveMin(int ELO) {
