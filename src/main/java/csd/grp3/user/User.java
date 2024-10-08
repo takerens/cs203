@@ -41,8 +41,8 @@ public class User implements UserDetails{
     @NotNull(message = "Authorities should not be null")
     private String authorities;
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<UserTournament> userTournaments = new ArrayList<>();
+    // @OneToMany(mappedBy = "user", orphanRemoval = true)
+    // private List<UserTournament> userTournaments = new ArrayList<>();
 
     public User(String username, String password) {
         this.username = username;

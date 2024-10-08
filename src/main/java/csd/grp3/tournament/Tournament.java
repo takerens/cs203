@@ -41,6 +41,6 @@ public class Tournament {
     @NotNull(message = "size: put a valid tournament size")
     private int size;
 
-    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserTournament> userTournaments;
+    // @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    // private List<UserTournament> userTournaments;
 }

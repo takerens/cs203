@@ -7,6 +7,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import csd.grp3.user.User;
+import csd.grp3.usertournament.UserTournament;
+import csd.grp3.usertournament.UserTournamentService;
 
 import java.util.*;
 
@@ -19,6 +21,9 @@ public class TournamentController {
     @Autowired
     private TournamentService tournamentService;
 
+    @Autowired
+    private UserTournamentService userTournamentService;
+
     @GetMapping("/tournaments")
     public ResponseEntity<List<Tournament>> getAllTournaments() {
         List<Tournament> tournamentList = tournamentService.listTournaments();
@@ -26,8 +31,8 @@ public class TournamentController {
     }
 
     @GetMapping("/tournaments/{id}")
-    public ResponseEntity<Tournament> getTournamentById(@PathVariable Long id) {
-        Tournament tournamentData = tournamentService.getTournament(id);
+    public ResponseEntity<List<UserTournament>> getTournamentById(@PathVariable Long id) {
+        List<UserTournament> tournamentData = userTournamentService.findByTournament(tournamentService.getTournament(id));
         return new ResponseEntity<>(tournamentData, HttpStatus.OK);
     }
 
