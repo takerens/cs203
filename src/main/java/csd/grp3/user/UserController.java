@@ -2,11 +2,7 @@ package csd.grp3.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import csd.grp3.tournament.TournamentService;
 
 import jakarta.validation.Valid;
 
@@ -46,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@Valid @RequestBody User user) {
+    public ResponseEntity<User> loginUser(@RequestBody User user) {
         User loggedIn = userService.login(user.getUsername(), user.getPassword());
         setUser(loggedIn);
         return ResponseEntity.status(HttpStatus.OK).body(loggedIn);

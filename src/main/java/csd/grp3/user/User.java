@@ -2,10 +2,7 @@ package csd.grp3.user;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
-import csd.grp3.tournament.Tournament;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,10 +22,6 @@ import lombok.*;
 @Table(name = "AppUsers")
 
 public class User implements UserDetails{
-    /*
-     * TODO:
-     * Remove elo attribute after creation of player(?)
-     */
     private Integer ELO;
 
     @Id @NotNull(message = "Username should not be null")
@@ -40,11 +33,6 @@ public class User implements UserDetails{
 
     @NotNull(message = "Authorities should not be null")
     private String authorities;
-
-    // Mapping tournament points (Tournament -> Double for points)
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id") // Specify the foreign key in the tournament table
-    private Map<Tournament, Integer> gamePoints;
 
     public User(String username, String password) {
         this.username = username;
@@ -81,4 +69,6 @@ public class User implements UserDetails{
     public boolean isEnabled() {
         return true; // Implement as needed
     }
+
+    
 }

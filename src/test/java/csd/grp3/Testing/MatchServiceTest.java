@@ -1,7 +1,8 @@
 package csd.grp3.Testing;
 
 import csd.grp3.round.Round;
-import csd.grp3.player.Player;
+import csd.grp3.user.User;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -27,7 +28,7 @@ public class MatchServiceTest {
 
     private Match match;
     private Round round;
-    private Player player;
+    private User user;
 
     @BeforeEach
     void setUp() {
@@ -37,10 +38,10 @@ public class MatchServiceTest {
         round = new Round();
         round.setId(1L);
 
-        player = new Player();
-        player.setUsername("playerUser");
-        player.setPassword("password");
-        player.setAuthorities("ROLE_PLAYER");
+        user = new User();
+        user.setUsername("testUser");
+        user.setPassword("password");
+        user.setAuthorities("ROLE_PLAYER");
 
         match = new Match();
         match.setId(1L);

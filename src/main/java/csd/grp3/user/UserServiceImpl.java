@@ -1,32 +1,30 @@
 package csd.grp3.user;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
 
 import jakarta.transaction.Transactional;
 
 @Service
-public class UserServiceImpl implements UserService{
-
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder encoder;
+public class UserServiceImpl implements UserService {
 
     @Autowired
+    private final UserRepository userRepository;
+    @Autowired
+    private final BCryptPasswordEncoder encoder;
+
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder ) {
         this.userRepository = userRepository;
         this.encoder = encoder;
     }
 
     @Override
-    public User findByUsername(String username) {
+    public User findByUsername(String username) throws UserNotFoundException{
         return userRepository.findByUsername(username)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Override
@@ -38,8 +36,8 @@ public class UserServiceImpl implements UserService{
             throw new BadCredentialsException("Username already exists");
         }
 
-        //Encode password given by user to store
-        String encodedPassword = encoder.encode(password);
+        // Encode password given by user to store
+        String encodedPassword = this.encoder.encode(password);
 
         return userRepository.save(new User(username, encodedPassword));
     }
