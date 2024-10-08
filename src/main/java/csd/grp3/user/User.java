@@ -1,5 +1,7 @@
 package csd.grp3.user;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -9,10 +11,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import csd.grp3.match.Match;
+import csd.grp3.tournament.*;
 
 @Entity
 @Getter
@@ -24,10 +30,7 @@ import lombok.*;
 @Table(name = "AppUsers")
 
 public class User implements UserDetails{
-    /*
-     * TODO:
-     * Remove elo attribute after creation of player(?)
-     */
+
     private Integer ELO;
 
     @Id @NotNull(message = "Username should not be null")
@@ -39,6 +42,9 @@ public class User implements UserDetails{
 
     @NotNull(message = "Authorities should not be null")
     private String authorities;
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<Tournament> tournaments = new ArrayList<>();
 
     public User(String username, String password) {
         this.username = username;

@@ -6,6 +6,7 @@ import csd.grp3.match.Match;
 import csd.grp3.player.Player;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
+import csd.grp3.usertournament.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -43,11 +44,14 @@ public class Tournament {
     @NotNull(message = "size: put a valid tournament size")
     private int size;
 
-    @ManyToMany
-    private List<Player> waitingList;
-    @ManyToMany
-    private List<Player> players;
-    private List<Match> matches;
+    @OneToMany(mappedBy = "tournament", orphanRemoval = true)
+    private List<User> users;
+
+    // @ManyToMany
+    // private List<Player> waitingList;
+    // @ManyToMany(mappedBy = "tournament")
+    // private List<TournamentUser> players = new ArrayList<>();
+    // private List<Match> matches;
 
 
     /**
@@ -56,7 +60,7 @@ public class Tournament {
      * 
      */
     public void endTournament() {
-        for(Player user : this.players) {
+        for(User user : this.players) {
             List<Match> userMatches = new ArrayList<>();
 
             for (Round round : this.rounds) {

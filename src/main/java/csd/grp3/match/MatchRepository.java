@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import csd.grp3.player.Player;
+import csd.grp3.user.User;
 import csd.grp3.round.Round;
 import org.springframework.lang.NonNull;
 
@@ -18,7 +18,7 @@ public interface MatchRepository extends JpaRepository<Match, Long>{
     @NonNull List<Match> findByRound(@NonNull Round round);
     @Override void deleteById(@NonNull Long id);
 
-    List<Match> findByBlackAndWhiteOrWhiteAndBlack(Player player1black, Player player2white, Player player1white, Player player2black);
-    List<Match> findByBlackOrWhite(Player player);
+    List<Match> findByBlackAndWhiteOrWhiteAndBlack(User player1black, User player2white, User player1white, User player2black);
+    List<Match> findByBlackOrWhite(User player);
 
 } 
