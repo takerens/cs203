@@ -1,6 +1,5 @@
 package csd.grp3.match;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -17,13 +16,8 @@ public class MatchServiceImpl implements MatchService{
 
     @Override
     public Match getMatch(Long id) throws MatchNotFoundException{
-        Optional<Match> optMatch = matches.findById(id);
-        
-        if (optMatch.isPresent()) {
-            return optMatch.get();
-        } else {
-            throw new MatchNotFoundException();
-        }
+        return matches.findById(id)
+            .orElseThrow(() -> new MatchNotFoundException());
     }
 
     @Override

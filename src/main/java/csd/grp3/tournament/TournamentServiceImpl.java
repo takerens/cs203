@@ -38,7 +38,8 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public Tournament getTournament(Long id) throws TournamentNotFoundException {
-        return getTournament(id);
+        return tournaments.findById(id)
+                .orElseThrow(() -> new TournamentNotFoundException(id));
     }
 
     // TODO Do this function properly accourding to baseline()
@@ -70,7 +71,7 @@ public class TournamentServiceImpl implements TournamentService {
             if (userList.size() == tournament.getSize()) {
                 waitingList.add(user);
                 tournament.setWaitingList(waitingList);
-            // else, we want to add to normal userList
+                // else, we want to add to normal userList
             } else {
                 userList.add(user);
                 tournament.setUsers(userList);
@@ -80,33 +81,30 @@ public class TournamentServiceImpl implements TournamentService {
         tournaments.save(tournament);
     }
 
-
     @Override
-    public void withdrawPlayer(User user, Long id) {
-        Optional<Tournament> tournament = tournaments.findById(id);
-        if (tournament.isPresent()) {
-            Tournament tournamentData = tournament.get();
-            Player playerToWithdraw = null;
-    
-            // Find the Player object associated with the User
-            for (Player player : tournamentData.getPlayers()) {
-                if (player.getUser().equals(user)) {
-                    playerToWithdraw = player;
-                    break;
-                }
-            }
-    
-            // If no matching player is found, throw an exception
-            if (playerToWithdraw == null) {
-                throw new PlayerNotRegisteredException("Player is not registered in this tournament.");
-            }
-    
-            // Proceed with the withdrawal
-            handleWithdrawal(playerToWithdraw, tournamentData);
-            tournaments.save(tournamentData);
+    public void withdrawUser(User user, Long id) {
+        Tournament tournament = getTournament(id);
+        List<User> userList = tournament.getUsers();
+        List<User> waitingList = tournament.getWaitingList();
+
+        LocalDateTime now = LocalDateTime.now();
+        if (tournament.getDate() != null && now.isAfter(tournament.getDate().minusDays(1))) {
+            // TODO 3: Change to BYE user
+            User bot = new User();
+            bot.setUsername("Bot_" + UUID.randomUUID().toString().substring(0, 5));
+            bot.setELO(user.getELO());
+            userList.remove(user);
+            userList.add(bot);
+            tournament.setUsers(userList);
         } else {
-            throw new TournamentNotFoundException(id);
+            userList.remove(user);
+            if (!waitingList.isEmpty()) {
+                userList.add(waitingList.remove(0));
+            }
+            tournament.setUsers(userList);
+            tournament.setWaitingList(waitingList);
         }
+        tournaments.save(tournament);
     }
 
     @Override
@@ -153,7 +151,7 @@ public class TournamentServiceImpl implements TournamentService {
                 }
             }
         }
-      
+
         // update match results
 
         // firstly, we update the round with all new match data.
@@ -185,7 +183,6 @@ public class TournamentServiceImpl implements TournamentService {
 
         // save tournament data back into database
         tournaments.save(tournament);
-    }   
     }
 
     public List<Tournament> getTournamentAboveMin(int ELO) {
@@ -234,9 +231,9 @@ public class TournamentServiceImpl implements TournamentService {
                 eligibleTournamentList.add(tournament);
             }
         }
-        
+
         return eligibleTournamentList;
-    } 
+    }
 
     /**
      * Checks if 2 users have played each other in the tournament before.
@@ -245,8 +242,8 @@ public class TournamentServiceImpl implements TournamentService {
      * If never faced each other, returns "no direct encounter".
      * 
      * @param tournament - Tournament to check
-     * @param user1    - First user
-     * @param user2    - Second user
+     * @param user1      - First user
+     * @param user2      - Second user
      * @return Username of winner
      */
     public String directEncounterResultInTournament(Tournament tournament, User user1, User user2) {
@@ -353,7 +350,7 @@ public class TournamentServiceImpl implements TournamentService {
     /**
      * Checks previous match to determine next match colour (for colour priority)
      * 
-     * @param user     - priority user
+     * @param user       - priority user
      * @param tournament - Tournament matches to consider
      * @return - true if next colour is white
      */
@@ -453,39 +450,6 @@ public class TournamentServiceImpl implements TournamentService {
 
         matchService.addMatch(match);
         return match;
-    }
-
-    private void handleWithdrawal(User user, Tournament tournament) {
-        List<User> userList = tournament.getUsers();
-        List<User> waitingList = tournament.getWaitingList();
-
-        LocalDateTime now = LocalDateTime.now();
-        if (tournament.getDate() != null && now.isAfter(tournament.getDate().minusDays(1))) {
-            User bot = new User();
-            bot.setUsername("Bot_" + UUID.randomUUID().toString().substring(0, 5));
-            bot.setELO(user.getELO());
-            userList.remove(user);
-            userList.add(bot);
-            tournament.setUsers(userList);
-
-            // Mark the bot to always lose in matches
-            for (Round round : tournament.getRounds()) {
-                for (Match match : round.getMatches()) {
-                    if (match.getWhite().equals(bot)) {
-                        match.setResult(-1); // Black wins
-                    } else if (match.getBlack().equals(bot)) {
-                        match.setResult(1); // White wins
-                    }
-                }
-            }
-        } else {
-            userList.remove(user);
-            if (!waitingList.isEmpty()) {
-                userList.add(waitingList.remove(0));
-            }
-            tournament.setUsers(userList);
-            tournament.setWaitingList(waitingList);
-        }
     }
 
     /**
