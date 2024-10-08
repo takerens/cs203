@@ -4,14 +4,19 @@ import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder encoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder ) {
         this.userRepository = userRepository;
+        this.encoder = encoder;
     }
 
     // This function checks if password is alphanumeric and is 8 chars long
@@ -55,6 +60,8 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    @Override
+    @Transactional
     public User createNewUser(String username, String password) {
 
         if (userRepository.findByUsername(username).isPresent()) {
@@ -72,6 +79,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(new User(username, encodedPassword));
     }
 
+    @Override
     public boolean login(String username, String password) {
 
         // If user does not exist, immediately return false
