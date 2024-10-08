@@ -1,31 +1,35 @@
-import React, { useEffect, useState, useParams } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
+import Navbar from '../components/NavBar';
+import SecondaryNavbar from '../components/SecondaryNavbar';
 
 const TournamentStandings = () => {
     const { tournamentId } = useParams();
     const [standings, setStandings] = useState([]);
+    const [ tournament, setTournament ] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => { // Fetch Tournament Standings
         const fetchStandings = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}/standings`, {
+                const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
                 });
-    
+
                 if (!response.ok) {
                     const errorResponse = await response.json(); // Get error message from response
-                    console.error('Fetching Tournament Standings:', errorResponse); // Log error for debugging
+                    console.error('Fetching Tournament Data:', errorResponse); // Log error for debugging
                     throw new Error(errorResponse.message); // General error message
                 }
-    
-                const tournamentData = await response.json();
-                console.log("Tournament Standings: " + tournamentData); // View Data for Debugging
-                setStandings(tournamentData); // List of Players
-    
+
+                const tournamentData = await response.json(); // Tournament
+                console.log("Tournament Data: " + tournamentData); // View Data for Debugging
+                setTournament(tournamentData);
+                setStandings(tournamentData.players);
             } catch (error) {
-                setErrorMessage(error.message);
+                setErrorMessage("Fetch Tournament Data Error: " + error.message);
             }
         };
 
@@ -33,6 +37,8 @@ const TournamentStandings = () => {
     }, [tournamentId]);
 
     return (
+        <><Navbar userRole="ROLE_USER" />
+        <SecondaryNavbar userRole="ROLE_USER" tournament={tournament}/>
         <main>
             <h3>Standings</h3>
             <ErrorMessage message={errorMessage}/>
@@ -56,7 +62,7 @@ const TournamentStandings = () => {
                     ))}
                 </tbody>
             </table>
-        </main>
+        </main></>
     );
 };
 

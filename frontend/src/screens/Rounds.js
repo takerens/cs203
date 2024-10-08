@@ -36,33 +36,33 @@ const TournamentRounds = () => {
             }
         };
 
+        // Fetch rounds data
+        const fetchRoundsAndMatches = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                if (!response.ok) {
+                    const errorResponse = await response.json(); // Get error message from response
+                    console.error('Fetching Tournament Data:', errorResponse); // Log error for debugging
+                    throw new Error(errorResponse.message); // General error message
+                }
+
+                const tournamentData = await response.json(); // Tournament
+                console.log("Tournament Data: " + tournamentData); // View Data for Debugging
+                setTournament(tournamentData);
+                setRounds(tournamentData.rounds);
+                setMatches(tournamentData.rounds[roundNumber]);
+            } catch (error) {
+                setErrorMessage("Fetch Tournament Data Error: " + error.message);
+            }
+        };
+
         fetchUserData();
         fetchRoundsAndMatches();
-    }, []);
-
-    // Fetch rounds data
-    const fetchRoundsAndMatches = async () => {
-        try {
-            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-            });
-
-            if (!response.ok) {
-                const errorResponse = await response.json(); // Get error message from response
-                console.error('Fetching Tournament Data:', errorResponse); // Log error for debugging
-                throw new Error(errorResponse.message); // General error message
-            }
-
-            const tournamentData = await response.json(); // Tournament
-            console.log("Tournament Data: " + tournamentData); // View Data for Debugging
-            setTournament(tournamentData);
-            setRounds(tournamentData.rounds);
-            setMatches(tournamentData.rounds[roundNumber]);
-        } catch (error) {
-            setErrorMessage("Fetch Tournament Data Error: " + error.message);
-        }
-    };
+    }, [roundNumber, tournamentId]);
 
     const handleResultChange = async () => {
         try {
@@ -122,7 +122,7 @@ const TournamentRounds = () => {
                         <th>White Player</th>
                         <th>Rating</th>
                         <th>Points</th>
-                        <th>Round {roundNumber}</th>
+                        <th>Results</th>
                         <th>Black Player</th>
                         <th>Rating</th>
                         <th>Points</th>

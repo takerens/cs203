@@ -9,6 +9,7 @@ const AddTournament = () => {
     const [date, setDate] = useState('');
     const [size, setSize] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();

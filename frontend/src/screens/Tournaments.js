@@ -31,13 +31,14 @@ const TournamentManagement = () => {
 
         fetchUserData();
         fetchTournamentData();
-    }, []);
+    }, );
 
     const fetchTournamentData = async () => {
         try {
             const response = await fetch("http://localhost:8080/tournaments", {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(user),
             });
 
             if (!response.ok) {
@@ -147,7 +148,10 @@ const TournamentManagement = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {tournaments.map((tournament) => (
+                            {tournaments.map((tournament) => {
+                                const hasTournamentStarted = new Date() > new Date(tournament.date);
+
+                                return (
                                 <tr key={tournament.id}> 
                                     <td>{tournament.title}</td>
                                     <td>{tournament.minElo}</td>
@@ -161,7 +165,7 @@ const TournamentManagement = () => {
                                                     <button>View Details</button>
                                                 </Link>
                                                 <form onSubmit={(e) => handleRegister(e, tournament.id)}>
-                                                    <button type="submit">Register</button>
+                                                    <button type="submit" disabled={hasTournamentStarted}>Register</button>
                                                 </form>
                                                 <form onSubmit={(e) => handleWithdraw(e, tournament.id)}>
                                                     <button type="submit">Withdraw</button>
@@ -183,7 +187,7 @@ const TournamentManagement = () => {
                                         )}
                                     </td>
                                 </tr>
-                            ))}
+                            );})}
                         </tbody>
                     </table>
                 </div>

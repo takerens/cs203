@@ -6,6 +6,8 @@ import Login from './screens/Login';
 import TournamentManagement from './screens/Tournaments';
 import TournamentRounds from './screens/Rounds';
 import TournamentStandings from './screens/Standings';
+import AddTournament from './screens/AddTournament';
+import UpdateTournament from './screens/UpdateTournament';
 
 const App = () => {
   return (

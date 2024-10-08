@@ -49,16 +49,16 @@ input[type="submit"].register-button:hover {
 }
 
 /* NAVIGATION */
-/*Used*/.nav-container {
+.nav-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-/*Used*/.navbar {
+.navbar {
   background-color: #A3C1DA; /* Blue background */
   padding: 15px; /* Padding for the navbar */
 }
-/*Used*/.secondary-navbar {
+.secondary-navbar {
   background-color: lightgray; /* Gray background */
   padding: 15px; /* Padding for the navbar */
 }
@@ -68,28 +68,28 @@ input[type="submit"].register-button:hover {
   font-size: 24px;
   cursor: pointer; /* Change cursor to pointer */
 }
-/*Used*/.navbar-nav {
+.navbar-nav {
   list-style-type: none; /* Remove bullets from list */
   margin: 0;
   padding: 0;
   display: flex; /* Flexbox for horizontal layout */
 }
-/*Used*/.nav-item {
+.nav-item {
   margin: 0 15px; /* Spacing between nav items */
 }
-/*Used*/.nav-link {
+.nav-link {
   color: black;
   text-decoration: none; /* Remove underline */
   padding: 10px; /* Padding for clickable area */
   border-radius: 5px; /* Rounded corners */
 }
-/*Used*/.nav-link:hover {
+.nav-link:hover {
   background-color: #45a049; /* Darker green on hover */
 }
-/*Used*/.logout-form {
+.logout-form {
   display: inline; /* Keep the form inline */
 }
-/*Used*/.logout-button {
+.logout-button {
   background-color: #f44336; /* Red background for logout */
   color: white;
   border: none; /* Remove border */
@@ -97,7 +97,7 @@ input[type="submit"].register-button:hover {
   border-radius: 5px; /* Rounded corners */
   cursor: pointer; /* Pointer cursor on hover */
 }
-/*Used*/.logout-button:hover {
+.logout-button:hover {
   background-color: #d32f2f; /* Darker red on hover */
 }
 
@@ -121,6 +121,11 @@ h2 {
 }
 .button:hover {
   background-color: #45a049; /* Darker green on hover */
+}
+button:disabled {
+  background-color: #CCCCCC; /* Gray out the button */
+  cursor: not-allowed;       /* Show not-allowed cursor */
+  color: #666666;            /* Gray out text */
 }
 table {
   width: 100%;
@@ -163,17 +168,17 @@ h1, h2, p {
 }
 
 /* PAGINATION */
-/*Used*/.pagination {
+.pagination {
   margin-bottom: 20px;
 }
-/*Used*/.pagination Link {
+.pagination Link {
   margin: 0 5px;
   text-decoration: underline;
   color: lightblue
   (63, 63, 190);
 
 }
-/*Used*/.pagination Link.current {
+.pagination Link.current {
   text-decoration: none;
   font-weight: bold;
   color: red;

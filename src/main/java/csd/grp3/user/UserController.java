@@ -2,18 +2,13 @@ package csd.grp3.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import csd.grp3.tournament.TournamentService;
 
 import jakarta.validation.Valid;
 
 @RestController
 public class UserController {
     private UserService userService;
-    private TournamentService tournamentService;
 
     //TEMPORARY
     private User user;
@@ -27,9 +22,8 @@ public class UserController {
     }
     // Till HERE
 
-    public UserController(UserService userService, TournamentService tournamentService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.tournamentService = tournamentService;
         this.user = null;
     }
 

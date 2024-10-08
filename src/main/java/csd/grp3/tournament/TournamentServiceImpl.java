@@ -424,4 +424,18 @@ public class TournamentServiceImpl implements TournamentService {
             tournament.setWaitingList(waitingList);
         }
     }
+
+    public List<Tournament> getUserEligibleTournament(User user) { 
+        int userELO = user.getELO(); 
+        List<Tournament> tournamentList = listTournaments(); 
+        List<Tournament> eligibleTournamentList = new ArrayList<>(); 
+ 
+        for (Tournament tournament : tournamentList) { 
+            if (tournament.getMaxElo() >= userELO && tournament.getMinElo() <= userELO) { 
+                eligibleTournamentList.add(tournament); 
+            } 
+        } 
+         
+        return eligibleTournamentList; 
+    }
 }
