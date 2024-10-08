@@ -32,7 +32,7 @@ Content-Type: application/json
 GET http://localhost:8080/users
 
 ### Retrieve Tournament Data for User
-GET http://localhost:8080/tournaments/1
+GET http://localhost:8080/tournaments
 Content-Type: application/json
 Authorization: Basic VXNlcjp1c2VyMTIzNA==
 

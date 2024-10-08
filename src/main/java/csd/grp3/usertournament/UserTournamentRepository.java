@@ -1,6 +1,5 @@
 package csd.grp3.usertournament;
 
-import csd.grp3.tournament.Tournament;
 import csd.grp3.user.*;
 
 import org.springframework.stereotype.Repository;
@@ -13,8 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface UserTournamentRepository extends JpaRepository<UserTournament, UserTournamentId>{
-    List<UserTournament> findByUser(User user);
-    List<UserTournament> findByTournament(Tournament tournament);
+    List<User> findUsersByTournamentId(Long tournamentId);
 
     Optional<UserTournament> findById_TournamentIdAndId_Username(Long tournamentId, String username);
     // @Query("SELECT ut from UserTournament ut where ut.tournamentId = :tournamentId and ut.username = :username")

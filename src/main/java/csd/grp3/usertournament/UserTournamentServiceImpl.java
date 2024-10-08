@@ -2,7 +2,6 @@ package csd.grp3.usertournament;
 
 import java.util.List;
 
-import org.hibernate.annotations.DialectOverride.OverridesAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,16 +65,6 @@ public class UserTournamentServiceImpl implements UserTournamentService {
     @Override
     public void delete(Long tourneyID, String username) {
         userTournamentRepo.deleteById_TournamentIdAndId_Username( tourneyID,  username);
-    }
-
-    @Override
-    public List<UserTournament> findByUser(User user) {
-        return userTournamentRepo.findByUser(user);
-    }
-
-    @Override
-    public List<UserTournament> findByTournament(Tournament tournament) {
-        return userTournamentRepo.findByTournament(tournament);
     }
     
 }

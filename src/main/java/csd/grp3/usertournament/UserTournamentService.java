@@ -13,6 +13,4 @@ public interface UserTournamentService {
     UserTournament updatePlayerStatus(Long tourneyID, String username, char status);
     UserTournament add(Tournament tourneyID, User username, char status);
     void delete(Long tourneyID, String username);
-    List<UserTournament> findByTournament(Tournament tournament);
-    List<UserTournament> findByUser(User user);
 }
