@@ -10,6 +10,8 @@ import lombok.*;
 
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="Tournaments")
 @Getter
@@ -25,6 +27,7 @@ public class Tournament {
     private Long id;
 
     @OneToMany(mappedBy = "tournament", orphanRemoval = true)
+    @JsonIgnore
     private List<Round> rounds;
 
     @NotNull(message = "Title: not null")
@@ -42,5 +45,6 @@ public class Tournament {
     private int size;
 
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<UserTournament> userTournaments;
 }

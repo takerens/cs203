@@ -2,6 +2,8 @@ package csd.grp3.round;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import csd.grp3.match.Match;
 import csd.grp3.tournament.Tournament;
 import jakarta.persistence.Entity;
@@ -33,6 +35,7 @@ public class Round {
     private Tournament tournament;
 
     @OneToMany(mappedBy = "round", orphanRemoval = true)
+    @JsonIgnore
     private List<Match> matches;
     
 }
