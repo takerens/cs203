@@ -13,9 +13,9 @@ import jakarta.validation.Valid;
 @RestController
 public class UserController {
     private UserService userService;
-
     private TournamentService tournamentService;
 
+    //TEMPORARY
     private User user;
 
     private void setUser(User user) {
@@ -25,6 +25,7 @@ public class UserController {
     private User getUser() {
         return this.user;
     }
+    // Till HERE
 
     public UserController(UserService userService, TournamentService tournamentService) {
         this.userService = userService;
@@ -48,31 +49,8 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<User> loginUser(@RequestBody User user) {
-        if (userService.login(user.getUsername(), user.getPassword())) {
-            setUser(userService.findByUsername(user.getUsername()));
-            return ResponseEntity.status(HttpStatus.OK).body(userService.findByUsername(user.getUsername()));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // null is needed
-    }
-
-    @PostMapping("/register/{tournamentId}")
-    // @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<HttpStatus> registerForTournament(@PathVariable Long tournamentId, @RequestBody User user) {
-        if (user == null || !tournamentService.tournamentExists(tournamentId)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        tournamentService.registerPlayer(user, tournamentId);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
-    }
-
-    @DeleteMapping("/withdraw/{tournamentId}")
-    public ResponseEntity<HttpStatus> withdrawfromTournament(@PathVariable Long tournamentId, @RequestBody User user) {
-        if (user == null || !tournamentService.tournamentExists(tournamentId)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        tournamentService.withdrawPlayer(user, tournamentId);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        User loggedIn = userService.login(user.getUsername(), user.getPassword());
+        setUser(loggedIn);
+        return ResponseEntity.status(HttpStatus.OK).body(loggedIn);
     }
 }

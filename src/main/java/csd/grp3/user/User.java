@@ -44,6 +44,7 @@ public class User implements UserDetails{
         this.username = username;
         this.password = password;
         this.authorities = "ROLE_USER";
+        this.ELO = 100;
     }
 
     public String getUserRole() {
