@@ -22,7 +22,7 @@ public class Grp3Application {
 		UserRepository users = ctx.getBean(UserRepository.class);
 		System.out.println("[Add Admin]: " + users.save(new User("Admin", encoder.encode("password123"), "ROLE_ADMIN", 0)).getUsername());
 		System.out.println("[Add User]: " + users.save(new User("User", encoder.encode("user1234"), "ROLE_USER", 100)).getUsername());
-
+		System.out.println("[Add Bot]: " + users.save(new User("DEFAULT_BOT", encoder.encode("goodpassword"), "ROLE_USER", 0)).getUsername());
 
 		// JPA User Repository init
 		TournamentRepository ts = ctx.getBean(TournamentRepository.class);
