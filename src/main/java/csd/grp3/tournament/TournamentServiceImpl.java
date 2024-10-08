@@ -3,6 +3,7 @@ package csd.grp3.tournament;
 import csd.grp3.match.*;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
+import csd.grp3.user.UserService;
 import csd.grp3.usertournament.UserTournamentService;
 import csd.grp3.exception.MatchNotCompletedException;
 
@@ -25,7 +26,10 @@ public class TournamentServiceImpl implements TournamentService {
     private MatchService matchService;
 
     @Autowired
-    private UserTournamentService userTournamentService;
+    private UserTournamentService UTService;
+
+    @Autowired
+    private UserService userService;
 
     @Override
     public List<Tournament> listTournaments() {
@@ -60,8 +64,8 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void registerUser(User user, Long id) throws TournamentNotFoundException {
         Tournament tournament = getTournament(id);
-        List<User> userList = tournament.getUsers();
-        List<User> waitingList = tournament.getWaitingList();
+        List<User> userList = UTService.getPlayers(id);
+        List<User> waitingList = UTService.getWaitingList(id);
 
         // check if tournament already has that user data
         if (userList.contains(user) || waitingList.contains(user)) {
@@ -71,11 +75,11 @@ public class TournamentServiceImpl implements TournamentService {
             // if tournament is full, we add to waitingList instead
             if (userList.size() == tournament.getSize()) {
                 waitingList.add(user);
-                tournament.setWaitingList(waitingList);
+                UTService.add(tournament, user, 'w');
                 // else, we want to add to normal userList
             } else {
                 userList.add(user);
-                tournament.setUsers(userList);
+                UTService.add(tournament, user, 'r');
             }
         }
 
@@ -85,25 +89,20 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void withdrawUser(User user, Long id) {
         Tournament tournament = getTournament(id);
-        List<User> userList = tournament.getUsers();
-        List<User> waitingList = tournament.getWaitingList();
+        List<User> userList = UTService.getPlayers(id);
+        List<User> waitingList = UTService.getWaitingList(id);
 
+        // Reduce code redundancy in UTService.delete
         LocalDateTime now = LocalDateTime.now();
         if (tournament.getDate() != null && now.isAfter(tournament.getDate().minusDays(1))) {
-            // TODO 3: Change to BYE user
-            User bot = new User();
-            bot.setUsername("Bot_" + UUID.randomUUID().toString().substring(0, 5));
-            bot.setELO(user.getELO());
-            userList.remove(user);
-            userList.add(bot);
-            tournament.setUsers(userList);
+            UTService.delete(tournament.getId(), user.getUsername());
         } else {
-            userList.remove(user);
+            UTService.delete(tournament.getId(), user.getUsername());
             if (!waitingList.isEmpty()) {
                 userList.add(waitingList.remove(0));
             }
-            tournament.setUsers(userList);
-            tournament.setWaitingList(waitingList);
+            User waitingListToPlayer = waitingList.remove(0);
+            UTService.updatePlayerStatus(tournament.getId(), waitingListToPlayer.getUsername(), 'r');
         }
         tournaments.save(tournament);
     }
@@ -130,6 +129,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void updateResults(Round round) throws MatchNotCompletedException {
         List<Match> matches = round.getMatches();
+        Tournament tournament = round.getTournament();
 
         // check match ended
         for (Match match : matches) {
@@ -143,12 +143,12 @@ public class TournamentServiceImpl implements TournamentService {
                 User black = match.getBlack();
                 User white = match.getWhite();
                 if (result == -1) {
-                    userTournamentService.updateGamePoints(match.getTournament().getId(), black.getUsername(), 1.0);
+                    UTService.updateGamePoints(tournament.getId(), black.getUsername(), 1.0);
                 } else if (result == 1) {
-                    userTournamentService.updateGamePoints(match.getTournament().getId(), white.getUsername(), 1.0);
+                    UTService.updateGamePoints(tournament.getId(), white.getUsername(), 1.0);
                 } else if (result == 0.5) {
-                    userTournamentService.updateGamePoints(match.getTournament().getId(), black.getUsername(), 0.5);
-                    userTournamentService.updateGamePoints(match.getTournament().getId(), white.getUsername(), 0.5);
+                    UTService.updateGamePoints(tournament.getId(), black.getUsername(), 0.5);
+                    UTService.updateGamePoints(tournament.getId(), white.getUsername(), 0.5);
                 }
             }
         }
@@ -159,7 +159,6 @@ public class TournamentServiceImpl implements TournamentService {
         round.setMatches(matches);
 
         // next, we get tournament that the round is in.
-        Tournament tournament = round.getTournament();
 
         // we get the list of rounds that tournament stores
         List<Round> rounds = tournament.getRounds();
@@ -278,7 +277,7 @@ public class TournamentServiceImpl implements TournamentService {
         double buchholzScore = 0;
         for (Match match : matchList) {
             User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
-            buchholzScore += userTournamentService.getGamePoints(tournament.getId(), opponent.getUsername());
+            buchholzScore += UTService.getGamePoints(tournament.getId(), opponent.getUsername());
         }
         return buchholzScore;
     }
@@ -293,7 +292,7 @@ public class TournamentServiceImpl implements TournamentService {
         List<Double> opponentScores = new ArrayList<>();
         for (Match match : matchList) {
             User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
-            opponentScores.add(userTournamentService.getGamePoints(tournament.getId(), opponent.getUsername()));
+            opponentScores.add(UTService.getGamePoints(tournament.getId(), opponent.getUsername()));
         }
 
         if (!opponentScores.isEmpty()) {
@@ -305,7 +304,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     public Round createPairings(Tournament tournament) {
         List<Match> pairings = new ArrayList<>();
-        List<User> users = tournament.getUsers();
+        List<User> users = UTService.getPlayers(tournament.getId());
         Set<User> pairedUsers = new HashSet<>();
 
         // New round
@@ -313,7 +312,7 @@ public class TournamentServiceImpl implements TournamentService {
         nextRound.setTournament(tournament);
 
         users.sort(Comparator
-            .comparingDouble((User user) -> userTournamentService.getGamePoints(tournament.getId(), user.getUsername()))
+            .comparingDouble((User user) -> UTService.getGamePoints(tournament.getId(), user.getUsername()))
             .thenComparing(User::getELO)
             .reversed());
 
@@ -465,7 +464,7 @@ public class TournamentServiceImpl implements TournamentService {
     public void endTournament(Long id) {
         Tournament tournament = getTournament(id);
 
-        for (User user : tournament.getUsers()) {
+        for (User user : UTService.getPlayers(id)) {
             List<Match> userMatches = new ArrayList<>();
 
             for (Round round : tournament.getRounds()) {
@@ -478,6 +477,15 @@ public class TournamentServiceImpl implements TournamentService {
 
             update(userMatches, user);
         }
+    }
+
+    private Match handleBYE(User worst, String color, Round round) { // color is color of worst player
+        User bot = userService.findByUsername("DEFAULT_BOT");
+        Match match = createMatchWithUserColour(worst, color, bot, round);
+        match.setBYE(true);
+        match.setResult(color.equals("white") ? 1 : -1);
+        matchService.addMatch(match); // is this necessary
+        return match;
     }
 
     /**
