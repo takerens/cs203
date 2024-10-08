@@ -73,8 +73,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // Encode password given by user to store
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String encodedPassword = encoder.encode(password);
+        String encodedPassword = this.encoder.encode(password);
 
         return userRepository.save(new User(username, encodedPassword));
     }
@@ -93,8 +92,7 @@ public class UserServiceImpl implements UserService {
         String encodedPassword = user.getPassword();
 
         // Return if the password matches
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.matches(password, encodedPassword);
+        return this.encoder.matches(password, encodedPassword);
     }
 
     public List<User> findAll() {
@@ -102,9 +100,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found")); // Throw an exception if not found
-    }
+    public User getUser(String username) {
+        Optional<User> optUser = userRepository.findByUsername(username);
 
+        if (optUser.isPresent()) {
+            return optUser.get();
+        } else {
+            throw new UserNotFoundException();
+        }
+    }
 }

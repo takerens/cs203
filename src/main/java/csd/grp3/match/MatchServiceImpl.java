@@ -1,9 +1,11 @@
 package csd.grp3.match;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import csd.grp3.round.Round;
+import csd.grp3.user.User;
 
 @Service
 public class MatchServiceImpl implements MatchService{
@@ -14,13 +16,14 @@ public class MatchServiceImpl implements MatchService{
     }
 
     @Override
-    public List<Match> getRoundMatches(Round round) {
-        return matches.findByRound(round);
-    }
-
-    @Override
-    public Match getMatch(Long id){
-        return matches.findById(id).orElse(null);
+    public Match getMatch(Long id) throws MatchNotFoundException{
+        Optional<Match> optMatch = matches.findById(id);
+        
+        if (optMatch.isPresent()) {
+            return optMatch.get();
+        } else {
+            throw new MatchNotFoundException();
+        }
     }
 
     @Override
@@ -30,15 +33,29 @@ public class MatchServiceImpl implements MatchService{
 
     @Override 
     public Match updateMatch(Long id, Match newMatch) {
-        return matches.findById(id).map(match -> {
-            match.setResult(newMatch.getResult());
-            match.setBYE(newMatch.isBYE());
-            return matches.save(match);
-        }).orElse(null);
+        Match match = getMatch(id);
+        match.setResult(newMatch.getResult());
+        match.setBYE(newMatch.isBYE());
+        return matches.save(match);
     }
 
     @Override 
     public void deleteMatch(Long id) {
         matches.deleteById(id);
+    }
+
+    @Override
+    public List<Match> getRoundMatches(Round round) {
+        return matches.findByRound(round);
+    }
+
+    @Override
+    public List<Match> getUserMatches(User user) {
+        return matches.findByBlackOrWhite(user);
+    }
+
+    @Override
+    public List<Match> getMatchesBetweenTwoUsers(User user1, User user2) {
+        return matches.findByBlackAndWhiteOrWhiteAndBlack(user1,user2,user2,user1);
     }
 }

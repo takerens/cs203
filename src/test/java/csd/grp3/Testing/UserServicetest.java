@@ -139,12 +139,9 @@ public class UserServicetest {
         User user = new User(username, "encodedPassword");
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        Optional<User> result = userService.findByUsername(username);
+        User result = userService.getUser(username);
         assertNotNull(result);
-        assertTrue(result.isPresent());
-
-        User foundUser = result.get(); 
-        assertEquals(username, foundUser.getUsername());
+        assertEquals(user, result);
     }
 
     // Test for finding a user by username when user is not found
@@ -155,7 +152,7 @@ public class UserServicetest {
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            userService.findByUsername(username);
+            userService.getUser(username);
         });
 
         assertEquals("User not found", exception.getMessage());

@@ -24,10 +24,6 @@ import lombok.*;
 @Table(name = "AppUsers")
 
 public class User implements UserDetails{
-    /*
-     * TODO:
-     * Remove elo attribute after creation of player(?)
-     */
     private Integer ELO;
 
     @Id @NotNull(message = "Username should not be null")
@@ -75,4 +71,6 @@ public class User implements UserDetails{
     public boolean isEnabled() {
         return true; // Implement as needed
     }
+
+    
 }

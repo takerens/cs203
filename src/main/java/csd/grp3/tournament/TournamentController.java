@@ -8,8 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import csd.grp3.match.MatchRepository;
-import csd.grp3.round.RoundRepository;
 import csd.grp3.user.User;
 
 import jakarta.servlet.http.HttpSession;
@@ -18,13 +16,6 @@ import java.util.*;
 
 @Controller
 public class TournamentController {
-
-    @Autowired
-    private MatchRepository matchRepo;
-
-    @Autowired 
-    private RoundRepository roundRepo;
-
     @Autowired
     private TournamentRepository tournamentRepo;
 
@@ -139,14 +130,14 @@ public class TournamentController {
     // }
 
     @DeleteMapping("/{id}/withdraw")
-    public ResponseEntity<Void> withdrawPlayer(@RequestBody User player, @PathVariable Long id) {
-        tournamentService.withdrawPlayer(player, id);
+    public ResponseEntity<Void> withdraw(@RequestBody User user , @PathVariable Long id) {
+        tournamentService.withdrawUser(user, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/{id}/register")
-    public ResponseEntity<Void> registerPlayer(@RequestBody User player, @PathVariable Long id) {
-        tournamentService.registerPlayer(player, id);
+    public ResponseEntity<Void> registerUser(@RequestBody User user, @PathVariable Long id) {
+        tournamentService.registerUser(user, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -7,8 +7,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import csd.grp3.tournament.TournamentService;
 
-
-import java.util.Optional;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -43,21 +41,10 @@ public class UserController {
             System.out.println("[Error]: User is not authenticated. Please log in first");
             return "redirect:/login?error=Please log in first";
         }
-        Optional<User> user = userService.findByUsername(username);
 
-        if (user.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "User not found.");
-            return "redirect:/tournaments"; // Redirect on failure
-        }
+        User user = userService.getUser(username);
 
-        if (!tournamentService.tournamentExists(tournamentId)) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Tournament not found.");
-            return "redirect:/tournaments"; // Redirect on failure
-        }
-
-        User user2 = user.get();
-
-        tournamentService.registerPlayer(user2, tournamentId);
+        tournamentService.registerUser(user, tournamentId);
         redirectAttributes.addFlashAttribute("message", "Successfully registered for the tournament!");
         return "redirect:/tournaments"; // Redirect after successful registration
     }
@@ -71,23 +58,10 @@ public class UserController {
             System.out.println("[Error]: User is not authenticated. Please log in first");
             return "redirect:/login?error=Please log in first";
         }
-      
-        Optional<User> user = userService.findByUsername(username);
+    
+        User user = userService.getUser(username);
 
-
-        if (user == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "User not found.");
-            return "redirect:/tournaments"; // Redirect on failure
-        }
-
-        User user2 = user.get();
-
-        if (!tournamentService.tournamentExists(tournamentId)) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Tournament not found.");
-            return "redirect:/tournaments"; // Redirect on failure
-        }
-
-        tournamentService.withdrawPlayer(user2, tournamentId);
+        tournamentService.withdrawUser(user, tournamentId);
         redirectAttributes.addFlashAttribute("message", "Successfully withdrew from the tournament!");
         return "redirect:/tournaments"; // Redirect after successful withdrawal
     }
