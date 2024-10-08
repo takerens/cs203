@@ -20,5 +20,5 @@ public interface TournamentService {
     boolean tournamentExists(Long tournamentId);
     void addRound(Long id);
     void updateResults(Round round);
-    String directEncounterResultInTournament(Tournament tournament, Player player1, Player player2);
+    String directEncounterResultInTournament(Tournament tournament, User player1, User player2);
 }

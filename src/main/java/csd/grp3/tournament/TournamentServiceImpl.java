@@ -5,6 +5,8 @@ import csd.grp3.match.MatchRepository;
 import csd.grp3.player.Player;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
+import csd.grp3.usertournament.UserTournament;
+import csd.grp3.usertournament.UserTournamentRepository;
 import csd.grp3.exception.MatchNotCompletedException;
 
 import java.time.LocalDateTime;
@@ -21,12 +23,16 @@ public class TournamentServiceImpl implements TournamentService {
     private TournamentRepository tournaments;
 
     @Autowired
+    private UserTournamentRepository userTournaments;
+
+    @Autowired
     private MatchRepository matches;
 
 
 
-    public TournamentServiceImpl(TournamentRepository tournaments) {
+    public TournamentServiceImpl(TournamentRepository tournaments, UserTournamentRepository userTournaments) {
         this.tournaments = tournaments;
+        this.userTournaments = userTournaments;
     }
 
     @Override

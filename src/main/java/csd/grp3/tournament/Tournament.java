@@ -2,10 +2,7 @@ package csd.grp3.tournament;
 
 import java.time.LocalDateTime;
 
-import csd.grp3.match.Match;
-import csd.grp3.player.Player;
 import csd.grp3.round.Round;
-import csd.grp3.user.User;
 import csd.grp3.usertournament.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -44,34 +41,6 @@ public class Tournament {
     @NotNull(message = "size: put a valid tournament size")
     private int size;
 
-    @OneToMany(mappedBy = "tournament", orphanRemoval = true)
-    private List<User> users;
-
-    // @ManyToMany
-    // private List<Player> waitingList;
-    // @ManyToMany(mappedBy = "tournament")
-    // private List<TournamentUser> players = new ArrayList<>();
-    // private List<Match> matches;
-
-
-    /**
-     * Iterates through Users and find the matches played by each user.
-     * Calls CalculateElo.update for each user
-     * 
-     */
-    public void endTournament() {
-        for(User user : this.players) {
-            List<Match> userMatches = new ArrayList<>();
-
-            for (Round round : this.rounds) {
-                for (Match match : round.getMatches()) {
-                    if (user.equals(match.getWhite()) || user.equals(match.getBlack()) ) {
-                        userMatches.add(match);
-                    }
-                }
-            }
-
-            CalculateELO.update(userMatches, user);
-        }
-    }
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserTournament> userTournaments;
 }

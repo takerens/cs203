@@ -4,25 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
-import csd.grp3.tournament.Tournament;
-import jakarta.persistence.*;
+import csd.grp3.usertournament.UserTournament;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import csd.grp3.match.Match;
-import csd.grp3.tournament.*;
 
 @Entity
 @Getter
@@ -48,7 +42,7 @@ public class User implements UserDetails{
     private String authorities;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<Tournament> tournaments = new ArrayList<>();
+    private List<UserTournament> userTournaments = new ArrayList<>();
 
     public User(String username, String password) {
         this.username = username;
