@@ -3,15 +3,18 @@ package csd.grp3.tournament;
 import csd.grp3.match.*;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
+import csd.grp3.usertournament.UserTournamentService;
 import csd.grp3.exception.MatchNotCompletedException;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.*;
+import lombok.AllArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@AllArgsConstructor
 @Service
 public class TournamentServiceImpl implements TournamentService {
 
@@ -21,10 +24,8 @@ public class TournamentServiceImpl implements TournamentService {
     @Autowired
     private MatchService matchService;
 
-    public TournamentServiceImpl(TournamentRepository tournaments, MatchService matchService) {
-        this.tournaments = tournaments;
-        this.matchService = matchService;
-    }
+    @Autowired
+    private UserTournamentService userTournamentService;
 
     @Override
     public List<Tournament> listTournaments() {
@@ -142,12 +143,12 @@ public class TournamentServiceImpl implements TournamentService {
                 User black = match.getBlack();
                 User white = match.getWhite();
                 if (result == -1) {
-                    black.setGamePoints(black.getGamePoints() + 1);
+                    userTournamentService.updateGamePoints(match.getTournament().getId(), black.getUsername(), 1.0);
                 } else if (result == 1) {
-                    white.setGamePoints(white.getGamePoints() + 1);
+                    userTournamentService.updateGamePoints(match.getTournament().getId(), white.getUsername(), 1.0);
                 } else if (result == 0.5) {
-                    black.setGamePoints(black.getGamePoints() + 0.5);
-                    white.setGamePoints(white.getGamePoints() + 0.5);
+                    userTournamentService.updateGamePoints(match.getTournament().getId(), black.getUsername(), 0.5);
+                    userTournamentService.updateGamePoints(match.getTournament().getId(), white.getUsername(), 0.5);
                 }
             }
         }
@@ -277,7 +278,7 @@ public class TournamentServiceImpl implements TournamentService {
         double buchholzScore = 0;
         for (Match match : matchList) {
             User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
-            buchholzScore += opponent.getGamePoints();
+            buchholzScore += userTournamentService.getGamePoints(tournament.getId(), opponent.getUsername());
         }
         return buchholzScore;
     }
@@ -292,7 +293,7 @@ public class TournamentServiceImpl implements TournamentService {
         List<Double> opponentScores = new ArrayList<>();
         for (Match match : matchList) {
             User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
-            opponentScores.add(opponent.getGamePoints());
+            opponentScores.add(userTournamentService.getGamePoints(tournament.getId(), opponent.getUsername()));
         }
 
         if (!opponentScores.isEmpty()) {
@@ -311,7 +312,10 @@ public class TournamentServiceImpl implements TournamentService {
         Round nextRound = new Round();
         nextRound.setTournament(tournament);
 
-        users.sort(Comparator.comparingDouble(User::getGamePoints).thenComparing(User::getELO).reversed());
+        users.sort(Comparator
+            .comparingDouble((User user) -> userTournamentService.getGamePoints(tournament.getId(), user.getUsername()))
+            .thenComparing(User::getELO)
+            .reversed());
 
         for (int i = 0; i < users.size(); i++) {
             User user1 = users.get(i);

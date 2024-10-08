@@ -45,7 +45,7 @@ public class MatchServiceImpl implements MatchService{
 
     @Override
     public List<Match> getUserMatches(User user) {
-        return matches.findByBlackOrWhite(user);
+        return matches.findByBlackOrWhite(user, user);
     }
 
     @Override

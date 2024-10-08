@@ -15,5 +15,5 @@ public interface MatchRepository extends JpaRepository<Match, Long>{
     void deleteById(Long id);
     List<Match> findByRound(Round round);
     List<Match> findByBlackAndWhiteOrWhiteAndBlack(User user1black, User user2white, User user1white, User user2black);
-    List<Match> findByBlackOrWhite(User user);
+    List<Match> findByBlackOrWhite(User white, User black);
 } 
