@@ -13,8 +13,12 @@ import csd.grp3.user.User;
 import jakarta.servlet.http.HttpSession;
 
 import java.util.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@Controller
+
+@RestController
+@RequestMapping("/tournaments")
 public class TournamentController {
     @Autowired
     private TournamentRepository tournamentRepo;
@@ -22,32 +26,19 @@ public class TournamentController {
     @Autowired
     private TournamentService tournamentService;
 
-    @GetMapping("/")
-    public String home() {
-        return "This is tournament system";
+    @GetMapping
+    public ResponseEntity<List<Tournament>> getAllTournaments() {
+        // List<Tournament> tournamentList = tournamentRepo.findAll();
+        // System.out.println(tournamentList);
+        // should be like this (below)
+        List<Tournament> tournamentList = tournamentService.listTournaments();
+        return ResponseEntity.status(HttpStatus.OK).body(tournamentList);
     }
 
-    @GetMapping("/tournaments")
-    public String getAllTournaments(Model model, HttpSession session) {
-        List<Tournament> tournamentList = tournamentRepo.findAll();
-        System.out.println(tournamentList);
-
-        model.addAttribute("userRole", "ROLE_USER");
-        model.addAttribute("tournaments", tournamentList);
-        return "tournaments";
-    }
-
-    @GetMapping("/tournaments/{id}")
-    public String getTournamentById(@PathVariable Long id, Model model) {
-        Optional<Tournament> tournamentData = tournamentRepo.findById(id);
-
-        if (tournamentData.isPresent()) {
-            System.out.println(tournamentData.get());
-            model.addAttribute("tournament", tournamentData.get());
-            return "tournament";
-        }
-
-        return "Tournament not found";
+    @GetMapping("/{id}")
+    public ResponseEntity<Tournament> getTournamentById(@PathVariable Long id) {
+        Tournament tournamentData = tournamentService.getTournament(id);
+        return new ResponseEntity<>(tournamentData, HttpStatus.OK);
     }
 
     // @GetMapping("/tournaments/{title}")
@@ -61,7 +52,7 @@ public class TournamentController {
     //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     // }
 
-    @PostMapping("/tournaments")
+    @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Tournament> addTournament(@RequestBody Tournament tournament) {
         Tournament tournamentObj = tournamentRepo.save(tournament);
@@ -69,7 +60,7 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
     }
 
-    @PostMapping("/tournaments/{id}")
+    @PutMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Tournament> updateTournamentById(@PathVariable Long id, @RequestBody Tournament newTournamentData) {
         Optional<Tournament> oldTournamentData = tournamentRepo.findById(id);
@@ -83,7 +74,7 @@ public class TournamentController {
             // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
             updatedTournamentData.setMinElo(newTournamentData.getMinElo());
             updatedTournamentData.setSize(newTournamentData.getSize());
-            updatedTournamentData.setWaitingList(newTournamentData.getWaitingList());
+            // updatedTournamentData.setWaitingList(newTournamentData.getWaitingList());
 
             Tournament tournamentObj = tournamentRepo.save(updatedTournamentData);
             return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
@@ -115,7 +106,7 @@ public class TournamentController {
     //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     // }
 
-    @DeleteMapping("/tournaments/{id}")
+    @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteTournamentById(@PathVariable Long id) {
         tournamentRepo.deleteById(id);
@@ -129,7 +120,7 @@ public class TournamentController {
     //     return new ResponseEntity<>(HttpStatus.OK);
     // }
 
-    @DeleteMapping("/{id}/withdraw")
+    @DeleteMapping("{id}/withdraw")
     public ResponseEntity<Void> withdraw(@RequestBody User user , @PathVariable Long id) {
         tournamentService.withdrawUser(user, id);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -141,4 +132,10 @@ public class TournamentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // TODO
+    @GetMapping("/{id}/standings")
+    public ResponseEntity<List<User>> getStandings(@PathVariable Long id) {
+        return null; // List Users in order of GamePoints
+    }
+    
 }

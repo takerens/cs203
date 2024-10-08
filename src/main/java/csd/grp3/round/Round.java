@@ -2,8 +2,11 @@ package csd.grp3.round;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import csd.grp3.match.Match;
 import csd.grp3.tournament.Tournament;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -32,7 +35,8 @@ public class Round {
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 
-    @OneToMany(mappedBy = "round", orphanRemoval = true)
+    @OneToMany(mappedBy = "round", orphanRemoval = true, cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Match> matches;
     
 }
