@@ -109,11 +109,6 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public boolean tournamentExists(Long tournamentId) {
-        return tournamentId != null && tournaments.existsById(tournamentId);
-    }
-
-    @Override
     public void addRound(Long id) throws TournamentNotFoundException {
         Optional<Tournament> tournament = tournaments.findById(id);
 

@@ -50,7 +50,6 @@ public class TournamentController {
         return "Tournament not found";
     }
     
-
     @PostMapping("/tournaments")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Tournament> addTournament(@RequestBody Tournament tournament) {
