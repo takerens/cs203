@@ -2,14 +2,15 @@ package csd.grp3.user;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import csd.grp3.tournament.Tournament;
+import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -39,6 +40,11 @@ public class User implements UserDetails{
 
     @NotNull(message = "Authorities should not be null")
     private String authorities;
+
+    // Mapping tournament points (Tournament -> Double for points)
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id") // Specify the foreign key in the tournament table
+    private Map<Tournament, Integer> gamePoints;
 
     public User(String username, String password) {
         this.username = username;

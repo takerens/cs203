@@ -2,6 +2,9 @@ package csd.grp3.user;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
@@ -14,62 +17,25 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
 
+    @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder ) {
         this.userRepository = userRepository;
         this.encoder = encoder;
     }
 
-    //This function checks if password is alphanumeric and is 8 chars long
-    private boolean checkPasswordRequirement(String password) {
-    
-        //Initialise booleans for password requirements
-        boolean hasChar = false;
-        boolean hasNum = false;
-        boolean isAtLeast8Char = false;
-
-        //Make password lowercase
-        String tmpPassword = password.toLowerCase();
-
-        //Check if password has char and num
-        for (int i = 0; i < password.length(); i++) {
-            char c = tmpPassword.charAt(i);
-            if (c >= '0' && c <= '9') {
-                hasNum = true;
-            } else if (c >= 'a' && c <= 'z'){
-                hasChar = true;
-            }
-        }
-
-        //Check if password is at least 8 char long
-        if (password.length() >= 8) {
-            isAtLeast8Char = true;
-        }
-    
-        //Print out error message
-        if ((!hasChar || !hasNum) && isAtLeast8Char) {
-            System.out.println("Password must contain both numbers and characters");
-        } else if ((hasChar && hasNum) && !isAtLeast8Char) {
-            System.out.println("Password must be at least 8 characters long");
-        } else if ((!hasChar || !hasNum) && !isAtLeast8Char) {
-            System.out.println("Password must contain both numbers and characters and be at least 8 characters long");
-        } else {
-            System.out.println("Password requirements met");
-            return true;
-        }
-
-        return false;
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
     }
 
     @Override
     @Transactional
-    public User createNewUser(String username, String password) {
+    public User createNewUser(String username, String password) throws BadCredentialsException{
 
+        //Check if the username already exists, if it does throw exception
         if (userRepository.findByUsername(username).isPresent()) {
-System.out.println("Username already exists. Please choose another username");
-            return null;
-        } else if (!checkPasswordRequirement(password)) {
-System.out.println("Does not meet password requirements");
-            return null;
+            throw new BadCredentialsException("Username already exists");
         }
 
         //Encode password given by user to store
@@ -79,33 +45,23 @@ System.out.println("Does not meet password requirements");
     }
 
     @Override
-    public boolean login(String username, String password) {
-
-        //If user does not exist, immediately return false
-        if (userRepository.findByUsername(username).isEmpty()) {
-            System.out.println("USERNAME DOES NOT EXIST");
-            return false;
-        }
-
+    public User login(String username, String password) throws UsernameNotFoundException{
         //Get the password associated with the searched username
-        User user = userRepository.findByUsername(username).get();
+        User user = findByUsername(username);
         String encodedPassword = user.getPassword();
 
-        //Return if the password matches
-        // removed instantiation in method use constructor-based dependency injection
-        return encoder.matches(password, encodedPassword);
-    }
-    
-
-    
-    
-    public List<User> findAll() {
-        return userRepository.findAll();
+        //Return the user if the password matches
+        if (encoder.matches(password, encodedPassword)) {
+            return user;
+        }
+        //Else throw exception
+        throw new BadCredentialsException("Password does not match");
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User changePassword(String username, String password) {
+        User user = findByUsername(username);
+        user.setPassword(encoder.encode(password));
+        return userRepository.save(user);
     }
-    
 }
