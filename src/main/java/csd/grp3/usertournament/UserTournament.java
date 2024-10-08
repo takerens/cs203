@@ -22,6 +22,8 @@ import lombok.Setter;
 public class UserTournament {
     @EmbeddedId
     private UserTournamentId id;
+    // Long tournamentId
+    // String username
 
     @ManyToOne
     @MapsId("tournamentId")
@@ -33,8 +35,8 @@ public class UserTournament {
     @JoinColumn(name="username")
     private User user;
 
-    // w = waitlist, r = registered, b = bye
+    // w = waitlist, r = registered
     private char status;
 
-    private double gamePoints;
+    private double gamePoints = 0;
 }

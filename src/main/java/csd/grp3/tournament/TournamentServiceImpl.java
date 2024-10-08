@@ -2,11 +2,10 @@ package csd.grp3.tournament;
 
 import csd.grp3.match.Match;
 import csd.grp3.match.MatchRepository;
-import csd.grp3.player.Player;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import csd.grp3.usertournament.UserTournament;
-import csd.grp3.usertournament.UserTournamentRepository;
+import csd.grp3.usertournament.UserTournamentServiceImpl;
 import csd.grp3.exception.MatchNotCompletedException;
 
 import java.time.LocalDateTime;
@@ -23,16 +22,16 @@ public class TournamentServiceImpl implements TournamentService {
     private TournamentRepository tournaments;
 
     @Autowired
-    private UserTournamentRepository userTournaments;
+    private UserTournamentServiceImpl UTService;
 
     @Autowired
     private MatchRepository matches;
 
 
 
-    public TournamentServiceImpl(TournamentRepository tournaments, UserTournamentRepository userTournaments) {
+    public TournamentServiceImpl(TournamentRepository tournaments, UserTournamentServiceImpl UTService) {
         this.tournaments = tournaments;
-        this.userTournaments = userTournaments;
+        this.UTService = UTService;
     }
 
     @Override
@@ -70,9 +69,8 @@ public class TournamentServiceImpl implements TournamentService {
         Optional<Tournament> tournament = tournaments.findById(id);
 
         if (tournament.isPresent()) {
-            Tournament tournamentData = tournament.get();
-            List<Player> playerList = tournamentData.getPlayers();
-            List<Player> waitingList = tournamentData.getWaitingList();
+            List<User> playerList = UTService.getPlayers(id);
+            List<User> waitingList = UTService.getWaitingList(id);
 
             // check if tournament already has that player data
             if (playerList.contains(player) || waitingList.contains(player)) {
@@ -81,18 +79,12 @@ public class TournamentServiceImpl implements TournamentService {
                 // if player isn't inside tournament
                 // if tournament is full, we add to waitingList instead
                 if (playerList.size() == tournamentData.getSize()) {
-                    waitingList.add((Player) player);
-                    tournamentData.setWaitingList(waitingList);
+                    UTService.add(id, player.getUsername(), 'w');
                 // else, we want to add to normal playerList
                 } else {
-                    playerList.add((Player) player);
-                    tournamentData.setPlayers(playerList);
+                    UTService.add(id, player.getUsername(), 'r');
                 }
             }
-
-            // we save the tournament data back to database
-            addPlayer((Player) player, tournamentData);
-            tournaments.save(tournamentData);
         } else {
             throw new TournamentNotFoundException(id);
         }
@@ -104,11 +96,11 @@ public class TournamentServiceImpl implements TournamentService {
         Optional<Tournament> tournament = tournaments.findById(id);
         if (tournament.isPresent()) {
             Tournament tournamentData = tournament.get();
-            Player playerToWithdraw = null;
+            User playerToWithdraw = null;
     
             // Find the Player object associated with the User
-            for (Player player : tournamentData.getPlayers()) {
-                if (player.getUser().equals(user)) {
+            for (User player : UTService.getPlayers(id)) {
+                if (player.equals(user)) {
                     playerToWithdraw = player;
                     break;
                 }
@@ -159,9 +151,10 @@ public class TournamentServiceImpl implements TournamentService {
             } else {
                 // update player data with match results
                 double result = match.getResult();
-                Player black = match.getBlack();
-                Player white = match.getWhite();
+                User black = match.getBlack();
+                User white = match.getWhite();
                 if (result == -1) {
+                    UTService.updateGamePoints(id, black, 1);
                     black.setGamePoints(black.getGamePoints() + 1);
                 } else if (result == 1) {
                     white.setGamePoints(white.getGamePoints() + 1);

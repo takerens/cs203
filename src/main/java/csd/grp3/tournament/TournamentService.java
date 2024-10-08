@@ -1,6 +1,5 @@
 package csd.grp3.tournament;
 
-import csd.grp3.player.Player;
 import csd.grp3.user.User;
 import csd.grp3.round.Round;
 

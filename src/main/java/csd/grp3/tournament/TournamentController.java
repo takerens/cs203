@@ -40,6 +40,7 @@ public class TournamentController {
         Optional<Tournament> tournamentData = tournamentRepo.findById(id);
 
         if (tournamentData.isPresent()) {
+            
             return new ResponseEntity<>(tournamentData.get(), HttpStatus.OK);
         }
 
