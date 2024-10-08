@@ -24,7 +24,7 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
-        this.user = null;
+        this.user = null; //TEMP
     }
 
     @GetMapping("/user")
@@ -42,9 +42,21 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody User user) {
+    public ResponseEntity<User> loginUser(@Valid @RequestBody User user) {
         User loggedIn = userService.login(user.getUsername(), user.getPassword());
         setUser(loggedIn);
         return ResponseEntity.status(HttpStatus.OK).body(loggedIn);
+    }
+
+    @GetMapping("/profile/{username}")
+    public ResponseEntity<User> viewProfile(@PathVariable String username) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findByUsername(username));
+    }
+
+    @PutMapping("/user/{username}")
+    public ResponseEntity<User> changePassword(@PathVariable String username,@Valid @RequestBody User user) {
+        User updatedUser = userService.changePassword(user.getUsername(), user.getPassword());
+
+        return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 }

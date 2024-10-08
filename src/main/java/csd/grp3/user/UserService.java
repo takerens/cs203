@@ -4,4 +4,5 @@ public interface UserService {
     User createNewUser(String username, String password);
     User login(String username, String password);
     User findByUsername(String username);
+    User changePassword(String username, String password);
 }

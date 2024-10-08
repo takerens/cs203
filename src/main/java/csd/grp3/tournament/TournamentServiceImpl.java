@@ -65,6 +65,26 @@ public class TournamentServiceImpl implements TournamentService {
 
         if (tournament.isPresent()) {
             Tournament tournamentData = tournament.get();
+            List<Player> playerList = tournamentData.getPlayers();
+            List<Player> waitingList = tournamentData.getWaitingList();
+
+            // check if tournament already has that player data
+            if (playerList.contains(player) || waitingList.contains(player)) {
+                throw new PlayerAlreadyRegisteredException();
+            } else {
+                // if player isn't inside tournament
+                // if tournament is full, we add to waitingList instead
+                if (playerList.size() == tournamentData.getSize()) {
+                    waitingList.add((Player) player);
+                    tournamentData.setWaitingList(waitingList);
+                // else, we want to add to normal playerList
+                } else {
+                    playerList.add((Player) player);
+                    tournamentData.setPlayers(playerList);
+                }
+            }
+
+            // we save the tournament data back to database
             addPlayer((Player) player, tournamentData);
             tournaments.save(tournamentData);
         } else {
@@ -145,7 +165,7 @@ public class TournamentServiceImpl implements TournamentService {
                 }
             }
         }
-
+      
         // update match results
 
         // firstly, we update the round with all new match data.
