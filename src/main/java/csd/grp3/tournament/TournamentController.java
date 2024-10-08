@@ -21,67 +21,35 @@ public class TournamentController {
 
     @GetMapping("/tournaments")
     public ResponseEntity<List<Tournament>> getAllTournaments() {
-        try {
-            List<Tournament> tournamentList = new ArrayList<>();
-            tournamentRepo.findAll().forEach(tournamentList::add);
-
-            if (tournamentList.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-            }
-
-            return ResponseEntity.status(HttpStatus.OK).body(tournamentList);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        List<Tournament> tournamentList = tournamentService.listTournaments();
+        return ResponseEntity.status(HttpStatus.OK).body(tournamentList);
     }
 
     @GetMapping("/tournaments/{id}")
     public ResponseEntity<Tournament> getTournamentById(@PathVariable Long id) {
-        Optional<Tournament> tournamentData = tournamentRepo.findById(id);
-
-        if (tournamentData.isPresent()) {
-            
-            return new ResponseEntity<>(tournamentData.get(), HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Tournament tournamentData = tournamentService.getTournament(id);
+        return new ResponseEntity<>(tournamentData, HttpStatus.OK);
     }
 
     @PostMapping("/tournaments")
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Tournament> addTournament(@RequestBody Tournament tournament) {
-        Tournament tournamentObj = tournamentRepo.save(tournament);
-
+        Tournament tournamentObj = tournamentService.addTournament(tournament);
         return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
     }
 
     @PostMapping("/tournaments/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Tournament> updateTournamentById(@PathVariable Long id, @RequestBody Tournament newTournamentData) {
-        Optional<Tournament> oldTournamentData = tournamentRepo.findById(id);
+        // Tournament tournamentObj = updateTournamentById(id, newTournamentData);
+        return new ResponseEntity<>(HttpStatus.OK);
 
-        if (oldTournamentData.isPresent()) {
-            Tournament updatedTournamentData = oldTournamentData.get();
-            updatedTournamentData.setTitle(newTournamentData.getTitle());
-            updatedTournamentData.setDate(newTournamentData.getDate());
-            // updatedTournamentData.setMatches(newTournamentData.getMatches());
-            updatedTournamentData.setMaxElo(newTournamentData.getMaxElo());
-            // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
-            updatedTournamentData.setMinElo(newTournamentData.getMinElo());
-            updatedTournamentData.setSize(newTournamentData.getSize());
-            updatedTournamentData.setWaitingList(newTournamentData.getWaitingList());
-
-            Tournament tournamentObj = tournamentRepo.save(updatedTournamentData);
-            return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/tournaments/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteTournamentById(@PathVariable Long id) {
-        tournamentRepo.deleteById(id);
+        tournamentService.deleteTournament(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

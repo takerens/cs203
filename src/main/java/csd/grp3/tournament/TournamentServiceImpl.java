@@ -13,6 +13,8 @@ import java.util.*;
 import java.util.stream.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,7 +38,14 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public List<Tournament> listTournaments() {
-        return tournaments.findAll();
+        List<Tournament> tournamentList = new ArrayList<>();
+        tournaments.findAll().forEach(tournamentList::add);
+
+        if (tournamentList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return tournamentList;
     }
 
     @Override
@@ -71,6 +80,7 @@ public class TournamentServiceImpl implements TournamentService {
         if (tournament.isPresent()) {
             List<User> playerList = UTService.getPlayers(id);
             List<User> waitingList = UTService.getWaitingList(id);
+            Tournament tournamentData = tournament.get();
 
             // check if tournament already has that player data
             if (playerList.contains(player) || waitingList.contains(player)) {
@@ -79,10 +89,10 @@ public class TournamentServiceImpl implements TournamentService {
                 // if player isn't inside tournament
                 // if tournament is full, we add to waitingList instead
                 if (playerList.size() == tournamentData.getSize()) {
-                    UTService.add(id, player.getUsername(), 'w');
+                    UTService.add(tournamentData, player, 'w');
                 // else, we want to add to normal playerList
                 } else {
-                    UTService.add(id, player.getUsername(), 'r');
+                    UTService.add(tournamentData, player, 'r');
                 }
             }
         } else {
@@ -141,6 +151,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void updateResults(Round round) throws MatchNotCompletedException {
         List<Match> matches = round.getMatches();
+        Tournament tournament = round.getTournament();
 
         // check match ended
         for (Match match : matches) {
@@ -154,13 +165,12 @@ public class TournamentServiceImpl implements TournamentService {
                 User black = match.getBlack();
                 User white = match.getWhite();
                 if (result == -1) {
-                    UTService.updateGamePoints(id, black, 1);
-                    black.setGamePoints(black.getGamePoints() + 1);
+                    UTService.updateGamePoints(tournament.getId(), black.getUsername(), 1);
                 } else if (result == 1) {
-                    white.setGamePoints(white.getGamePoints() + 1);
+                    UTService.updateGamePoints(tournament.getId(), white.getUsername(), 1);
                 } else if (result == 0.5) {
-                    black.setGamePoints(black.getGamePoints() + 0.5);
-                    white.setGamePoints(white.getGamePoints() + 0.5);
+                    UTService.updateGamePoints(tournament.getId(), black.getUsername(), 0.5);
+                    UTService.updateGamePoints(tournament.getId(), white.getUsername(), 0.5);
                 }
             }
         }
@@ -171,7 +181,6 @@ public class TournamentServiceImpl implements TournamentService {
         round.setMatches(matches);
 
         // next, we get tournament that the round is in.
-        Tournament tournament = round.getTournament();
 
         // we get the list of rounds that tournament stores
         List<Round> rounds = tournament.getRounds();
@@ -209,7 +218,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param player2    - Second player
      * @return Username of winner
      */
-    public String directEncounterResultInTournament(Tournament tournament, Player player1, Player player2) {
+    public String directEncounterResultInTournament(Tournament tournament, User player1, User player2) {
         List<Match> directEncounters = matches.findByBlackAndWhiteOrWhiteAndBlack(player1, player2, player2, player1)
                 .stream()
                 .filter(match -> match.getTournament().equals(tournament))
@@ -232,30 +241,30 @@ public class TournamentServiceImpl implements TournamentService {
 
     // Calculate Buchholz score for a player in a specific tournament (sum of
     // opponents' match points)
-    public double calculateBuchholzInTournament(Player player, Tournament tournament) {
+    public double calculateBuchholzInTournament(User player, Tournament tournament) {
         List<Match> matchList = matches.findByBlackOrWhite(player).stream()
                 .filter(match -> match.getTournament().equals(tournament))
                 .collect(Collectors.toList());
 
         double buchholzScore = 0;
         for (Match match : matchList) {
-            Player opponent = match.getWhite().equals(player) ? match.getBlack() : match.getWhite();
-            buchholzScore += opponent.getGamePoints();
+            User opponent = match.getWhite().equals(player) ? match.getBlack() : match.getWhite();
+            buchholzScore += UTService.getGamePoints(tournament.getId(), opponent.getUsername());
         }
         return buchholzScore;
     }
 
     // Calculate Buchholz Cut 1 (exclude lowest opponent score) in a specific
     // tournament
-    public double calculateBuchholzCut1InTournament(Player player, Tournament tournament) {
+    public double calculateBuchholzCut1InTournament(User player, Tournament tournament) {
         List<Match> matchList = matches.findByBlackOrWhite(player).stream()
                 .filter(match -> match.getTournament().equals(tournament))
                 .collect(Collectors.toList());
 
         List<Double> opponentScores = new ArrayList<>();
         for (Match match : matchList) {
-            Player opponent = match.getWhite().equals(player) ? match.getBlack() : match.getWhite();
-            opponentScores.add(opponent.getGamePoints());
+            User opponent = match.getWhite().equals(player) ? match.getBlack() : match.getWhite();
+            opponentScores.add(UTService.getGamePoints(tournament.getId(), opponent.getUsername()));
         }
 
         if (!opponentScores.isEmpty()) {
@@ -267,17 +276,17 @@ public class TournamentServiceImpl implements TournamentService {
 
     public Round createPairings(Tournament tournament) {
         List<Match> pairings = new ArrayList<>();
-        List<Player> players = tournament.getPlayers();
-        Set<Player> pairedPlayers = new HashSet<>();
+        List<User> players = UTService.getPlayers(tournament.getId());
+        Set<User> pairedPlayers = new HashSet<>();
 
         // New round
         Round nextRound = new Round();
         nextRound.setTournament(tournament);
 
-        players.sort(Comparator.comparingDouble(Player::getGamePoints).thenComparing(Player::getELO).reversed());
+        // players.sort(Comparator.comparingDouble(User::getGamePoints).thenComparing(User::getELO).reversed());
 
         for (int i = 0; i < players.size(); i++) {
-            Player player1 = players.get(i);
+            User player1 = players.get(i);
 
             if (pairedPlayers.contains(player1))
                 continue;
@@ -287,7 +296,7 @@ public class TournamentServiceImpl implements TournamentService {
             boolean isPlayer1White = isNextColourWhite(player1, tournament);
 
             for (int j = i + 1; j < players.size(); j++) {
-                Player player2 = players.get(j);
+                User player2 = players.get(j);
 
                 if (pairedPlayers.contains(player2))
                     continue;
@@ -317,7 +326,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param tournament - Tournament matches to consider
      * @return - true if next colour is white
      */
-    private boolean isNextColourWhite(Player player, Tournament tournament) {
+    private boolean isNextColourWhite(User player, Tournament tournament) {
         List<Match> matchList = matches.findByBlackOrWhite(player).stream()
                 .filter(match -> match.getTournament().equals(tournament))
                 .collect(Collectors.toList());
@@ -344,7 +353,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param tournament - Tournament matches to consider
      * @return true if List<match> of matches played size() != 0
      */
-    private boolean hasPlayedBefore(Player player1, Player player2, Tournament tournament) {
+    private boolean hasPlayedBefore(User player1, User player2, Tournament tournament) {
         return matches.findByBlackAndWhiteOrWhiteAndBlack(player1, player2, player2, player1).stream()
                 .filter(match -> match.getTournament().equals(tournament))
                 .collect(Collectors.toList())
@@ -362,7 +371,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param nextColour - either "white" or "black" only
      * @return - true if not same colour for 3 times consecutively
      */
-    private boolean isColourSuitable(Player player, Tournament tournament, String nextColour) {
+    private boolean isColourSuitable(User player, Tournament tournament, String nextColour) {
         List<Match> matchList = matches.findByBlackOrWhite(player).stream()
                 .filter(match -> match.getTournament().equals(tournament))
                 .collect(Collectors.toList());
@@ -399,7 +408,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param round
      * @return
      */
-    private Match createMatchWithPlayerColour(Player player1, String player1Colour, Player player2, Round round) {
+    private Match createMatchWithPlayerColour(User player1, String player1Colour, User player2, Round round) {
         Match match = new Match();
         match.setRound(round);
 
@@ -415,8 +424,8 @@ public class TournamentServiceImpl implements TournamentService {
         return match;
     }
 
-    private Match handleBYE(Player worst, String color, Round round) { // color is color of worst player
-        Player bot = new Player();
+    private Match handleBYE(User worst, String color, Round round) { // color is color of worst player
+        User bot = new User();
         Match match = createMatchWithPlayerColour(worst, color, bot, round);
         match.setBYE(true);
         match.setResult(color.equals("white") ? 1 : -1);
@@ -424,23 +433,20 @@ public class TournamentServiceImpl implements TournamentService {
         return match;
     }
 
-    private void handleWithdrawal(Player player, Tournament tournament) {
-        List<Player> playerList = tournament.getPlayers();
-        List<Player> waitingList = tournament.getWaitingList();
+    private void handleWithdrawal(User player, Tournament tournament) {
+        List<User> playerList = UTService.getPlayers(tournament.getId());
+        List<User> waitingList = UTService.getWaitingList(tournament.getId());
 
         LocalDateTime now = LocalDateTime.now();
         if (tournament.getDate() != null && now.isAfter(tournament.getDate().minusDays(1))) {
-            Player bot = new Player();
-            
-
+            User bot = new User();
             
         } else {
-            playerList.remove(player);
+            UTService.delete(tournament.getId(), player.getUsername());
             if (!waitingList.isEmpty()) {
-                playerList.add(waitingList.remove(0));
+                User addingToPlayer = waitingList.remove(0);
+                UTService.updatePlayerStatus(tournament.getId(), addingToPlayer.getUsername(), 'r');
             }
-            tournament.setPlayers(playerList);
-            tournament.setWaitingList(waitingList);
         }
     }
 

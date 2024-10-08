@@ -19,7 +19,7 @@ public class UserTournamentServiceImpl implements UserTournamentService {
     }
 
     public UserTournament findRecord(Long tourneyID, String username) throws UserTournamentNotFoundException {
-        return userTournamentRepo.findUserTournamentByTournamentIdAndUsername(tourneyID, username)
+        return userTournamentRepo.findById_TournamentIdAndId_Username(tourneyID, username)
             .orElseThrow(() -> new UserTournamentNotFoundException());
     }
 
@@ -40,11 +40,11 @@ public class UserTournamentServiceImpl implements UserTournamentService {
     }
 
     @Override
-    public UserTournament updateGamePoints(Long tourneyID, String username, double increment) {
+    public void updateGamePoints(Long tourneyID, String username, double increment) {
         UserTournament ut = findRecord(tourneyID, username);
         double updatedGamePoints = ut.getGamePoints() + increment;
         ut.setGamePoints(updatedGamePoints);
-        return userTournamentRepo.save(ut);
+        userTournamentRepo.save(ut);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class UserTournamentServiceImpl implements UserTournamentService {
 
     @Override
     public void delete(Long tourneyID, String username) {
-        userTournamentRepo.deleteByTournamentIdAndUsername(tourneyID, username);
+        userTournamentRepo.deleteById_TournamentIdAndId_Username( tourneyID,  username);
     }
     
 }

@@ -31,14 +31,13 @@ const TournamentManagement = () => {
 
         fetchUserData();
         fetchTournamentData();
-    }, );
+    }, []);
 
     const fetchTournamentData = async () => {
         try {
             const response = await fetch("http://localhost:8080/tournaments", {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(user),
             });
 
             if (!response.ok) {
@@ -148,7 +147,8 @@ const TournamentManagement = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {tournaments.map((tournament) => {
+                            {/* {tournaments && tournaments.length > 0 ? ( */}
+                                {tournaments.map((tournament) => {
                                 const hasTournamentStarted = new Date() > new Date(tournament.date);
 
                                 return (
@@ -157,7 +157,7 @@ const TournamentManagement = () => {
                                     <td>{tournament.minElo}</td>
                                     <td>{tournament.maxElo}</td>
                                     <td>{formatDate(tournament.date)}</td>
-                                    <td>{tournament.size - tournament.participants.length}</td>
+                                    <td>{tournament.size}</td> {/* - tournament.participants.length*/}
                                     <td>
                                         {user.userRole === 'ROLE_USER' && (
                                             <>

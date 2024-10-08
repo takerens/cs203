@@ -15,6 +15,7 @@ const Login = () => {
         const userData = {
             username,
             password,
+            authorities : "ROLE_USER",
         };
 
         try {
