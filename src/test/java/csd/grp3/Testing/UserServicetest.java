@@ -18,6 +18,9 @@ import csd.grp3.user.UserServiceImpl;
 import csd.grp3.user.UserRepository;
 import csd.grp3.user.User;
 
+import org.springframework.security.authentication.BadCredentialsException;
+
+
 
 public class UserServicetest {
 
@@ -38,35 +41,40 @@ public class UserServicetest {
 
     // Test for creating a new user with valid credentials
     @Test
-    void testCreateNewUser_successful() {
+    void createNewUser_ValidUsernamePassword_ReturnUser() {
         String username = "testUser";
-        String password = "Password123";
+        String password = "Password";
+        User user = new User(username, password);
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
-    
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         User newUser = userService.createNewUser(username, password);
+
         assertNotNull(newUser);
         assertEquals(username, newUser.getUsername());
         assertTrue(encoder.matches(password, newUser.getPassword()));
+        verify(userRepository).findByUsername(username);
+        verify(userRepository).save(user);
     }
 
     // Test for creating a new user with an existing username
     @Test
-    void testCreateNewUser_existingUsername() {
+    void createNewUser_ExistingUsername_ThrowBadCredentialsException() {
         String username = "existingUser";
         String password = "Password123";
+        userRepository.save(new User(username, password));
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(new User(username, password)));
 
         User newUser = userService.createNewUser(username, password);
+        assertThrows(BadCredentialsException.class, ()->userService.createNewUser(username, password));
         assertNull(newUser, "Should return null when username already exists.");
     }
 
     // Test for creating a new user with an invalid password
     @Test
-    void testCreateNewUser_invalidPassword() {
+    void createNewUser_invalidPassword() {
         String username = "newUser";
         String invalidPassword = "Pwd1";
 
