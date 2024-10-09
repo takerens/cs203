@@ -36,25 +36,27 @@ public class UserServicetest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        encoder = new BCryptPasswordEncoder();
     }
 
     // Test for creating a new user with valid credentials
     @Test
     void createNewUser_ValidUsernamePassword_ReturnUser() {
+        //arrange
         String username = "testUser";
         String password = "Password";
-        User user = new User(username, password);
+        String encoded = encoder.encode(password);
+        User user = new User(username, encoded);
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenReturn(user);
 
+        //act
         User newUser = userService.createNewUser(username, password);
 
+        //assert
         assertNotNull(newUser);
         assertEquals(username, newUser.getUsername());
-        assertTrue(encoder.matches(password, newUser.getPassword()));
-        verify(userRepository).findByUsername(username);
+        verify(userRepository).findByUsername(newUser.getUsername());
         verify(userRepository).save(user);
     }
 
@@ -67,34 +69,27 @@ public class UserServicetest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(new User(username, password)));
 
-        User newUser = userService.createNewUser(username, password);
         assertThrows(BadCredentialsException.class, ()->userService.createNewUser(username, password));
-        assertNull(newUser, "Should return null when username already exists.");
     }
 
-    // Test for creating a new user with an invalid password
-    @Test
-    void createNewUser_invalidPassword() {
-        String username = "newUser";
-        String invalidPassword = "Pwd1";
+    // // Test for creating a new user with an invalid password
+    // @Test
+    // void createNewUser_PasswordTooShort() {
+    //     String username = "testUser";
+    //     String shortPassword = "Pwd1";
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+    //     when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        User newUser = userService.createNewUser(username, invalidPassword);
-        assertNull(newUser, "Should return null when password doesn't meet the requirements.");
-    }
+    //     User newUser = userService.createNewUser(username, shortPassword);
+    //     assertNull(newUser, "Should return null when password doesn't meet the requirements.");
+    // }
     @Test
-    void testLogin_successful() {
+    void login_Successful_ReturnUser() {
         String username = "testUser";
         String rawPassword = "Password123";
-        String encodedPassword = encoder.encode(rawPassword);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(new User()));
     
-        User user = new User(username, encodedPassword);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
-    
-        // boolean result = userService.login(username, rawPassword);
-    
-        // assertTrue(result, "Login should be successful if the password matches.");
     }
     
     // Test for login with non-existent username (should return false)

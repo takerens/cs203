@@ -33,7 +33,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public List<Tournament> listTournaments() {
-        return tournaments.getAllTournaments();
+        return tournaments.findAll();
     }
 
     @Override

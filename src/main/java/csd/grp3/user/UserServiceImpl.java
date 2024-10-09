@@ -11,11 +11,10 @@ import jakarta.transaction.Transactional;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
     private final BCryptPasswordEncoder encoder;
-
+    
+    @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder ) {
         this.userRepository = userRepository;
         this.encoder = encoder;
@@ -37,9 +36,9 @@ public class UserServiceImpl implements UserService {
         }
 
         // Encode password given by user to store
-        String encodedPassword = this.encoder.encode(password);
-
-        return userRepository.save(new User(username, encodedPassword));
+        String encodedPassword = encoder.encode(password);
+        User user = new User(username, encodedPassword);
+        return userRepository.save(user);
     }
 
     @Override
