@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -14,8 +15,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
     
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder ) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder) {
         this.userRepository = userRepository;
         this.encoder = encoder;
     }
@@ -41,19 +41,19 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    @Override
-    public User login(String username, String password) throws UsernameNotFoundException{
-        //Get the password associated with the searched username
-        User user = findByUsername(username);
-        String encodedPassword = user.getPassword();
+    // @Override
+    // public User login(String username, String password) throws UserNotFoundException, BadCredentialsException{
+    //     //Get the password associated with the searched username
+    //     User user = findByUsername(username);
+    //     String encodedPassword = user.getPassword();
 
-        //Return the user if the password matches
-        if (encoder.matches(password, encodedPassword)) {
-            return user;
-        }
-        //Else throw exception
-        throw new BadCredentialsException("Password does not match");
-    }
+    //     //Return the user if the password matches
+    //     if (encoder.matches(password, encodedPassword)) {
+    //         return user;
+    //     }
+    //     //Else throw exception
+    //     throw new BadCredentialsException("Password does not match");
+    // }
 
     @Override
     public User changePassword(String username, String password) {
