@@ -1,19 +1,26 @@
 package csd.grp3.tournament;
 
-import csd.grp3.match.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import csd.grp3.exception.MatchNotCompletedException;
+import csd.grp3.match.Match;
+import csd.grp3.match.MatchService;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import csd.grp3.user.UserService;
 import csd.grp3.usertournament.UserTournamentService;
-import csd.grp3.exception.MatchNotCompletedException;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.*;
 import lombok.AllArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
 @Service
@@ -30,6 +37,9 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserTournamentService userTournamentService;
 
     @Override
     public List<Tournament> listTournaments() {
@@ -53,6 +63,45 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = getTournament(id);
         tournament.setTitle(newTournamentInfo.getTitle());
         tournament.setDate(newTournamentInfo.getDate());
+        tournament.setMaxElo(newTournamentInfo.getMaxElo());
+        tournament.setMinElo(newTournamentInfo.getMinElo());
+        tournament.setSize(newTournamentInfo.getSize());
+
+        int minElo = tournament.getMinElo();
+        int maxElo = tournament.getMaxElo();
+        int size = tournament.getSize();
+
+        List<User> users = userTournamentService.getPlayers(id);
+        List<User> waitingUsers = userTournamentService.getWaitingList(id);
+        // modify list of players based on new Elo limits and new Size limits
+        // firstly, we change based on Elo limits
+        for (User user : users) {
+            if (user.getELO() < minElo || user.getELO() > maxElo) {
+                users.remove(user);
+            }
+        }
+
+        // secondly, we change based on size limits
+        int usersSize = users.size();
+        if (usersSize > size) {
+            for (int i = usersSize; i > size; i--) {
+                users.remove(i);
+            }
+        }
+
+        // lastly, we move those from waitingList onto main list based on new limits imposed.
+        usersSize = users.size();
+        while (usersSize < size) {
+            for (User waitingUser : waitingUsers) {
+                if (waitingUser.getELO() > minElo && waitingUser.getELO() < maxElo) {
+                    users.add(waitingUser);
+                    waitingUsers.remove(waitingUser);
+                }
+            }
+        }
+
+        // now we update waitingList and list for UserTournament
+        tournament.set
         return tournaments.save(tournament);
     }
 

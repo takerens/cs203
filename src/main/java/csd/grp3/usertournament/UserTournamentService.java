@@ -3,7 +3,7 @@ package csd.grp3.usertournament;
 import java.util.List;
 
 import csd.grp3.tournament.Tournament;
-import csd.grp3.user.User;
+import csd.grp3.user.User;  
 
 public interface UserTournamentService {
     UserTournament findRecord(Long tourneyID, String username);
@@ -14,4 +14,9 @@ public interface UserTournamentService {
     UserTournament updatePlayerStatus(Long tourneyID, String username, char status);
     UserTournament add(Tournament tourneyID, User username, char status);
     void delete(Long tourneyID, String username);
+
+    // adding for updateTournament functionality in tournament
+    void setPlayerList(Long tourneyID, UserTournament tournament);
+    void setWaitingList(Long tourneyID, UserTournament tournament);
+    UserTournament getUserTournament(Long tourneyID);
 }

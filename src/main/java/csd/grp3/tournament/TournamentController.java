@@ -1,20 +1,21 @@
 package csd.grp3.tournament;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import csd.grp3.user.User;
-
-import jakarta.servlet.http.HttpSession;
-
-import java.util.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -54,33 +55,20 @@ public class TournamentController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Tournament> addTournament(@RequestBody Tournament tournament) {
-        Tournament tournamentObj = tournamentRepo.save(tournament);
+    public ResponseEntity<HttpStatus> addTournament(@RequestBody Tournament tournament) {
+        tournamentService.addTournament(tournament);
 
-        return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Tournament> updateTournamentById(@PathVariable Long id, @RequestBody Tournament newTournamentData) {
-        Optional<Tournament> oldTournamentData = tournamentRepo.findById(id);
-
-        if (oldTournamentData.isPresent()) {
-            Tournament updatedTournamentData = oldTournamentData.get();
-            updatedTournamentData.setTitle(newTournamentData.getTitle());
-            updatedTournamentData.setDate(newTournamentData.getDate());
-            // updatedTournamentData.setMatches(newTournamentData.getMatches());
-            updatedTournamentData.setMaxElo(newTournamentData.getMaxElo());
-            // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
-            updatedTournamentData.setMinElo(newTournamentData.getMinElo());
-            updatedTournamentData.setSize(newTournamentData.getSize());
-            // updatedTournamentData.setWaitingList(newTournamentData.getWaitingList());
-
-            Tournament tournamentObj = tournamentRepo.save(updatedTournamentData);
-            return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<HttpStatus> updateTournamentById(@PathVariable Long id, @RequestBody Tournament newTournamentData) {
+        // updatedTournamentData.setMatches(newTournamentData.getMatches());
+        // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
+        // updatedTournamentData.setWaitingList(newTournamentData.getWaitingList());
+        tournamentService.updateTournament(id, newTournamentData);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // @PostMapping("/tournaments/title/{title}")
