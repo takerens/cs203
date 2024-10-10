@@ -101,7 +101,7 @@ public class TournamentServiceImpl implements TournamentService {
         }
 
         // now we update waitingList and list for UserTournament
-        tournament.set
+        // tournament.set
         return tournaments.save(tournament);
     }
 
