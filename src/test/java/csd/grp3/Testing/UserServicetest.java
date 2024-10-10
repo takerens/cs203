@@ -15,6 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import csd.grp3.user.UserServiceImpl;
 import csd.grp3.user.UserRepository;
 import csd.grp3.user.User;
+import csd.grp3.user.UserNotFoundException;
+
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -100,6 +102,32 @@ public class UserServicetest {
         });
     }
 
+    @Test
+    void changePassword_ValidUsernameAndPassword_ReturnUser() {
+        String username = "username";
+        String password = "oldpassword";
+        User user = new User(username, password);
+        userRepository.save(user);
+        String newPassword = "newpassword";
+
+        when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        user = userService.changePassword(username, newPassword);
+
+        assertNotNull(user);
+        assertEquals(username, user.getUsername());
+    }
+
+    @Test
+    void changePassword_InvalidUsername_ThrowsUsernameNotFoundException() {
+        String username = "username";
+        String newPassword = "newpassword";
+
+        assertThrows(UsernameNotFoundException.class, ()-> {
+            userService.changePassword(username, newPassword);
+        });
+    }
     // // Test for creating a new user with an invalid password
     // @Test
     // void createNewUser_PasswordTooShort() {

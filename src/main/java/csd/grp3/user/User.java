@@ -54,6 +54,10 @@ public class User implements UserDetails{
         this.ELO = ELO;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public String getUserRole() {
         return authorities;
     }
