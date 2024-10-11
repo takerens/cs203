@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -164,23 +167,55 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findById(1L);
     }
 
+    // @Test
+    // void updateTournament_UpdatedTournament_ReturnUpdatedTournament() {
+    //     // Arrange
+    //     Tournament newTournamentInfo = new Tournament(1L, null, "Updated Tournament", 0, 0, null, 0, new ArrayList<>());
+    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+    //     when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+    //     when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(new ArrayList<>());
+    //     when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(new ArrayList<>());
+
+    //     // Act
+    //     Tournament updatedTournament = tournamentService.updateTournament(1L, newTournamentInfo);
+
+    //     // Assert
+    //     assertNotNull(updatedTournament);
+    //     assertEquals("Updated Tournament", updatedTournament.getTitle());
+    //     verify(tournamentRepository).findById(1L);
+    //     verify(tournamentRepository).save(any(Tournament.class));
+    // }
+
     @Test
-    void updateTournament_UpdatedTournament_ReturnUpdatedTournament() {
-        // Arrange
-        Tournament newTournamentInfo = new Tournament(1L, null, "Updated Tournament", 0, 0, null, 0, new ArrayList<>());
-        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
-        when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(new ArrayList<>());
-        when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(new ArrayList<>());
+    void deleteTournament_DeleteSuccess_ReturnDeletedTournament() {
+        // mock getById method to return a Tournament
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
 
-        // Act
-        Tournament updatedTournament = tournamentService.updateTournament(1L, newTournamentInfo);
+        // mock the deleteById method to do nothing (since its a void method)
+        doNothing().when(tournamentRepository).deleteById(tournament.getId());
 
-        // Assert
-        assertNotNull(updatedTournament);
-        assertEquals("Updated Tournament", updatedTournament.getTitle());
-        verify(tournamentRepository).findById(1L);
-        verify(tournamentRepository).save(any(Tournament.class));
+        // act & assert
+        assertDoesNotThrow(() -> tournamentService.deleteTournament(tournament.getId()));
+
+        // verify delete called once with correct tournament ID
+        verify(tournamentRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void deleteTournament_TournamentNotFound_ReturnTournamentNotFoundException() {
+        // mock deleteById method to do nothing (since its a void method)
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.empty());
+
+        // Act & Assert: Expect TournamentNotFoundException to be thrown
+        TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
+            tournamentService.deleteTournament(tournament.getId());
+        });
+
+        // Verify that the exception message is correct
+        assertEquals("Could not find tournament 1", exception.getMessage());
+
+        // Verify that deleteById was never called with the correct argument
+        verify(tournamentRepository, never()).deleteById(1L);
     }
 
 //     @Test
@@ -192,14 +227,6 @@ public class TournamentServiceImplTest {
 //         assertNotNull(result);
 //         assertEquals(tournament.getId(), result.getId());
 //         verify(tournamentRepository, times(1)).findById(1L);
-//     }
-
-//     @Test
-//     void testDeleteTournament() {
-//         doNothing().when(tournamentRepository).deleteById(1L);
-
-//         assertDoesNotThrow(() -> tournamentService.deleteTournament(1L));
-//         verify(tournamentRepository, times(1)).deleteById(1L);
 //     }
 
 //     @Test
