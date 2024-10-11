@@ -62,6 +62,7 @@ public class UserTournamentServiceImpl implements UserTournamentService {
 
     @Override
     public void delete(Long tourneyID, String username) {
+        findRecord(tourneyID, username);
         userTournamentRepo.deleteById_TournamentIdAndId_Username( tourneyID,  username);
     }
     
