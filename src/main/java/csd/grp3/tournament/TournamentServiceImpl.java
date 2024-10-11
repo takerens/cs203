@@ -38,9 +38,6 @@ public class TournamentServiceImpl implements TournamentService {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserTournamentService userTournamentService;
-
     @Override
     public List<Tournament> listTournaments() {
         return tournaments.getAllTournaments();
@@ -71,13 +68,14 @@ public class TournamentServiceImpl implements TournamentService {
         int maxElo = tournament.getMaxElo();
         int size = tournament.getSize();
 
-        List<User> users = userTournamentService.getPlayers(id);
-        List<User> waitingUsers = userTournamentService.getWaitingList(id);
+        List<User> users = UTService.getPlayers(id);
+        List<User> waitingUsers = UTService.getWaitingList(id);
         // modify list of players based on new Elo limits and new Size limits
         // firstly, we change based on Elo limits
         for (User user : users) {
             if (user.getELO() < minElo || user.getELO() > maxElo) {
                 users.remove(user);
+                UTService.delete(id, user.getUsername());
             }
         }
 
@@ -86,6 +84,7 @@ public class TournamentServiceImpl implements TournamentService {
         if (usersSize > size) {
             for (int i = usersSize; i > size; i--) {
                 users.remove(i);
+                UTService.delete(id, users.get(i).getUsername());
             }
         }
 
@@ -96,6 +95,7 @@ public class TournamentServiceImpl implements TournamentService {
                 if (waitingUser.getELO() > minElo && waitingUser.getELO() < maxElo) {
                     users.add(waitingUser);
                     waitingUsers.remove(waitingUser);
+                    UTService.updatePlayerStatus(id, waitingUser.getUsername(), 'r');
                 }
             }
         }

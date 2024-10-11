@@ -64,20 +64,4 @@ public class UserTournamentServiceImpl implements UserTournamentService {
     public void delete(Long tourneyID, String username) {
         userTournamentRepo.deleteById_TournamentIdAndId_Username( tourneyID,  username);
     }
-    
-    // adding for updateTournament functionality in tournament
-    @Override
-    public void setPlayerList(Long tourneyID, UserTournament tournament) {
-
-    }
-
-    @Override
-    public void setWaitingList(Long tourneyID, UserTournament tournament) {
-
-    };
-
-    // @Override
-    // public UserTournament getUserTournament(Long tourneyID) {
-    //     return userTournamentRepo.findById(tourneyID);
-    // };
 }
