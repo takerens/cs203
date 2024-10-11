@@ -32,7 +32,7 @@ public class Match {
 
     private User white;
     private User black;
-    private boolean isBYE = false;
+    private boolean BYE = false;
 
     @Getter (AccessLevel.NONE)
     private Integer result = 0;

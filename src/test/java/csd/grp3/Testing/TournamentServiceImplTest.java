@@ -1,4 +1,4 @@
-package csd.grp3.Testing;
+package csd.grp3.testing;
 
 import csd.grp3.user.User;
 import org.junit.jupiter.api.BeforeEach;

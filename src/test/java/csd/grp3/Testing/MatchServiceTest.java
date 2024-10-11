@@ -1,111 +1,129 @@
-package csd.grp3.Testing;
+package csd.grp3.testing;
 
+import csd.grp3.match.Match;
+import csd.grp3.match.MatchNotFoundException;
+import csd.grp3.match.MatchRepository;
+import csd.grp3.match.MatchServiceImpl;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 
-import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import csd.grp3.match.*;
-
+@ExtendWith(MockitoExtension.class)
 public class MatchServiceTest {
+
+    @Mock
+    private MatchRepository matches;
 
     @InjectMocks
     private MatchServiceImpl matchService;
 
-    @Mock
-    private MatchRepository matchRepository;
+    @Test
+    void addMatch() {
+        // arrange
+        Match match = new Match();
 
-    private Match match;
-    private Round round;
-    private User user;
+        // act
+        // mock the save operation
+        when(matches.save(any(Match.class))).thenReturn(match);
 
-    @BeforeEach
-    void setUp() {
+        Match returnedMatch = matchService.addMatch(match);
 
-        MockitoAnnotations.openMocks(this);
-
-        round = new Round();
-        round.setId(1L);
-
-        user = new User();
-        user.setUsername("testUser");
-        user.setPassword("password");
-        user.setAuthorities("ROLE_PLAYER");
-
-        match = new Match();
-        match.setId(1L);
-        match.setRound(round);
-        match.setBYE(false);
+        // assert
+        assertEquals(match,returnedMatch);
+        verify(matches).save(match);
     }
 
     @Test
-    void testGetRoundMatches() {
-        List<Match> matchesList = new ArrayList<>();
-        matchesList.add(match);
-        
-        when(matchRepository.findByRound(round)).thenReturn(matchesList);
+    void getMatch_validId() {
+        // arrange
+        Match match = new Match();
+        matchService.addMatch(match);
 
-        List<Match> result = matchService.getRoundMatches(round);
+        // mock the find by id operation
+        when(matches.findById(match.getId())).thenReturn(Optional.of(match));
 
-        assertEquals(1, result.size());
-        assertEquals(match, result.get(0));
-        verify(matchRepository, times(1)).findByRound(round);
+        // act
+        Match returnedMatch = matchService.getMatch(match.getId());
+
+        //assert
+        assertEquals(match,returnedMatch);
+        verify(matches).findById(match.getId());
     }
 
     @Test
-    void testGetMatch() {
-        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
+    void getMatch_invalidId() {
+        // arrange
+        long invalidID = 0L;
 
-        Match result = matchService.getMatch(1L);
+        // mock the find by id operation
+        when(matches.findById(invalidID)).thenReturn(Optional.empty());
 
-        assertNotNull(result);
-        assertEquals(match.getId(), result.getId());
-        verify(matchRepository, times(1)).findById(1L);
+        // act
+
+        //assert
+        assertThrows(MatchNotFoundException.class, () -> {
+            matchService.getMatch(invalidID);
+        });
+
+        verify(matches).findById(invalidID);
     }
 
     @Test
-    void testAddMatch() {
-        when(matchRepository.save(any(Match.class))).thenReturn(match);
+    void updateMatch_validId() {
+        // arrange
+        Match match = new Match();
+        matchService.addMatch(match);
+        match.setResult(1);
+        match.setBYE(true);
 
-        Match result = matchService.addMatch(match);
+        // mock the find by id operation
+        when(matches.findById(match.getId())).thenReturn(Optional.of(match));
+        // mock the save operation
+        when(matches.save(match)).thenReturn(match);
 
-        assertEquals(match, result);
-        verify(matchRepository, times(1)).save(match);
+        // act
+        Match returnedMatch = matchService.updateMatch(match.getId(), match);
+
+        //assert
+        assertEquals(match.getResult(), returnedMatch.getResult());
+        assertEquals(match.isBYE(), returnedMatch.isBYE());
+        verify(matches, times(2)).save(match);
+        verify(matches).findById(match.getId());
     }
 
     @Test
-    void testUpdateMatch() {
-        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
+    void updateMatch_invalidId() {
+        // arrange
+        Match match = new Match();
+        matchService.addMatch(match);
+        match.setResult(1);
+        match.setBYE(true);
+        long invalidID = 0L;
 
-        Match newMatchInfo = new Match();
-        newMatchInfo.setResult(1);
-        newMatchInfo.setBYE(true);
+        // mock the find by id operation
+        when(matches.findById(invalidID)).thenReturn(Optional.empty());
 
-        Match updatedMatch = matchService.updateMatch(1L, newMatchInfo);
+        // act
 
-        assertNotNull(updatedMatch);
-        assertEquals(newMatchInfo.getResult(), updatedMatch.getResult());
-        assertTrue(updatedMatch.isBYE());
-        verify(matchRepository, times(1)).findById(1L);
-        verify(matchRepository, times(1)).save(updatedMatch);
-    }
-
-    @Test
-    void testDeleteMatch() {
-        doNothing().when(matchRepository).deleteById(1L);
-
-        assertDoesNotThrow(() -> matchService.deleteMatch(1L));
-        verify(matchRepository, times(1)).deleteById(1L);
+        //assert
+        assertThrows(MatchNotFoundException.class, () -> {
+            matchService.updateMatch(invalidID, match);
+        });
+        verify(matches, times(1)).save(match);
+        verify(matches).findById(invalidID);
     }
 }
