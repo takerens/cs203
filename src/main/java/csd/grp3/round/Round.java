@@ -2,7 +2,9 @@ package csd.grp3.round;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import csd.grp3.match.Match;
 import csd.grp3.tournament.Tournament;
@@ -32,10 +34,12 @@ public class Round {
 
     @ManyToOne
     @JoinColumn(name = "tournament_id", nullable = false)
+    @JsonBackReference // Prevents infinite recursion
     private Tournament tournament;
 
     @OneToMany(mappedBy = "round", orphanRemoval = true)
     @JsonIgnore
+    @JsonManagedReference // Prevents infinite recursion
     private List<Match> matches;
     
 }

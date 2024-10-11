@@ -42,7 +42,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser( @RequestBody User user) {
+    public ResponseEntity<User> loginUser(@RequestBody User user) {
+        System.out.println("Receiving " + user.getUsername());
         User loggedIn = userService.login(user.getUsername(), user.getPassword());
         setUser(loggedIn);
         return ResponseEntity.status(HttpStatus.OK).body(loggedIn);

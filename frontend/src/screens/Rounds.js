@@ -51,10 +51,17 @@ const TournamentRounds = () => {
                 }
 
                 const tournamentData = await response.json(); // Tournament
-                console.log("Tournament Data: " + tournamentData); // View Data for Debugging
+                console.log("Tournament Data: " + JSON.stringify(tournamentData, null, 2)); // View Data for Debugging
                 setTournament(tournamentData);
                 setRounds(tournamentData.rounds);
-                setMatches(tournamentData.rounds[roundNumber]);
+                console.log("Tournament Rounds: " + JSON.stringify(tournamentData.rounds));
+                // Check if roundNumber is a valid index
+                if (tournamentData.rounds && tournamentData.rounds.length > roundNumber) {
+                    setMatches(tournamentData.rounds[roundNumber].matches); // Assuming matches are within each round
+                } else {
+                    // No Matches yet
+                    setMatches([]); // Or handle this case as needed
+                }
             } catch (error) {
                 setErrorMessage("Fetch Tournament Data Error: " + error.message);
             }
@@ -66,7 +73,7 @@ const TournamentRounds = () => {
 
     const handleResultChange = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}rounds/${roundNumber}`, {
+            const response = await fetch(`http://localhost:8080/match/updateList`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newResults),
@@ -100,67 +107,73 @@ const TournamentRounds = () => {
 
     return (
         <><Navbar userRole={user.userRole} />
-        <SecondaryNavbar userRole={user.userRole} tournament={tournament}/>
-        <main>
-            <h3>Round</h3>
+            <SecondaryNavbar userRole={user.userRole} tournament={tournament} />
+            <main>
+                <h3>Round</h3>
 
-            <Pagination tournamentId={tournamentId} inProgressRounds={rounds.length} currentRound={roundNumber} />
-            <ErrorMessage message={errorMessage} />
-            <div>
-                {user.userRole === 'ROLE_ADMIN' && !editing && (
-                    <button onClick={() => setEditing(true)}>Edit Match Details</button>
-                )}
-                {editing && (
-                    <button onClick={handleResultChange}>Done</button>
-                )}
-            </div>
+                <Pagination tournamentId={tournamentId} inProgressRounds={rounds.length} currentRound={roundNumber} />
+                <ErrorMessage message={errorMessage} />
+                <div>
+                    {user.userRole === 'ROLE_ADMIN' && !editing && (
+                        <button onClick={() => setEditing(true)}>Edit Match Details</button>
+                    )}
+                    {editing && (
+                        <button onClick={handleResultChange}>Done</button>
+                    )}
+                </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>No.</th>
-                        <th>White Player</th>
-                        <th>Rating</th>
-                        <th>Points</th>
-                        <th>Results</th>
-                        <th>Black Player</th>
-                        <th>Rating</th>
-                        <th>Points</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {matches.map((match, index) => (
-                        <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{match.white.username}</td>
-                            <td>{match.white.rating}</td>
-                            <td>{match.white.points}</td>
-                            <td>
-                                {editing ? (
-                                    <select
-                                        defaultValue={displayResult(newResults[match.id]) || displayResult(match.result)}
-                                        onChange={(e) => handleDropdownChange(match.id, e.target.value)}
-                                    >
-                                        <option value="0">N/A</option>
-                                        <option value="1">1:0</option>
-                                        <option value="-1">0:1</option>
-                                        <option value="0.5">0.5:0.5</option>
-                                        {/* Option for BYE needed */}
-                                    </select>
-                                ) : (
-                                    <span>
-                                        {match.result === 1 ? '1:0' : match.result === -1 ? '0:1' : match.result === 0.5 ? '0.5:0.5' : 'N/A'}
-                                    </span>
-                                )}
-                            </td>
-                            <td>{match.black.username}</td>
-                            <td>{match.black.rating}</td>
-                            <td>{match.black.points}</td>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>White Player</th>
+                            <th>Rating</th>
+                            <th>Points</th>
+                            <th>Results</th>
+                            <th>Black Player</th>
+                            <th>Rating</th>
+                            <th>Points</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-        </main></>
+                    </thead>
+                    <tbody>
+                        {matches && matches.length > 0 ? (
+                            matches.map((match, index) => (
+                                <tr key={index}>
+                                    <td>{index + 1}</td>
+                                    <td>{match.white.username}</td>
+                                    <td>{match.white.rating}</td>
+                                    <td>{match.white.points}</td>
+                                    <td>
+                                        {editing ? (
+                                            <select
+                                                defaultValue={displayResult(newResults[match.id]) || displayResult(match.result)}
+                                                onChange={(e) => handleDropdownChange(match.id, e.target.value)}
+                                            >
+                                                <option value="0">N/A</option>
+                                                <option value="1">1:0</option>
+                                                <option value="-1">0:1</option>
+                                                <option value="0.5">0.5:0.5</option>
+                                                {/* Option for BYE needed */}
+                                            </select>
+                                        ) : (
+                                            <span>
+                                                {match.result === 1 ? '1:0' : match.result === -1 ? '0:1' : match.result === 0.5 ? '0.5:0.5' : 'N/A'}
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td>{match.black.username}</td>
+                                    <td>{match.black.rating}</td>
+                                    <td>{match.black.points}</td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="8">No matches available.</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </main></>
     )
 };
 

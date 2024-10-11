@@ -1,6 +1,9 @@
 package csd.grp3.match;
 
 import csd.grp3.user.User;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import csd.grp3.round.Round;
 import csd.grp3.tournament.Tournament;
 import jakarta.persistence.Entity;
@@ -28,6 +31,7 @@ public class Match {
 
     @ManyToOne
     @JoinColumn(name = "round_id", nullable = false)
+    @JsonBackReference // Prevents infinite recursion
     private Round round;
 
     private User white;

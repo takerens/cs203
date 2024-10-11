@@ -11,6 +11,7 @@ import lombok.*;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name="Tournaments")
@@ -26,9 +27,9 @@ public class Tournament {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToMany(mappedBy = "tournament", orphanRemoval = true)
-    @JsonIgnore
-    private List<Round> rounds;
+    @OneToMany(mappedBy = "tournament", orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference // Prevents infinite recursion
+    private List<Round> rounds = new ArrayList<>();
 
     @NotNull(message = "Title: not null")
     private String title;
@@ -45,6 +46,6 @@ public class Tournament {
     private int size;
 
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @JsonManagedReference(value = "tournamentUserTournament") // Prevents infinite recursion
     private List<UserTournament> userTournaments;
 }

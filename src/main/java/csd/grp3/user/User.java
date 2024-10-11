@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -31,7 +32,7 @@ import lombok.*;
 
 public class User implements UserDetails{
 
-    private Integer ELO;
+    private Integer ELO = 100;
 
     @Id @NotNull(message = "Username should not be null")
     private String username;
@@ -44,7 +45,7 @@ public class User implements UserDetails{
     private String authorities;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
-    @JsonIgnore
+    @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
     private List<UserTournament> userTournaments = new ArrayList<>();
 
     public User(String username, String password) {

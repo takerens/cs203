@@ -1,5 +1,7 @@
 package csd.grp3.usertournament;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import csd.grp3.tournament.Tournament;
 import csd.grp3.user.User;
 import jakarta.persistence.EmbeddedId;
@@ -28,11 +30,13 @@ public class UserTournament {
     @ManyToOne
     @MapsId("tournamentId")
     @JoinColumn(name="tournament_id")
+    @JsonBackReference(value = "tournamentUserTournament") // Prevents infinite recursion
     private Tournament tournament;
 
     @ManyToOne
     @MapsId("username")
     @JoinColumn(name="username")
+    @JsonBackReference(value = "userUserTournament") // Prevents infinite recursion
     private User user;
 
     // w = waitlist, r = registered

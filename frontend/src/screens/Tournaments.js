@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 import ErrorMessage from '../components/ErrorMessage';
 
@@ -7,6 +7,7 @@ const TournamentManagement = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [tournaments, setTournaments] = useState([]);
     const [user, setUser] = useState({});
+    const navigate = useNavigate();
 
     // When page loaded, fetch user data
     useEffect(() => {
@@ -47,7 +48,7 @@ const TournamentManagement = () => {
             }
 
             const tournamentData = await response.json();
-            console.log("Tournament Data: " + tournamentData); // View Data for Debugging
+            console.log("Tournament Data: " + JSON.stringify(tournamentData, null, 2)); // View Data for Debugging
             setTournaments(tournamentData);
 
         } catch (error) {
@@ -118,6 +119,11 @@ const TournamentManagement = () => {
         // Delete to (check tournament controller)
     };
 
+    const handleAdd = async (e) => {
+        e.preventDefault();
+        navigate('/addTournament');
+    };
+
     return (
         <>
             <Navbar userRole={user.userRole} />
@@ -126,15 +132,15 @@ const TournamentManagement = () => {
                 <h1>Tournament Management</h1>
                 
                 <div className="view">
-                    <p>Available Tournaments.</p>
                     {user.userRole === 'ROLE_ADMIN' && (
                         <p>
                             Add New Tournament: 
-                            <form onSubmit={`/addTournament`}>
+                            <form onSubmit={handleAdd}>
                                 <button type="submit">Add Tournament</button>
                             </form>
                         </p>
                     )}
+                    <p>Available Tournaments.</p>
                     <table>
                         <thead>
                             <tr>
