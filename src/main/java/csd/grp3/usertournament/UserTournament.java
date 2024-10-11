@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,7 @@ public class UserTournament {
     private User user;
 
     // w = waitlist, r = registered
+    @Pattern(regexp = "r|w", message = "Status must be 'r' or 'w'")
     private char status;
 
     private double gamePoints = 0;

@@ -23,4 +23,16 @@ public interface TournamentService {
     List<Tournament> getTournamentBelowMax(int ELO);
     List<Tournament> getTournamentAboveMinBelowMax(int minELO, int maxELO);
     List<Tournament> getUserEligibleTournament(User user);
+    double calculateBuchholzInTournament(User user, Tournament tournament);
+    double calculateBuchholzCut1InTournament(User user, Tournament tournament);
+    Round createPairings(Tournament tournament);
+    
+    // public static void update(List<Match> matches, User user);
+    // private --
+    // boolean isNextColourWhite(User user, Tournament tournament)
+    // boolean hasPlayedBefore(User user1, User user2, Tournament tournament)
+    // boolean isColourSuitable(User user, Tournament tournament, String nextColour)
+    // Match createMatchWithUserColour(User user1, String user1Colour, User user2, Round round)
+    // Match handleBYE(User worst, String color, Round round);
+
 }

@@ -2,10 +2,12 @@ package csd.grp3.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -34,20 +36,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authz) -> authz
-                    .requestMatchers( "/verify/**").permitAll()
-                    .requestMatchers("/login", "/register").permitAll()
+                    .requestMatchers(HttpMethod.POST,"/register").permitAll()
                     .anyRequest().permitAll())
-            // ensure that the application won’t create any session in our stateless REST
-            // APIs
-            // .sessionManagement(configurer ->
-            // configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // ensure that the application won’t create any session in our stateless REST APIs
+            .sessionManagement(configurer ->
+            configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .httpBasic(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable()) // CSRF protection is needed only for browser based attacks
             .formLogin(form -> form.disable())
-            // .exceptionHandling(handling -> handling
-            //         .authenticationEntryPoint((request, response, authException) -> {
-            //             response.sendRedirect("/login?error=Please Login First");
-            //         }))
             .headers(header -> header.disable()) // disable the security headers, as we do not return HTML in our
                                                     // APIs
             .authenticationProvider(authenticationProvider());

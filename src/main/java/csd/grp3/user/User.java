@@ -1,13 +1,19 @@
 package csd.grp3.user;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
 import jakarta.persistence.*;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import csd.grp3.usertournament.UserTournament;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -38,11 +44,23 @@ public class User implements UserDetails{
         this.username = username;
         this.password = password;
         this.authorities = "ROLE_USER";
+        this.ELO = 100; // Default
+    }
+
+    public User(String username, String password, String authorities, int ELO) {
+        this.username = username;
+        this.password = password;
+        this.authorities = authorities;
+        this.ELO = ELO;
     }
 
     public String getUserRole() {
         return authorities;
     }
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @JsonIgnore
+    private List<UserTournament> userTournaments = new ArrayList<>();
   
     // Return a collection of authorities (roles) granted to the user.
     @Override
