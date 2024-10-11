@@ -19,6 +19,7 @@ import csd.grp3.match.MatchService;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import csd.grp3.user.UserService;
+import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentService;
 import lombok.AllArgsConstructor;
 
@@ -100,8 +101,15 @@ public class TournamentServiceImpl implements TournamentService {
             }
         }
 
+        // now that we have the userList, we want to update our UserTournament with the userList's UserTournaments
+        List<UserTournament> newUserTournaments = new ArrayList<UserTournament>();
+        for (User user : users) {
+            newUserTournaments.add(UTService.findRecord(id, user.getUsername()));
+        }
         // now we update waitingList and list for UserTournament
         // tournament.set
+        tournament.setUserTournaments(newUserTournaments);
+
         return tournaments.save(tournament);
     }
 
@@ -113,6 +121,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void registerUser(User user, Long id) throws TournamentNotFoundException {
         Tournament tournament = getTournament(id);
+        List<UserTournament> userTournamentsList = tournament.getUserTournaments();
         List<User> userList = UTService.getPlayers(id);
         List<User> waitingList = UTService.getWaitingList(id);
 
@@ -129,15 +138,18 @@ public class TournamentServiceImpl implements TournamentService {
             } else {
                 userList.add(user);
                 UTService.add(tournament, user, 'r');
+                userTournamentsList.add(UTService.findRecord(id, user.getUsername()));
             }
         }
-
+        
+        tournament.setUserTournaments(userTournamentsList);
         tournaments.save(tournament);
     }
 
     @Override
     public void withdrawUser(User user, Long id) {
         Tournament tournament = getTournament(id);
+        List<UserTournament> userTournamentsList = tournament.getUserTournaments();
         List<User> userList = UTService.getPlayers(id);
         List<User> waitingList = UTService.getWaitingList(id);
 
@@ -145,14 +157,19 @@ public class TournamentServiceImpl implements TournamentService {
         LocalDateTime now = LocalDateTime.now();
         if (tournament.getDate() != null && now.isAfter(tournament.getDate().minusDays(1))) {
             UTService.delete(tournament.getId(), user.getUsername());
+            userTournamentsList.remove(UTService.findRecord(id, user.getUsername()));
         } else {
             UTService.delete(tournament.getId(), user.getUsername());
+            userTournamentsList.remove(UTService.findRecord(id, user.getUsername()));
             if (!waitingList.isEmpty()) {
+                userTournamentsList.add(UTService.findRecord(id, waitingList.get(0).getUsername()));
                 userList.add(waitingList.remove(0));
             }
             User waitingListToPlayer = waitingList.remove(0);
             UTService.updatePlayerStatus(tournament.getId(), waitingListToPlayer.getUsername(), 'r');
         }
+
+        tournament.setUserTournaments(userTournamentsList);
         tournaments.save(tournament);
     }
 
