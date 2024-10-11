@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -22,6 +23,8 @@ import csd.grp3.tournament.Tournament;
 import csd.grp3.tournament.TournamentNotFoundException;
 import csd.grp3.tournament.TournamentRepository;
 import csd.grp3.tournament.TournamentServiceImpl;
+import csd.grp3.usertournament.UserTournamentRepository;
+import csd.grp3.usertournament.UserTournamentServiceImpl;
 // import csd.grp3.user.User;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,8 +33,14 @@ public class TournamentServiceImplTest {
     @Mock
     private TournamentRepository tournamentRepository;
 
+    @Mock
+    private UserTournamentRepository userTournamentRepository;
+
     @InjectMocks
     private TournamentServiceImpl tournamentService;
+
+    @InjectMocks
+    private UserTournamentServiceImpl userTournamentService;
 
     private Tournament tournament;
     // private User player;
@@ -39,10 +48,11 @@ public class TournamentServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        // tournament = new Tournament();
-        // tournament.setId(1L);
-        // tournament.setTitle("Test Tournament");
-        // tournament.setSize(2);
+        tournament = new Tournament();
+        tournament.setId(1L);
+        tournament.setTitle("Test Tournament");
+        tournament.setSize(2);
+        tournament.setUserTournaments(new ArrayList<>());
         
     //     player = new User("testUser", "testPassword123");  // Username and password
     //     player.setAuthorities("ROLE_PLAYER"); // Set specific authorities
@@ -65,7 +75,6 @@ public class TournamentServiceImplTest {
     @Test
     void listTournaments_HasTournaments_ReturnListOfTournaments() {
         // Arrange
-        Tournament tournament = new Tournament();
         List<Tournament> tournamentsList = new ArrayList<>();
         tournamentsList.add(tournament);
         
@@ -100,9 +109,6 @@ public class TournamentServiceImplTest {
 
     @Test
     void getTournament_TournamentFound_ReturnTournament() {
-        // Arrange
-        Tournament tournament = new Tournament(1L, null, "Test Tournament", 0, 0, null, 0, null);
-
         // Mock findById to return the tournament
         when(tournamentRepository.findById(any(Long.class))).thenReturn(Optional.of(tournament));
 
@@ -116,31 +122,66 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findById(1L);
     }
 
-//     @Test
-//     void testAddTournament() {
-//         when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+    @Test
+    void addTournament_NewTitle_ReturnSavedTournament() {
+        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
 
-//         Tournament result = tournamentService.addTournament(tournament);
+        Tournament result = tournamentService.addTournament(tournament);
 
-//         assertEquals(tournament, result);
-//         verify(tournamentRepository, times(1)).save(tournament);
-//     }
+        assertEquals(tournament, result);
+        verify(tournamentRepository).save(tournament);
+    }
 
-//     @Test
-//     void testUpdateTournament() {
-//         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-//         when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+    @Test
+    void addTournament_SameTitle_ReturnSavedTournamentWithDifferentID() {
+        // Arrange
+        Tournament tournament2 = tournament;
+        tournament2.setId(2L);
+        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
 
-//         Tournament newTournamentInfo = new Tournament();
-//         newTournamentInfo.setTitle("Updated Tournament");
+        // Act
+        tournamentService.addTournament(tournament);
+        Tournament result = tournamentService.addTournament(tournament2);
 
-//         Tournament updatedTournament = tournamentService.updateTournament(1L, newTournamentInfo);
+        // Assert
+        assertEquals(2L, result.getId());
+        assertEquals("Test Tournament", result.getTitle());
+        verify(tournamentRepository, times(2)).save(tournament);
+    }
 
-//         assertNotNull(updatedTournament);
-//         assertEquals("Updated Tournament", updatedTournament.getTitle());
-//         verify(tournamentRepository, times(1)).findById(1L);
-//         verify(tournamentRepository, times(1)).save(any(Tournament.class));
-//     }
+    @Test
+    void updateTournament_NotFound_ReturnTournamentNotFoundException() {
+        // Arrange
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.empty());
+        
+        // Act
+        TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
+            tournamentService.updateTournament(1L, tournament);
+        });
+
+        // Assert
+        assertEquals("Could not find tournament 1", exception.getMessage());
+        verify(tournamentRepository).findById(1L);
+    }
+
+    @Test
+    void updateTournament_UpdatedTournament_ReturnUpdatedTournament() {
+        // Arrange
+        Tournament newTournamentInfo = new Tournament(1L, null, "Updated Tournament", 0, 0, null, 0, new ArrayList<>());
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+        when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(new ArrayList<>());
+        when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(new ArrayList<>());
+
+        // Act
+        Tournament updatedTournament = tournamentService.updateTournament(1L, newTournamentInfo);
+
+        // Assert
+        assertNotNull(updatedTournament);
+        assertEquals("Updated Tournament", updatedTournament.getTitle());
+        verify(tournamentRepository).findById(1L);
+        verify(tournamentRepository).save(any(Tournament.class));
+    }
 
 //     @Test
 //     void testGetTournament() {

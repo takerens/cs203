@@ -28,16 +28,16 @@ import lombok.AllArgsConstructor;
 public class TournamentServiceImpl implements TournamentService {
 
     @Autowired
-    private TournamentRepository tournaments;
+    private final TournamentRepository tournaments;
 
     @Autowired
-    private MatchService matchService;
+    private final MatchService matchService;
 
     @Autowired
-    private UserTournamentService UTService;
+    private final UserTournamentService UTService;
 
     @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Override
     public List<Tournament> listTournaments() {
