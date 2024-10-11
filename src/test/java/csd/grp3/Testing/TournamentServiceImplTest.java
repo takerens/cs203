@@ -1,11 +1,12 @@
 package csd.grp3.Testing;
 
-import csd.grp3.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,38 +18,52 @@ import static org.mockito.Mockito.*;
 
 import csd.grp3.tournament.Tournament;
 import csd.grp3.tournament.TournamentRepository;
-import csd.grp3.tournament.TournamentServiceImpl;;
+import csd.grp3.tournament.TournamentServiceImpl;
+import csd.grp3.user.User;
 
+@ExtendWith(MockitoExtension.class)
 public class TournamentServiceImplTest {
-
-    @InjectMocks
-    private TournamentServiceImpl tournamentService;
 
     @Mock
     private TournamentRepository tournamentRepository;
 
-    private Tournament tournament;
-    private User player;
+    @InjectMocks
+    private TournamentServiceImpl tournamentService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        tournament = new Tournament();
-        tournament.setId(1L);
-        tournament.setTitle("Test Tournament");
-        tournament.setSize(2);
-        tournament.setUsers(new ArrayList<>());
-        tournament.setWaitingList(new ArrayList<>());
+    // private Tournament tournament;
+    // private User player;
+
+    // @BeforeEach
+    // void setUp() {
+    //     MockitoAnnotations.openMocks(this);
+    //     tournament = new Tournament();
+    //     tournament.setId(1L);
+    //     tournament.setTitle("Test Tournament");
+    //     tournament.setSize(2);
         
-        player = new User("testUser", "testPassword123");  // Username and password
-        player.setAuthorities("ROLE_PLAYER"); // Set specific authorities
+    //     player = new User("testUser", "testPassword123");  // Username and password
+    //     player.setAuthorities("ROLE_PLAYER"); // Set specific authorities
+    // }
+
+    @Test
+    void listTournaments_NoTournaments_ReturnEmptyList() {
+        // mock the getAllTournaments()
+        when(tournamentRepository.getAllTournaments())
+        .thenReturn(new ArrayList<>());
+
+        List<Tournament> result = tournamentService.listTournaments();
+
+        assertEquals(0, result.size());
+        verify(tournamentRepository).getAllTournaments();
     }
 
     @Test
-    void testListTournaments() {
+    void listTournaments_HasTournaments_ReturnListOfTournaments() {
+        Tournament tournament = new Tournament();
         List<Tournament> tournamentsList = new ArrayList<>();
         tournamentsList.add(tournament);
         
+        // mock findAll()
         when(tournamentRepository.findAll()).thenReturn(tournamentsList);
 
         List<Tournament> result = tournamentService.listTournaments();
