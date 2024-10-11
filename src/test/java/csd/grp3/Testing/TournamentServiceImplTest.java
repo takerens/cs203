@@ -28,7 +28,7 @@ import csd.grp3.tournament.TournamentRepository;
 import csd.grp3.tournament.TournamentServiceImpl;
 import csd.grp3.usertournament.UserTournamentRepository;
 import csd.grp3.usertournament.UserTournamentServiceImpl;
-// import csd.grp3.user.User;
+import csd.grp3.user.User;
 
 @ExtendWith(MockitoExtension.class)
 public class TournamentServiceImplTest {
@@ -46,7 +46,7 @@ public class TournamentServiceImplTest {
     private UserTournamentServiceImpl userTournamentService;
 
     private Tournament tournament;
-    // private User player;
+    private User player;
 
     @BeforeEach
     void setUp() {
@@ -57,8 +57,8 @@ public class TournamentServiceImplTest {
         tournament.setSize(2);
         tournament.setUserTournaments(new ArrayList<>());
         
-    //     player = new User("testUser", "testPassword123");  // Username and password
-    //     player.setAuthorities("ROLE_PLAYER"); // Set specific authorities
+        player = new User("testUser", "testPassword123");  // Username and password
+        player.setAuthorities("ROLE_PLAYER"); // Set specific authorities
     }
 
     @Test
@@ -218,6 +218,22 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository, never()).deleteById(1L);
     }
 
+    @Test
+    void registerPlayer_TournamentNotFound_ReturnTournamentNotFoundException() {
+        // Arrange
+        List<User> userList = new ArrayList<>();
+        userList.add(player);
+
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        when(userTournamentRepository.findById(1L)).thenReturn(userList);
+
+        tournamentService.registerUser(player, 1L);
+
+        assertEquals(1, tournament.getUsers().size());
+        assertEquals(player, tournament.getUsers().get(0));
+        verify(tournamentRepository, times(1)).save(tournament);
+    }
+
 //     @Test
 //     void testGetTournament() {
 //         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
@@ -229,16 +245,7 @@ public class TournamentServiceImplTest {
 //         verify(tournamentRepository, times(1)).findById(1L);
 //     }
 
-//     @Test
-//     void testRegisterPlayer() {
-//         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
 
-//         tournamentService.registerUser(player, 1L);
-
-//         assertEquals(1, tournament.getUsers().size());
-//         assertEquals(player, tournament.getUsers().get(0));
-//         verify(tournamentRepository, times(1)).save(tournament);
-//     }
 
 //     @Test
 //     void testWithdrawPlayer() {
