@@ -3,7 +3,7 @@ package csd.grp3.usertournament;
 import java.util.List;
 
 import csd.grp3.tournament.Tournament;
-import csd.grp3.user.User;
+import csd.grp3.user.User;  
 
 public interface UserTournamentService {
     UserTournament findRecord(Long tourneyID, String username);

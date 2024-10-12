@@ -1,5 +1,6 @@
 package csd.grp3.usertournament;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -23,12 +24,20 @@ public class UserTournamentServiceImpl implements UserTournamentService {
 
     @Override
     public List<User> getPlayers(Long tourneyID) {
-        return userTournamentRepo.findRegisteredUsersByTournamentId(tourneyID);
+        List<User> players = userTournamentRepo.findRegisteredUsersByTournamentId(tourneyID);
+        if (players == null) {
+            players = new ArrayList<>();
+        }
+        return players;
     }
 
     @Override
     public List<User> getWaitingList(Long tourneyID) {
-        return userTournamentRepo.findWaitlistUsersByTournamentId(tourneyID);
+        List<User> waitingList = userTournamentRepo.findWaitlistUsersByTournamentId(tourneyID);
+        if (waitingList == null) {
+            waitingList = new ArrayList<>();
+        }
+        return waitingList;
     }
 
     @Override
@@ -65,5 +74,4 @@ public class UserTournamentServiceImpl implements UserTournamentService {
         findRecord(tourneyID, username);
         userTournamentRepo.deleteById_TournamentIdAndId_Username( tourneyID,  username);
     }
-    
 }

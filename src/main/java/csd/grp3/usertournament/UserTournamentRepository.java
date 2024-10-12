@@ -1,14 +1,14 @@
 package csd.grp3.usertournament;
 
-import csd.grp3.user.*;
-
-import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import csd.grp3.user.User;
 
 @Repository
 public interface UserTournamentRepository extends JpaRepository<UserTournament, UserTournamentId>{
@@ -44,4 +44,5 @@ public interface UserTournamentRepository extends JpaRepository<UserTournament, 
     //     @Param("username") String username, 
     //     @Param("updatedStatus") char newStatus);
     void deleteById_TournamentIdAndId_Username(Long tournamentId, String username);
+
 }
