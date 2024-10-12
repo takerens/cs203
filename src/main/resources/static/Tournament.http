@@ -1,0 +1,83 @@
+### Get all tournaments
+GET http://localhost:8080/tournaments
+
+### 
+GET http://localhost:8080/user
+
+### Get tourn by ID
+GET http://localhost:8080/tournaments/1
+
+### Get tourn by ID - not found
+GET http://localhost:8080/tournaments/9
+
+### add tourn - success
+POST http://localhost:8080/tournaments
+Content-Type: application/json
+
+{
+    "title": "New Tournament",
+    "minElo": 10,
+    "maxElo": 100,
+    "date": "2024-10-15T15:30:00",
+    "size": 3
+}
+
+### add tounr - min > max
+POST http://localhost:8080/tournaments
+Content-Type: application/json
+
+{
+    "title": "New Tournament",
+    "minElo": 100,
+    "maxElo": 10,
+    "date": "2024-10-15T15:30:00",
+    "size": 3
+}
+
+### add tounr - min = max
+POST http://localhost:8080/tournaments
+Content-Type: application/json
+
+{
+    "title": "New Tournament",
+    "minElo": 10,
+    "maxElo": 10,
+    "date": "2024-10-15T15:30:00",
+    "size": 3
+}
+
+### add tounr - DATE B4 TDY
+POST http://localhost:8080/tournaments
+Content-Type: application/json
+
+{
+    "title": "New Tournament",
+    "minElo": 100,
+    "maxElo": 10,
+    "date": "2024-08-15T15:30:00",
+    "size": 3
+}
+
+### add tounr - negative size / minmax elo
+POST http://localhost:8080/tournaments
+Content-Type: application/json
+
+{
+    "title": "New Tournament",
+    "minElo": 100,
+    "maxElo": 10,
+    "date": "2024-08-15T15:30:00",
+    "size": -1
+}
+
+### update tournament
+PUT http://localhost:8080/tournaments/1
+Content-Type: application/json
+
+{
+    "title": "New Tournament",
+    "minElo": 10,
+    "maxElo": 200,
+    "date": "2024-12-15T15:30:00",
+    "size": 5
+}

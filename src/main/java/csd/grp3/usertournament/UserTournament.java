@@ -1,7 +1,10 @@
 package csd.grp3.usertournament;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import csd.grp3.tournament.Tournament;
 import csd.grp3.user.User;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -29,16 +32,24 @@ public class UserTournament {
     @ManyToOne
     @MapsId("tournamentId")
     @JoinColumn(name="tournament_id")
+    @JsonBackReference(value = "tournamentUserTournament") // Prevents infinite recursion
     private Tournament tournament;
 
     @ManyToOne
     @MapsId("username")
     @JoinColumn(name="username")
+    @JsonBackReference(value = "userUserTournament") // Prevents infinite recursion
     private User user;
-
+    
     // w = waitlist, r = registered
-    @Pattern(regexp = "r|w", message = "Status must be 'r' or 'w'")
-    private char status;
+    private Character status;
 
     private double gamePoints = 0;
+
+    public void setStatus(Character status) {
+        if (status != null && !status.equals('r') && !status.equals('w')) {
+            throw new IllegalArgumentException("Status must be an alphabet character");
+        }
+        this.status = status;
+    }
 }

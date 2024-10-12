@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import csd.grp3.usertournament.UserTournament;
 import jakarta.validation.constraints.NotNull;
@@ -28,7 +29,7 @@ import lombok.*;
 @Table(name = "AppUsers")
 
 public class User implements UserDetails{
-    private Integer ELO;
+    private Integer ELO = 100;
 
     @Id @NotNull(message = "Username should not be null")
     private String username;
@@ -54,12 +55,13 @@ public class User implements UserDetails{
         this.ELO = ELO;
     }
 
+    @JsonIgnore
     public String getUserRole() {
         return authorities;
     }
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
     private List<UserTournament> userTournaments = new ArrayList<>();
   
     // Return a collection of authorities (roles) granted to the user.
