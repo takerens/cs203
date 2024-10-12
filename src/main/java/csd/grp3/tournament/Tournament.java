@@ -26,7 +26,7 @@ public class Tournament {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToMany(mappedBy = "tournament", orphanRemoval = true)
+    @OneToMany(mappedBy = "tournament", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Round> rounds;
 
     @NotNull(message = "Title: not null")

@@ -29,9 +29,6 @@ public class TournamentController {
 
     @GetMapping
     public ResponseEntity<List<Tournament>> getAllTournaments() {
-        // List<Tournament> tournamentList = tournamentRepo.findAll();
-        // System.out.println(tournamentList);
-        // should be like this (below)
         List<Tournament> tournamentList = tournamentService.listTournaments();
         return ResponseEntity.status(HttpStatus.OK).body(tournamentList);
     }
@@ -109,7 +106,7 @@ public class TournamentController {
     // }
 
     @DeleteMapping("{id}/withdraw")
-    public ResponseEntity<Void> withdraw(@RequestBody User user , @PathVariable Long id) {
+    public ResponseEntity<Void> withdraw(@RequestBody User user, @PathVariable Long id) {
         tournamentService.withdrawUser(user, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -123,6 +120,11 @@ public class TournamentController {
     // TODO
     @GetMapping("/{id}/standings")
     public ResponseEntity<List<User>> getStandings(@PathVariable Long id) {
+        return null; // List Users in order of GamePoints
+    }
+
+    @GetMapping("/{elo}")
+    public ResponseEntity<List<User>> getTournamentByElo(@PathVariable int elo) {
         return null; // List Users in order of GamePoints
     }
     
