@@ -88,13 +88,13 @@ public class TournamentServiceImpl implements TournamentService {
         if (usersSize > size) {
             for (int i = usersSize - 1; i >= size; i--) {
                 if (users.get(i).getELO() >= minElo && users.get(i).getELO() <= maxElo) { // eligible
-                        UTService.updatePlayerStatus(id, users.get(i).getUsername(), 'w');
+                    UTService.updatePlayerStatus(id, users.get(i).getUsername(), 'w');
                 } else {
                     UTService.delete(tournament, users.get(i));
                 }
             }
         }
-        
+
         // lastly, we proccess those in waitingList based on new limits imposed
         for (User waitingUser : waitingUsers) {
             if (waitingUser.getELO() >= minElo && waitingUser.getELO() <= maxElo) {
@@ -159,92 +159,69 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public boolean tournamentExists(Long tournamentId) {
-        return tournamentId != null && tournaments.existsById(tournamentId);
-    }
-
-    @Override
     @Transactional
-    public void addRound(Long id) throws TournamentNotFoundException, TournamentNotStartedException {
+    public void addRound(Long id) throws TournamentNotFoundException, InvalidTournamentStatus {
         Tournament tournament = getTournament(id);
         int currentRounds = tournament.getRounds().size();
 
         if (LocalDateTime.now().isBefore(tournament.getDate())) {
-            throw new TournamentNotStartedException("Wait for Tournament Start Date");
+            throw new InvalidTournamentStatus("Wait for Tournament Start Date");
         }
 
         if (UTService.getPlayers(id).size() < 2) {
-            throw new TournamentNotStartedException("Need at least 2 Players registered");
+            throw new InvalidTournamentStatus("Need at least 2 Players registered");
         }
 
         if (currentRounds > 0) {
             Round lastRound = tournament.getRounds().get(currentRounds - 1);
-            // if (!lastRound.isOver()) {
-            //     throw new TournamentNotStartedException("Round not over");
-            // }
+            updateMatchResults(lastRound); // results for this round only
+            if (!lastRound.isOver()) {
+                return; // return tournament data as is
+            }
+            updateResults(lastRound); // update tournament gamepoints
         }
         createPairings(tournament);
-        // tournaments.save(tournament);
     }
 
     @Override
-    public void updateResults(Round round) throws MatchNotCompletedException {
+    @Transactional
+    public void updateMatchResults(Round round) {
         List<Match> matches = round.getMatches();
         Tournament tournament = round.getTournament();
 
-        // check match ended
         for (Match match : matches) {
-            // if match not complete
-            if (match.getResult() == 0) {
-                // throw exception that it's not complete
-                throw new MatchNotCompletedException(match.getId());
-            } else {
+            // if match is complete
+            if (match.getResult() != 0) {
                 // update user data with match results
                 double result = match.getResult();
                 User black = match.getBlack();
                 User white = match.getWhite();
                 if (result == -1) {
-                    UTService.updateGamePoints(tournament.getId(), black.getUsername(), 1.0);
+                    UTService.updateMatchPoints(tournament.getId(), black.getUsername(), 1.0);
+                    UTService.updateMatchPoints(tournament.getId(), white.getUsername(), 0.0);
                 } else if (result == 1) {
-                    UTService.updateGamePoints(tournament.getId(), white.getUsername(), 1.0);
+                    UTService.updateMatchPoints(tournament.getId(), white.getUsername(), 1.0);
+                    UTService.updateMatchPoints(tournament.getId(), black.getUsername(), 0.0);
                 } else if (result == 0.5) {
-                    UTService.updateGamePoints(tournament.getId(), black.getUsername(), 0.5);
-                    UTService.updateGamePoints(tournament.getId(), white.getUsername(), 0.5);
+                    UTService.updateMatchPoints(tournament.getId(), black.getUsername(), 0.5);
+                    UTService.updateMatchPoints(tournament.getId(), white.getUsername(), 0.5);
                 }
             }
         }
-
-        // update match results
-
-        // firstly, we update the round with all new match data.
-        round.setMatches(matches);
-
-        // next, we get tournament that the round is in.
-
-        // we get the list of rounds that tournament stores
-        List<Round> rounds = tournament.getRounds();
-
-        // now, we find the specific round that we want to update
-        Long id = round.getId();
-        int index = 0;
-
-        // we loop through each round in tournament round list
-        for (Round eachRound : rounds) {
-            // if the id of the rounds are the same, we can set it to the new round.
-            if (eachRound.getId() == id) {
-                // set it using the index we stored.
-                rounds.set(index, round);
-            }
-            // index to find location of round
-            index += 1;
-        }
-
-        // update tournament with updated list of rounds
-        tournament.setRounds(rounds);
-
-        // save tournament data back into database
-        tournaments.save(tournament);
     }
+
+    @Override
+    @Transactional
+    public void updateResults(Round round) {
+        List<Match> matches = round.getMatches();
+        Tournament tournament = round.getTournament();
+
+        for (Match match : matches) {
+            UTService.updateGamePoints(tournament.getId(), match.getBlack().getUsername());
+            UTService.updateGamePoints(tournament.getId(), match.getWhite().getUsername());
+        }
+    }
+
 
     public List<Tournament> getTournamentAboveMin(int ELO) {
         List<Tournament> tournamentList = listTournaments();
@@ -282,8 +259,7 @@ public class TournamentServiceImpl implements TournamentService {
         return belowMaxList;
     }
 
-    public List<Tournament> getUserEligibleTournament(User user) {
-        int userELO = user.getELO();
+    public List<Tournament> getUserEligibleTournament(int userELO) {
         List<Tournament> tournamentList = listTournaments();
         List<Tournament> eligibleTournamentList = new ArrayList<>();
 
@@ -414,6 +390,9 @@ public class TournamentServiceImpl implements TournamentService {
                         nextRound);
                 newPair.setRound(nextRound);
                 matches.add(newPair);
+                pairedUsers.add(user1);
+                pairedUsers.add(user2);
+                break;
             }
         }
         // after all users are paired, assign the list to round and return it
@@ -534,6 +513,8 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void endTournament(Long id) {
         Tournament tournament = getTournament(id);
+        tournament.setCalculated(true);
+        tournaments.save(tournament); // set Calculated
 
         for (User user : UTService.getPlayers(id)) {
             List<Match> userMatches = new ArrayList<>();
@@ -567,7 +548,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param user    - User's ELO to update
      * @return none
      */
-    public static void update(List<Match> matches, User user) {
+    public void update(List<Match> matches, User user) {
         Integer userELO = user.getELO();
         Integer totalDiffRating = 0;
         Integer opponents = 0;
@@ -600,8 +581,8 @@ public class TournamentServiceImpl implements TournamentService {
 
             opponents++;
         }
-
-        user.setELO(userELO + developmentCoefficient * (wins - loss) / 2
+        
+        userService.updateELO(user, userELO + developmentCoefficient * (wins - loss) / 2
                 - (developmentCoefficient / 4 * classInterval) * totalDiffRating);
     }
 }

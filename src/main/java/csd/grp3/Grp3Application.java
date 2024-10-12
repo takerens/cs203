@@ -24,13 +24,15 @@ public class Grp3Application {
 		System.out.println("[Add User]: " + users.save(new User("User100", encoder.encode("user1234"), "ROLE_USER", 100)).getUsername());
 		System.out.println("[Add User]: " + users.save(new User("User0", encoder.encode("user1234"), "ROLE_USER", 0)).getUsername());
 		System.out.println("[Add User]: " + users.save(new User("User110", encoder.encode("user1234"), "ROLE_USER", 110)).getUsername());
+		System.out.println("[Add User]: " + users.save(new User("User150", encoder.encode("user1234"), "ROLE_USER", 150)).getUsername());
+		System.out.println("[Add User]: " + users.save(new User("User120", encoder.encode("user1234"), "ROLE_USER", 120)).getUsername());
 		System.out.println("[Add Bot]: " + users.save(new User("DEFAULT_BOT", encoder.encode("goodpassword"), "ROLE_USER", 0)).getUsername());
 
 		// JPA User Repository init
 		TournamentRepository ts = ctx.getBean(TournamentRepository.class);
 		Tournament t = new Tournament();
 		t.setTitle("Tournament A");
-		t.setSize(2);
+		t.setSize(4);
 		t.setTotalRounds(2);
 		t.setDate(LocalDateTime.of(2024, 9, 30, 15, 45));
 		System.out.println("[Add Tournament]: " + ts.save(t).getTitle());

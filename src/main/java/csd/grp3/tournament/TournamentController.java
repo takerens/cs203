@@ -45,8 +45,18 @@ public class TournamentController {
 
     @GetMapping("/{id}/rounds")
     public ResponseEntity<List<Round>> getRoundData(@PathVariable Long id) {
-        tournamentService.addRound(id);
         Tournament tournamentData = tournamentService.getTournament(id);
+        if (!tournamentData.isOver()) {
+            tournamentService.addRound(id);
+            tournamentData = tournamentService.getTournament(id); // get updated tournament info
+        } else { // tournament is over
+            if (!tournamentData.isCalculated()) {
+                Round last = tournamentData.getRounds().get(tournamentData.getTotalRounds() - 1);
+                tournamentService.updateMatchResults(last);
+                tournamentService.updateResults(last);
+                tournamentService.endTournament(id);
+            }
+        }
         return new ResponseEntity<List<Round>>(tournamentData.getRounds(), HttpStatus.OK);
     }
 
@@ -65,7 +75,6 @@ public class TournamentController {
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> addTournament(@RequestBody Tournament tournament) {
         tournamentService.addTournament(tournament);
-
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -136,8 +145,9 @@ public class TournamentController {
     }
 
     @GetMapping("/byElo/{elo}")
-    public ResponseEntity<List<User>> getTournamentByElo(@PathVariable int elo) {
-        return null; // List Users in order of GamePoints
+    public ResponseEntity<List<Tournament>> getTournamentByElo(@PathVariable int elo) {
+        List<Tournament> t = tournamentService.getUserEligibleTournament(elo);
+        return new ResponseEntity<List<Tournament>>(t, HttpStatus.OK);
     }
     
 }

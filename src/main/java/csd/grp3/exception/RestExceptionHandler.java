@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import csd.grp3.tournament.InvalidTournamentStatus;
 import csd.grp3.tournament.TournamentNotFoundException;
-import csd.grp3.tournament.TournamentNotStartedException;
+import csd.grp3.tournament.InvalidTournamentStatus;
 import csd.grp3.tournament.UserNotRegisteredException;
 
 /**
@@ -51,8 +52,8 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(TournamentNotStartedException.class)
-    public ResponseEntity<Object> handleTournamentNotStartedException(TournamentNotStartedException ex) {
+    @ExceptionHandler(InvalidTournamentStatus.class)
+    public ResponseEntity<Object> handleInvalidTournamentStatus(InvalidTournamentStatus ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("error", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);

@@ -38,10 +38,17 @@ public class UserTournamentServiceImpl implements UserTournamentService {
     }
 
     @Override
-    public void updateGamePoints(Long tourneyID, String username, double increment) {
+    public void updateGamePoints(Long tourneyID, String username) {
         UserTournament ut = findRecord(tourneyID, username);
-        double updatedGamePoints = ut.getGamePoints() + increment;
-        ut.setGamePoints(updatedGamePoints);
+        ut.setGamePoints(ut.getGamePoints()); // getGamePoints adds MatchPoints
+        ut.setMatchPoints(0); // reset match points
+        userTournamentRepo.save(ut);
+    }
+
+    @Override
+    public void updateMatchPoints(Long tourneyID, String username, double points) {
+        UserTournament ut = findRecord(tourneyID, username);
+        ut.setMatchPoints(points);
         userTournamentRepo.save(ut);
     }
 
@@ -65,14 +72,13 @@ public class UserTournamentServiceImpl implements UserTournamentService {
 
         UserTournament ut = new UserTournament(
                 new UserTournamentId(tourney.getId(), user.getUsername()),
-                tourney, user, status, 0);
+                tourney, user, status, 0, 0);
 
         // Add the userTournament to both parent entities' lists
         tourney.getUserTournaments().add(ut);
         user.getUserTournaments().add(ut);
 
         return ut;
-        // return userTournamentRepo.save(ut);
     }
 
     @Override

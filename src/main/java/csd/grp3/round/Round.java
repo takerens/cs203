@@ -42,5 +42,16 @@ public class Round {
     @OneToMany(mappedBy = "round", orphanRemoval = true, cascade = CascadeType.ALL)
     @JsonManagedReference // Prevents infinite recursion
     private List<Match> matches = new ArrayList<>();
+
+    public boolean isOver() {
+        boolean isOver = true;
+        for (Match m : matches) {
+            if (m.getResult() == 0) {
+                isOver = false;
+                break;
+            }
+        }
+        return !matches.isEmpty() && isOver;
+    }
     
 }
