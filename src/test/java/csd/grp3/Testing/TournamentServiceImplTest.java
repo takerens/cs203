@@ -585,12 +585,43 @@ public class TournamentServiceImplTest {
 
     @Test
     void getUserEligibleTournament_Eligible_ReturnTournamentList() {
+        // Arrange
+        player.setELO(200);
+        Tournament tournament = new Tournament(1L, null, null, 100, 300, null, 0, null);
+        List<Tournament> tournaments = new ArrayList<>();
+        tournaments.add(tournament);
 
+        // Mock repository
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getUserEligibleTournament(player);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(1L, result.get(0).getId());
+        verify(tournamentRepository).findAll();
     }
 
     @Test
     void getUserEligibleTournament_NotEligible_ReturnTournamentList() {
+        // Arrange
+        player.setELO(0);
+        Tournament tournament = new Tournament(1L, null, null, 100, 300, null, 0, null);
+        List<Tournament> tournaments = new ArrayList<>();
+        tournaments.add(tournament);
 
+        // Mock repository
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getUserEligibleTournament(player);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        verify(tournamentRepository).findAll();
     }
 
 //     @Test
