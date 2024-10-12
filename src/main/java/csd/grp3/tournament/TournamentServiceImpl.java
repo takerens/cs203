@@ -21,6 +21,7 @@ import csd.grp3.user.User;
 import csd.grp3.user.UserService;
 import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -41,7 +42,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public List<Tournament> listTournaments() {
-        return tournaments.getAllTournaments();
+        return tournaments.findAll();
     }
 
     @Override
@@ -75,8 +76,8 @@ public class TournamentServiceImpl implements TournamentService {
         // firstly, we change based on Elo limits
         for (User user : users) {
             if (user.getELO() < minElo || user.getELO() > maxElo) {
-                users.remove(user);
-                UTService.delete(id, user.getUsername());
+                // users.remove(user);
+                UTService.delete(tournament, user);
             }
         }
 
@@ -84,14 +85,14 @@ public class TournamentServiceImpl implements TournamentService {
         int usersSize = users.size();
         if (usersSize > size) {
             for (int i = usersSize; i > size; i--) {
-                users.remove(i);
-                UTService.delete(id, users.get(i).getUsername());
+                // users.remove(i);
+                UTService.delete(tournament, users.get(i));
             }
         }
 
         // lastly, we move those from waitingList onto main list based on new limits imposed.
         usersSize = users.size();
-        while (usersSize < size) {
+        while (usersSize < size && !waitingUsers.isEmpty()) {
             for (User waitingUser : waitingUsers) {
                 if (waitingUser.getELO() > minElo && waitingUser.getELO() < maxElo) {
                     users.add(waitingUser);
@@ -102,13 +103,13 @@ public class TournamentServiceImpl implements TournamentService {
         }
 
         // now that we have the userList, we want to update our UserTournament with the userList's UserTournaments
-        List<UserTournament> newUserTournaments = new ArrayList<UserTournament>();
-        for (User user : users) {
-            newUserTournaments.add(UTService.findRecord(id, user.getUsername()));
-        }
+        // List<UserTournament> newUserTournaments = new ArrayList<UserTournament>();
+        // for (User user : users) {
+        //     newUserTournaments.add(UTService.findRecord(id, user.getUsername()));
+        // }
         // now we update waitingList and list for UserTournament
         // tournament.set
-        tournament.setUserTournaments(newUserTournaments);
+        // tournament.setUserTournaments(newUserTournaments);
 
         return tournaments.save(tournament);
     }
@@ -120,58 +121,44 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void registerUser(User user, Long id) throws TournamentNotFoundException {
+    @Transactional
+    public void registerUser(User tempUser, Long id) throws TournamentNotFoundException {
         Tournament tournament = getTournament(id);
-        List<UserTournament> userTournamentsList = tournament.getUserTournaments();
         List<User> userList = UTService.getPlayers(id);
         List<User> waitingList = UTService.getWaitingList(id);
+        User user = userService.findByUsername(tempUser.getUsername());
 
         // check if tournament already has that user data
         if (userList.contains(user) || waitingList.contains(user)) {
             throw new PlayerAlreadyRegisteredException();
-        } else {
-            // if user isn't inside tournament
+        } else { // if user isn't inside tournament
             // if tournament is full, we add to waitingList instead
             if (userList.size() == tournament.getSize()) {
-                waitingList.add(user);
                 UTService.add(tournament, user, 'w');
                 // else, we want to add to normal userList
             } else {
-                userList.add(user);
                 UTService.add(tournament, user, 'r');
-                userTournamentsList.add(UTService.findRecord(id, user.getUsername()));
             }
         }
-        
-        tournament.setUserTournaments(userTournamentsList);
-        tournaments.save(tournament);
     }
 
     @Override
-    public void withdrawUser(User user, Long id) {
+    @Transactional
+    public void withdrawUser(User tempUser, Long id) throws UserNotRegisteredException{
         Tournament tournament = getTournament(id);
-        List<UserTournament> userTournamentsList = tournament.getUserTournaments();
         List<User> userList = UTService.getPlayers(id);
         List<User> waitingList = UTService.getWaitingList(id);
-
-        // Reduce code redundancy in UTService.delete
-        LocalDateTime now = LocalDateTime.now();
-        if (tournament.getDate() != null && now.isAfter(tournament.getDate().minusDays(1))) {
-            UTService.delete(tournament.getId(), user.getUsername());
-            userTournamentsList.remove(UTService.findRecord(id, user.getUsername()));
-        } else {
-            UTService.delete(tournament.getId(), user.getUsername());
-            userTournamentsList.remove(UTService.findRecord(id, user.getUsername()));
-            if (!waitingList.isEmpty()) {
-                userTournamentsList.add(UTService.findRecord(id, waitingList.get(0).getUsername()));
-                userList.add(waitingList.remove(0));
-            }
-            User waitingListToPlayer = waitingList.remove(0);
-            UTService.updatePlayerStatus(tournament.getId(), waitingListToPlayer.getUsername(), 'r');
+        User user = userService.findByUsername(tempUser.getUsername());
+        if (!userList.contains(user) && !waitingList.contains(user)) {
+            throw new UserNotRegisteredException("User has not registered for tournament");
         }
 
-        tournament.setUserTournaments(userTournamentsList);
-        tournaments.save(tournament);
+        UTService.delete(tournament, user); // Remove player
+
+        if (tournament.getDate().isAfter(LocalDateTime.now()) && userList.contains(user)) { // Before and in player list
+            User moveUser = waitingList.remove(0);
+            UTService.updatePlayerStatus(id, moveUser.getUsername(), 'r');
+        }
     }
 
     @Override

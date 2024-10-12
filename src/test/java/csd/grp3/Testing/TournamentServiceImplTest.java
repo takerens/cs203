@@ -55,7 +55,7 @@ public class TournamentServiceImplTest {
         tournament.setId(1L);
         tournament.setTitle("Test Tournament");
         tournament.setSize(2);
-        tournament.setUserTournaments(new ArrayList<>());
+        // tournament.setUserTournaments(new ArrayList<>());
         
         player = new User("testUser", "testPassword123");  // Username and password
         player.setAuthorities("ROLE_PLAYER"); // Set specific authorities
@@ -66,13 +66,13 @@ public class TournamentServiceImplTest {
         List<Tournament> tournamentsList = new ArrayList<>();
 
         // mock the getAllTournaments()
-        when(tournamentRepository.getAllTournaments()).thenReturn(tournamentsList);
+        when(tournamentRepository.findAll()).thenReturn(tournamentsList);
 
         List<Tournament> result = tournamentService.listTournaments();
 
         assertNotNull(result);
         assertEquals(0, result.size());
-        verify(tournamentRepository).getAllTournaments();
+        verify(tournamentRepository).findAll();
     }
 
     @Test
@@ -82,13 +82,13 @@ public class TournamentServiceImplTest {
         tournamentsList.add(tournament);
         
         // mock getAllTournaments()
-        when(tournamentRepository.getAllTournaments()).thenReturn(tournamentsList);
+        when(tournamentRepository.findAll()).thenReturn(tournamentsList);
 
         List<Tournament> result = tournamentService.listTournaments();
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(tournamentRepository).getAllTournaments();
+        verify(tournamentRepository).findAll();
         // assertEquals("Test Tournament", result.get(0).getTitle());
         // verify(tournamentRepository, times(1)).findAll();
     }

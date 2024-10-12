@@ -21,8 +21,8 @@ import csd.grp3.user.User;
 @RestController
 @RequestMapping("/tournaments")
 public class TournamentController {
-    @Autowired
-    private TournamentRepository tournamentRepo;
+    // @Autowired
+    // private TournamentRepository tournamentRepo;
 
     @Autowired
     private TournamentService tournamentService;
@@ -51,15 +51,15 @@ public class TournamentController {
     // }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> addTournament(@RequestBody Tournament tournament) {
         tournamentService.addTournament(tournament);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> updateTournamentById(@PathVariable Long id, @RequestBody Tournament newTournamentData) {
         // updatedTournamentData.setMatches(newTournamentData.getMatches());
         // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
@@ -91,10 +91,10 @@ public class TournamentController {
     //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     // }
 
-    @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteTournamentById(@PathVariable Long id) {
-        tournamentRepo.deleteById(id);
+        tournamentService.deleteTournament(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -105,7 +105,7 @@ public class TournamentController {
     //     return new ResponseEntity<>(HttpStatus.OK);
     // }
 
-    @DeleteMapping("{id}/withdraw")
+    @DeleteMapping("/{id}/withdraw")
     public ResponseEntity<Void> withdraw(@RequestBody User user, @PathVariable Long id) {
         tournamentService.withdrawUser(user, id);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -123,7 +123,7 @@ public class TournamentController {
         return null; // List Users in order of GamePoints
     }
 
-    @GetMapping("/{elo}")
+    @GetMapping("/byElo/{elo}")
     public ResponseEntity<List<User>> getTournamentByElo(@PathVariable int elo) {
         return null; // List Users in order of GamePoints
     }

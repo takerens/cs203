@@ -1,0 +1,69 @@
+### Register a new user
+POST http://localhost:8080/signup
+Content-Type: application/json
+
+{
+    "username": "user1",
+    "password": "pass1234",
+    "authorities": "ROLE_USER"
+}
+
+### Register a new user
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+    "username": "user1",
+    "password": "pass1234",
+    "authorities": "ROLE_USER"
+}
+
+### Register a user with a duplicated username
+POST http://localhost:8080/signup
+Content-Type: application/json
+
+{
+    "username": "user1",
+    "password": "pwd2aaaaaaa",
+    "authorities": "ROLE_USER"
+}
+
+### Register a user with password too short
+POST http://localhost:8080/signup
+Content-Type: application/json
+
+{
+    "username": "user",
+    "password": "pwd",
+    "authorities": "ROLE_USER"
+}
+
+### Register a user with null username
+POST http://localhost:8080/signup
+Content-Type: application/json
+
+{
+    "password": "pasdfawds",
+    "authorities": "ROLE_USER"
+}
+
+### Register for tournament
+POST http://localhost:8080/tournaments/1/register
+Content-Type: application/json
+
+{
+    "username": "user1",
+    "password": "pass1234",
+    "authorities": "ROLE_USER"
+}
+
+### Withdraw from tournament
+DELETE http://localhost:8080/tournaments/1/withdraw
+Content-Type: application/json
+
+{
+    "username": "user1",
+    "password": "pass1234",
+    "authorities": "ROLE_USER"
+}
+

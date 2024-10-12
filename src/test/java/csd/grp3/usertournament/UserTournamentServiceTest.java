@@ -263,11 +263,12 @@ public class UserTournamentServiceTest {
     @Test
     public void testDelete_Success() {
         UserTournament mockUserTournament = new UserTournament();
+        Tournament tournament = new Tournament();
         mockUserTournament.setId(new UserTournamentId(1L, "user1"));
         when(userTournamentRepo.findById_TournamentIdAndId_Username(any(Long.class), any(String.class)))
             .thenReturn(Optional.of(mockUserTournament));
 
-        userTournamentService.delete(1L, "user1");
+        userTournamentService.delete(tournament, "user1");
 
         verify(userTournamentRepo).findById_TournamentIdAndId_Username(1L, "user1");
         verify(userTournamentRepo).deleteById_TournamentIdAndId_Username(1L, "user1");

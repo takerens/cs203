@@ -13,5 +13,5 @@ public interface UserTournamentService {
     void updateGamePoints(Long tourneyID, String username, double gamePoints);
     UserTournament updatePlayerStatus(Long tourneyID, String username, char status);
     UserTournament add(Tournament tourneyID, User username, char status);
-    void delete(Long tourneyID, String username);
+    void delete(Tournament tourney, User user);
 }

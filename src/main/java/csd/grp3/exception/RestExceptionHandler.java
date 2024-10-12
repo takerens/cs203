@@ -22,7 +22,10 @@ public class RestExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new HashMap<>();
-        body.put("error", ex.getMessage());
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String errorMessage = error.getDefaultMessage(); // Get default message
+            body.put("message", errorMessage);
+        });
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
