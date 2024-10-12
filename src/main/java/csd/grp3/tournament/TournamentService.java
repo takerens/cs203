@@ -27,7 +27,8 @@ public interface TournamentService {
     List<Tournament> getUserEligibleTournament(User user);
     double calculateBuchholzInTournament(User user, Tournament tournament);
     double calculateBuchholzCut1InTournament(User user, Tournament tournament);
-    Round createPairings(Tournament tournament);
+    void createPairings(Tournament tournament);
+    List<User> getSortedUsers(Long id);
     
     // public static void update(List<Match> matches, User user);
     // private --

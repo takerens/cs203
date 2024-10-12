@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import csd.grp3.match.Match;
+import csd.grp3.round.Round;
 import csd.grp3.user.User;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -37,6 +41,13 @@ public class TournamentController {
     public ResponseEntity<Tournament> getTournamentById(@PathVariable Long id) {
         Tournament tournamentData = tournamentService.getTournament(id);
         return new ResponseEntity<>(tournamentData, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/rounds")
+    public ResponseEntity<List<Round>> getRoundData(@PathVariable Long id) {
+        tournamentService.addRound(id);
+        Tournament tournamentData = tournamentService.getTournament(id);
+        return new ResponseEntity<List<Round>>(tournamentData.getRounds(), HttpStatus.OK);
     }
 
     // @GetMapping("/tournaments/{title}")
@@ -120,7 +131,8 @@ public class TournamentController {
     // TODO
     @GetMapping("/{id}/standings")
     public ResponseEntity<List<User>> getStandings(@PathVariable Long id) {
-        return null; // List Users in order of GamePoints
+        List<User> users = tournamentService.getSortedUsers(id);
+        return new ResponseEntity<List<User>>(users, HttpStatus.OK);
     }
 
     @GetMapping("/byElo/{elo}")

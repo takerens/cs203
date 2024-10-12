@@ -46,6 +46,7 @@ public class UserTournamentServiceImpl implements UserTournamentService {
     }
 
     @Override
+    // @Transactional
     public UserTournament updatePlayerStatus(Long tourneyID, String username, char status) {
         UserTournament ut = findRecord(tourneyID, username);
         ut.setStatus(status);

@@ -1,15 +1,8 @@
+### get user details (only if logged in)
+GET http://localhost:8080/user
+
 ### Register a new user
 POST http://localhost:8080/signup
-Content-Type: application/json
-
-{
-    "username": "user1",
-    "password": "pass1234",
-    "authorities": "ROLE_USER"
-}
-
-### Register a new user
-POST http://localhost:8080/login
 Content-Type: application/json
 
 {
@@ -47,8 +40,8 @@ Content-Type: application/json
     "authorities": "ROLE_USER"
 }
 
-### Register for tournament
-POST http://localhost:8080/tournaments/1/register
+### Login a user
+POST http://localhost:8080/login
 Content-Type: application/json
 
 {
@@ -57,13 +50,22 @@ Content-Type: application/json
     "authorities": "ROLE_USER"
 }
 
-### Withdraw from tournament
-DELETE http://localhost:8080/tournaments/1/withdraw
+### Login a user - password mismatch
+POST http://localhost:8080/login
 Content-Type: application/json
 
 {
     "username": "user1",
-    "password": "pass1234",
+    "password": "badpassword",
     "authorities": "ROLE_USER"
 }
 
+### Login a user - user not found
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+    "username": "usernotexist",
+    "password": "badpassword",
+    "authorities": "ROLE_USER"
+}
