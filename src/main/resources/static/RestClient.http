@@ -30,3 +30,27 @@ Content-Type: application/json
 
 ### Retrieve all users
 GET http://localhost:8080/users
+
+### Update match
+PUT http://localhost:8080/match/updateList
+Content-Type: application/json
+
+[
+    {
+        "id": 1,
+        "round": null,
+        "white": "white1",
+        "black": "black1",
+        "BYE": false,
+        "result": 1.0
+    },
+    {
+        "id": 2,
+        "round": null,
+        "white": "white2",
+        "black": "black2",
+        "BYE": true,
+        "result": -1.0
+    }
+]
+

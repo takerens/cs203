@@ -35,7 +35,7 @@ public class Match {
     private boolean BYE = false;
 
     @Getter (AccessLevel.NONE)
-    private Integer result = 0;
+    private Double result = 0.0;
 
     public Tournament getTournament() {
         return this.round.getTournament();
@@ -49,7 +49,7 @@ public class Match {
      *  0 (unplayed/ongoing)
      * @return Integer value
      */
-    public Integer getResult() {
+    public Double getResult() {
         return result;
     }
 }

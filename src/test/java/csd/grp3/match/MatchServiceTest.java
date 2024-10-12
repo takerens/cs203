@@ -1,9 +1,5 @@
-package csd.grp3.testing;
+package csd.grp3.match;
 
-import csd.grp3.match.Match;
-import csd.grp3.match.MatchNotFoundException;
-import csd.grp3.match.MatchRepository;
-import csd.grp3.match.MatchServiceImpl;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 
@@ -91,7 +87,7 @@ public class MatchServiceTest {
         // arrange
         Match match = new Match();
         matchService.addMatch(match);
-        match.setResult(1);
+        match.setResult(1.0);
         match.setBYE(true);
 
         // mock the find by id operation
@@ -114,7 +110,7 @@ public class MatchServiceTest {
         // arrange
         Match match = new Match();
         matchService.addMatch(match);
-        match.setResult(1);
+        match.setResult(1.0);
         match.setBYE(true);
         long invalidID = 0L;
 

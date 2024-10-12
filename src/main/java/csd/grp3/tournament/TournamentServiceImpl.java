@@ -478,7 +478,7 @@ public class TournamentServiceImpl implements TournamentService {
         User bot = userService.findByUsername("DEFAULT_BOT");
         Match match = createMatchWithUserColour(worst, color, bot, round);
         match.setBYE(true);
-        match.setResult(color.equals("white") ? 1 : -1);
+        match.setResult(color.equals("white") ? 1.0 : -1.0);
         matchService.addMatch(match); // is this necessary
         return match;
     }
