@@ -1,11 +1,12 @@
 package csd.grp3.user;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import csd.grp3.usertournament.UserTournament;
+import jakarta.persistence.*;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,7 +55,14 @@ public class User implements UserDetails{
         this.username = username;
         this.password = password;
         this.authorities = "ROLE_USER";
-        this.ELO = 100;
+        this.ELO = 100; // Default
+    }
+
+    public User(String username, String password, String authorities, int ELO) {
+        this.username = username;
+        this.password = password;
+        this.authorities = authorities;
+        this.ELO = ELO;
     }
 
     public String getUserRole() {
@@ -94,4 +102,6 @@ public class User implements UserDetails{
     public boolean isEnabled() {
         return true; // Implement as needed
     }
+
+    
 }

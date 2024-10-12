@@ -3,6 +3,7 @@ package csd.grp3.tournament;
 import java.time.LocalDateTime;
 
 import csd.grp3.round.Round;
+import csd.grp3.usertournament.UserTournament;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import csd.grp3.tournament.TournamentNotFoundException;
-import csd.grp3.tournament.PlayerNotRegisteredException;
+import csd.grp3.tournament.UserNotRegisteredException;
 
 /**
  * Centralize exception handling in this class.
@@ -53,8 +53,8 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(PlayerNotRegisteredException.class)
-    public ResponseEntity<String> handlePlayerNotRegisteredException(PlayerNotRegisteredException ex) {
+    @ExceptionHandler(UserNotRegisteredException.class)
+    public ResponseEntity<String> handleUserNotRegisteredException(UserNotRegisteredException ex) {
         String message = "Error: " + ex.getMessage();
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }

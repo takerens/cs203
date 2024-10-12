@@ -6,6 +6,7 @@ import csd.grp3.tournament.Tournament;
 import csd.grp3.user.User;
 
 public interface UserTournamentService {
+    UserTournament findRecord(Long tourneyID, String username);
     List<User> getPlayers(Long tourneyID);
     List<User> getWaitingList(Long tourneyID);
     double getGamePoints(Long tourneyID, String username);

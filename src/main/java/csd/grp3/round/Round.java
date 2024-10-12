@@ -41,5 +41,4 @@ public class Round {
     @OneToMany(mappedBy = "round", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference // Prevents infinite recursion
     private List<Match> matches = new ArrayList<>();
-    
 }

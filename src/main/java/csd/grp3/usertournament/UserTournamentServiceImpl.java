@@ -2,7 +2,6 @@ package csd.grp3.usertournament;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import csd.grp3.tournament.Tournament;
@@ -13,7 +12,6 @@ public class UserTournamentServiceImpl implements UserTournamentService {
 
     private UserTournamentRepository userTournamentRepo;
 
-    @Autowired
     public UserTournamentServiceImpl(UserTournamentRepository userTournamentRepo) {
         this.userTournamentRepo = userTournamentRepo;
     }
@@ -64,6 +62,7 @@ public class UserTournamentServiceImpl implements UserTournamentService {
 
     @Override
     public void delete(Long tourneyID, String username) {
+        findRecord(tourneyID, username);
         userTournamentRepo.deleteById_TournamentIdAndId_Username( tourneyID,  username);
     }
     

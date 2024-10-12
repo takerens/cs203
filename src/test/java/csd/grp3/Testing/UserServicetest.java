@@ -154,10 +154,10 @@
 
 //         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-//         Exception exception = assertThrows(RuntimeException.class, () -> {
-//             userService.findByUsername(username);
-//         });
+        // Exception exception = assertThrows(RuntimeException.class, () -> {
+        //     userService.getUser(username);
+        // });
 
-//         assertEquals("User not found", exception.getMessage());
-//     }
+        // assertEquals("User not found", exception.getMessage());
+    // }
 // }
