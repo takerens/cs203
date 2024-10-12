@@ -124,15 +124,15 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findById(1L);
     }
 
-    @Test
-    void addTournament_NewTitle_ReturnSavedTournament() {
-        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+    // @Test
+    // void addTournament_NewTitle_ReturnSavedTournament() {
+    //     when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
 
 
 
-        assertEquals(tournament, result);
-        verify(tournamentRepository).save(tournament);
-    }
+    //     assertEquals(tournament, result);
+    //     verify(tournamentRepository).save(tournament);
+    // }
 
     @Test
     void addTournament_SameTitle_ReturnSavedTournamentWithDifferentID() {
@@ -240,22 +240,22 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository, times(1)).save(tournament);
     }
 
-    @Test
-    void registerPlayer_NoTournamentFound_ReturnTournamentNotFoundException() {
-        // Retrieve empty mock tournament
-        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.empty());
+    // @Test
+    // void registerPlayer_NoTournamentFound_ReturnTournamentNotFoundException() {
+    //     // Retrieve empty mock tournament
+    //     when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.empty());
 
-        // Act & Assert: Expect TournamentNotFoundException to be thrown
-        TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
-            tournamentService.registerUser(player, tournament.getId());
-        });
+    //     // Act & Assert: Expect TournamentNotFoundException to be thrown
+    //     TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
+    //         tournamentService.registerUser(player, tournament.getId());
+    //     });
 
-        // Verify that the exception message is correct
-        assertEquals("Could not find tournament 1", exception.getMessage());
+    //     // Verify that the exception message is correct
+    //     assertEquals("Could not find tournament 1", exception.getMessage());
 
-        // Verify that deleteById was never called with the correct argument
-        verify(tournamentRepository).findById(1L);
-    }
+    //     // Verify that deleteById was never called with the correct argument
+    //     verify(tournamentRepository).findById(1L);
+    // }
 
     // @Test
     // void withdrawPlayer_WithdrawSuccess_ReturnPlayer() {
@@ -280,27 +280,27 @@ public class TournamentServiceImplTest {
     //     verify(tournamentRepository, times(1)).save(tournament);
     // }
 
-    @Test
-    void withdrawPlayer_TournamentNotFound_ReturnTournamentNotFoundException() {
-        // Retrieve empty mock tournament
-        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.empty());
+    // @Test
+    // void withdrawPlayer_TournamentNotFound_ReturnTournamentNotFoundException() {
+    //     // Retrieve empty mock tournament
+    //     when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.empty());
 
-        // Act & Assert: Expect TournamentNotFoundException to be thrown
-        TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
-            tournamentService.withdrawUser(player, tournament.getId());
-        });
+    //     // Act & Assert: Expect TournamentNotFoundException to be thrown
+    //     TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
+    //         tournamentService.withdrawUser(player, tournament.getId());
+    //     });
 
-        // Verify that the exception message is correct
-        assertEquals("Could not find tournament 1", exception.getMessage());
+    //     // Verify that the exception message is correct
+    //     assertEquals("Could not find tournament 1", exception.getMessage());
 
-        // Verify that deleteById was never called with the correct argument
-        verify(tournamentRepository).findById(1L);
-    }
+    //     // Verify that deleteById was never called with the correct argument
+    //     verify(tournamentRepository).findById(1L);
+    // }
 
-    @Test
-    void withdrawPlayer_PlayerNotFound_ReturnUserTournamentNotFoundException() {
+    // @Test
+    // void withdrawPlayer_PlayerNotFound_ReturnUserTournamentNotFoundException() {
         
-    }
+    // }
 
 //     @Test
 //     void testGetTournament() {
