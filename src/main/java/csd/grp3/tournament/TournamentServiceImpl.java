@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,7 +18,6 @@ import csd.grp3.match.MatchService;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import csd.grp3.user.UserService;
-import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -233,6 +231,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournaments.save(tournament);
     }
 
+    @Override
     public List<Tournament> getTournamentAboveMin(int ELO) {
         List<Tournament> tournamentList = listTournaments();
         List<Tournament> tournamentListAboveMin = new ArrayList<>();
@@ -246,6 +245,7 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentListAboveMin;
     }
 
+    @Override
     public List<Tournament> getTournamentBelowMax(int ELO) {
         List<Tournament> tournamentList = listTournaments();
         List<Tournament> tournamentListBelowMax = new ArrayList<>();

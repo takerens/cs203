@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import csd.grp3.round.Round;
 import csd.grp3.tournament.Tournament;
 import csd.grp3.tournament.TournamentNotFoundException;
 import csd.grp3.tournament.TournamentRepository;
@@ -317,21 +316,282 @@ public class TournamentServiceImplTest {
 
     @Test
     void addRound_AddSuccess_ReturnRound() {
-        // Arrange
-        List<Round> rounds = new ArrayList<>();
-        Round round = new Round(1L, tournament, null);
-
         // Mock findbyId and save
         when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
         when(tournamentRepository.save(tournament)).thenReturn(tournament);
 
-        // Act
-        
+        // Act, add 1 round to tournament
+        tournamentService.addRound(1L);
 
         // Assert
+        assertEquals(1, tournament.getRounds().size());
+        verify(tournamentRepository).findById(tournament.getId());
+        verify(tournamentRepository).save(tournament);
+    }
+
+    // @Test
+    // void updateResult_MatchNotEnded_ReturnMatchNotCompletedException() {
+
+    // }
+    
+    // @Test
+    // void updateResult_UpdatedResult_ReturnNothing() {
+
+    // }
+
+    @Test
+    void getTournamentAboveMin_TournamentAboveMin_ReturnListOfTournamentAboveMin() {
+        // Arrange
+        int elo = 100;
+        Tournament testTournament = new Tournament(1L, null, null, 200, 300, null, elo, null);
+        List<Tournament> tournaments = new ArrayList<>();
+        tournaments.add(testTournament);
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentAboveMin(elo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(200, result.get(0).getMinElo());
+        verify(tournamentRepository).findAll();
+    }
+
+    @Test
+    void getTournamentAboveMin_TournamentBelowMin_ReturnEmptyList() {
+        // Arrange
+        int elo = 100;
+        Tournament testTournament = new Tournament(1L, null, null, 50, 75, null, elo, null);
+        List<Tournament> tournaments = new ArrayList<>();
+        tournaments.add(testTournament);
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentAboveMin(elo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        verify(tournamentRepository).findAll();
+    }
+
+    @Test
+    void getTournamentAboveMin_TournamentIsMin_ReturnListOfTournamentAboveMin() {
+        // Arrange
+        int elo = 100;
+        Tournament testTournament = new Tournament(1L, null, null, 100, 300, null, elo, null);
+        List<Tournament> tournaments = new ArrayList<>();
+        tournaments.add(testTournament);
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentAboveMin(elo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(100, result.get(0).getMinElo());
+        verify(tournamentRepository).findAll();
+    }
+
+    @Test
+    void getTournamentAboveMin_NoTournaments_ReturnEmptyList() {
+        // Arrange
+        int elo = 100;
+        List<Tournament> tournaments = new ArrayList<>();
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentAboveMin(elo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        verify(tournamentRepository).findAll();
+    }
+
+    @Test
+    void getTournamentBelowMax_TournamentBelowMax_ReturnListOfTournamentBelowMax() {
+        // Arrange
+        int elo = 100;
+        Tournament testTournament = new Tournament(1L, null, null, 50, 75, null, elo, null);
+        List<Tournament> tournaments = new ArrayList<>();
+        tournaments.add(testTournament);
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentBelowMax(elo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(75, result.get(0).getMaxElo());
+        verify(tournamentRepository).findAll();
+    }
+
+    @Test
+    void getTournamentBelowMax_TournamentAboveMax_ReturnEmptyList() {
+        // Arrange
+        int elo = 100;
+        Tournament testTournament = new Tournament(1L, null, null, 50, 200, null, elo, null);
+        List<Tournament> tournaments = new ArrayList<>();
+        tournaments.add(testTournament);
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentBelowMax(elo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        verify(tournamentRepository).findAll();
+    }
+
+    @Test
+    void getTournamentBelowMax_TournamentIsMax_ReturnListOfTournamentBelowMax() {
+        // Arrange
+        int elo = 100;
+        Tournament testTournament = new Tournament(1L, null, null, 50, 100, null, elo, null);
+        List<Tournament> tournaments = new ArrayList<>();
+        tournaments.add(testTournament);
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentBelowMax(elo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(100, result.get(0).getMaxElo());
+        verify(tournamentRepository).findAll();
+    }
+
+    @Test
+    void getTournamentBelowMax_NoTournaments_ReturnEmptyList() {
+        // Arrange
+        int elo = 100;
+        List<Tournament> tournaments = new ArrayList<>();
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentBelowMax(elo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        verify(tournamentRepository).findAll();
+    }
+
+    @Test
+    void getTournamentAboveMinBelowMax_TournamentAboveMinNotBelowMax_ReturnEmptyList() {
+        // Arrange
+        int minElo = 100;
+        int maxElo = 200;
+        Tournament testTournament = new Tournament(1L, null, null, 150, 250, null, 10, null);
+        List<Tournament> tournaments = new ArrayList<>();
+        tournaments.add(testTournament);
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentAboveMinBelowMax(minElo, maxElo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        verify(tournamentRepository, times(2)).findAll();
+    }
+
+    @Test
+    void getTournamentAboveMinBelowMax_TournamentNotAboveMinBelowMax_ReturnEmptyList() {
+        // Arrange
+        int minElo = 100;
+        int maxElo = 200;
+        Tournament testTournament = new Tournament(1L, null, null, 50, 150, null, 10, null);
+        List<Tournament> tournaments = new ArrayList<>();
+        tournaments.add(testTournament);
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentAboveMinBelowMax(minElo, maxElo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        verify(tournamentRepository, times(2)).findAll();
+    }
+
+    @Test
+    void getTournamentAboveMinBelowMax_TournamentAboveMinBelowMax_ReturnListOfTournamentAboveMinBelowMax() {
+        // Arrange
+        int minElo = 100;
+        int maxElo = 200;
+        Tournament testTournament = new Tournament(1L, null, null, 125, 175, null, 10, null);
+        List<Tournament> tournaments = new ArrayList<>();
+        tournaments.add(testTournament);
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentAboveMinBelowMax(minElo, maxElo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(125, result.get(0).getMinElo());
+        assertEquals(175, result.get(0).getMaxElo());
+        verify(tournamentRepository, times(2)).findAll();
+    }
+
+    @Test
+    void getTournamentAboveMinBelowMax_NoTournament_ReturnEmptyList() {
+        // Arrange
+        int minElo = 100;
+        int maxElo = 200;
+        List<Tournament> tournaments = new ArrayList<>();
+
+        // Mock repos
+        when(tournamentRepository.findAll()).thenReturn(tournaments);
+
+        // Act
+        List<Tournament> result = tournamentService.getTournamentAboveMinBelowMax(minElo, maxElo);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        verify(tournamentRepository, times(2)).findAll();
+    }
+
+    @Test
+    void getUserEligibleTournament_Eligible_ReturnTournamentList() {
 
     }
 
+    @Test
+    void getUserEligibleTournament_NotEligible_ReturnTournamentList() {
+
+    }
 
 //     @Test
 //     void testTournamentExists() {
