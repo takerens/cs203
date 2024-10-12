@@ -26,45 +26,29 @@ public class Grp3Application {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		// JPA User Repository init
 		UserRepository users = ctx.getBean(UserRepository.class);
-		User admin = new User();
-		admin.setUsername("Admin");
-		admin.setPassword(encoder.encode("pass1234"));
-		admin.setAuthorities("ROLE_ADMIN");
-		System.out.println("[Add Admin]: " + users.save(admin).getUsername());
-		User user = new User( "User", encoder.encode("user1234"));
-		System.out.println("[Add User]: " + users.save(user).getUsername()); // , "ROLE_USER", 100
-
+		System.out.println("[Add Admin]: " + users.save(new User("Admin", encoder.encode("password123"), "ROLE_ADMIN", 0)).getUsername());
+		System.out.println("[Add User]: " + users.save(new User("User100", encoder.encode("user1234"), "ROLE_USER", 100)).getUsername());
+		System.out.println("[Add User]: " + users.save(new User("User0", encoder.encode("user1234"), "ROLE_USER", 0)).getUsername());
+		System.out.println("[Add User]: " + users.save(new User("User110", encoder.encode("user1234"), "ROLE_USER", 110)).getUsername());
+		System.out.println("[Add User]: " + users.save(new User("User150", encoder.encode("user1234"), "ROLE_USER", 150)).getUsername());
+		System.out.println("[Add User]: " + users.save(new User("User120", encoder.encode("user1234"), "ROLE_USER", 120)).getUsername());
+		System.out.println("[Add Bot]: " + users.save(new User("DEFAULT_BOT", encoder.encode("goodpassword"), "ROLE_USER", 0)).getUsername());
 
 		// JPA User Repository init
 		TournamentRepository ts = ctx.getBean(TournamentRepository.class);
 		Tournament t = new Tournament();
 		t.setTitle("Tournament A");
-		t.setSize(2);
+		t.setSize(4);
+		t.setTotalRounds(2);
 		t.setDate(LocalDateTime.of(2024, 9, 30, 15, 45));
 		t.setId(1L);
 		System.out.println("[Add Tournament]: " + ts.save(t).getTitle());
 		Tournament t1 = new Tournament();
 		t1.setTitle("Tournament B");
-		t1.setDate(LocalDateTime.of(2024, 10, 20, 15, 0));
-		t1.setSize(4);
+		t1.setSize(1);
+		t1.setTotalRounds(1);
+		t1.setDate(LocalDateTime.of(2024, 12, 20, 15, 0));
 		System.out.println("[Add Tournament]: " + ts.save(t1).getTitle());
-		
-		RoundRepository rs = ctx.getBean(RoundRepository.class);
-		MatchRepository ms = ctx.getBean(MatchRepository.class);
-		Round r1 = new Round();
-		r1.setTournament(t);
-		t.getRounds().add(r1);
-		ts.save(t);
-		System.out.println("[Add Round]: " + rs.save(r1).getId());
-
-		Match m1 = new Match();
-		m1.setWhite(admin);
-		m1.setBlack(user);
-		r1.getMatches().add(m1);
-		m1.setRound(r1);
-		rs.save(r1);
-		System.out.println("[Add Match]: " + ms.save(m1).getId());
-		System.out.println("[T1 Rounds]: " + t.getRounds().size());
 	}
 
 }

@@ -16,18 +16,19 @@ public interface TournamentService {
     void deleteTournament(Long id);
     void registerUser(User user, Long id);
     void withdrawUser(User user, Long id);
-    boolean tournamentExists(Long tournamentId);
     void addRound(Long id);
+    void updateMatchResults(Round round);
     void updateResults(Round round);
     String directEncounterResultInTournament(Tournament tournament, User user1, User user2);
     void endTournament(Long id);
     List<Tournament> getTournamentAboveMin(int ELO);
     List<Tournament> getTournamentBelowMax(int ELO);
     List<Tournament> getTournamentAboveMinBelowMax(int minELO, int maxELO);
-    List<Tournament> getUserEligibleTournament(User user);
+    List<Tournament> getUserEligibleTournament(int ELO);
     double calculateBuchholzInTournament(User user, Tournament tournament);
     double calculateBuchholzCut1InTournament(User user, Tournament tournament);
-    Round createPairings(Tournament tournament);
+    void createPairings(Tournament tournament);
+    List<User> getSortedUsers(Long id);
     
     // public static void update(List<Match> matches, User user);
     // private --

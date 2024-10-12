@@ -38,9 +38,22 @@ public class UserTournament {
     @JoinColumn(name="username")
     @JsonBackReference(value = "userUserTournament") // Prevents infinite recursion
     private User user;
-
+    
     // w = waitlist, r = registered
-    private char status;
+    private Character status;
 
     private double gamePoints = 0;
+
+    private double matchPoints = 0;
+
+    public void setStatus(Character status) {
+        if (status != null && !status.equals('r') && !status.equals('w')) {
+            throw new IllegalArgumentException("Status must be r : registered or w : waiting list");
+        }
+        this.status = status;
+    }
+
+    public double getGamePoints() {
+        return gamePoints + matchPoints;
+    }
 }

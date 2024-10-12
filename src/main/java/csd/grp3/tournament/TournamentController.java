@@ -15,12 +15,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import csd.grp3.match.Match;
+import csd.grp3.round.Round;
 import csd.grp3.user.User;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
 @RequestMapping("/tournaments")
 public class TournamentController {
+    // @Autowired
+    // private TournamentRepository tournamentRepo;
 
     @Autowired
     private TournamentService tournamentService;
@@ -37,27 +43,46 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentData, HttpStatus.OK);
     }
 
+    @GetMapping("/{id}/rounds")
+    public ResponseEntity<List<Round>> getRoundData(@PathVariable Long id) {
+        Tournament tournamentData = tournamentService.getTournament(id);
+        if (!tournamentData.isOver()) {
+            tournamentService.addRound(id);
+            tournamentData = tournamentService.getTournament(id); // get updated tournament info
+        } else { // tournament is over
+            if (!tournamentData.isCalculated()) {
+                Round last = tournamentData.getRounds().get(tournamentData.getTotalRounds() - 1);
+                tournamentService.updateMatchResults(last);
+                tournamentService.updateResults(last);
+                tournamentService.endTournament(id);
+            }
+        }
+        return new ResponseEntity<List<Round>>(tournamentData.getRounds(), HttpStatus.OK);
+    }
+
     @PostMapping
-    public ResponseEntity<Tournament> addTournament(@RequestBody Tournament tournament) {
-        Tournament tournamentObj = tournamentService.addTournament(tournament);
-        return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
+    // @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<HttpStatus> addTournament(@RequestBody Tournament tournament) {
+        tournamentService.addTournament(tournament);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Tournament> updateTournamentById(@PathVariable Long id, @RequestBody Tournament newTournamentData) {
-        Tournament tournamentObj = tournamentService.updateTournament(id, newTournamentData);
-        return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
-
+    // @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<HttpStatus> updateTournamentById(@PathVariable Long id, @RequestBody Tournament newTournamentData) {
+        tournamentService.updateTournament(id, newTournamentData);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteTournamentById(@PathVariable Long id) {
         tournamentService.deleteTournament(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}/withdraw")
-    public ResponseEntity<Void> withdrawUser(@RequestBody User user, @PathVariable Long id) {
+    public ResponseEntity<Void> withdraw(@RequestBody User user, @PathVariable Long id) {
         tournamentService.withdrawUser(user, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -67,4 +92,18 @@ public class TournamentController {
         tournamentService.registerUser(user, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    // TODO
+    @GetMapping("/{id}/standings")
+    public ResponseEntity<List<User>> getStandings(@PathVariable Long id) {
+        List<User> users = tournamentService.getSortedUsers(id);
+        return new ResponseEntity<List<User>>(users, HttpStatus.OK);
+    }
+
+    @GetMapping("/byElo/{elo}")
+    public ResponseEntity<List<Tournament>> getTournamentByElo(@PathVariable int elo) {
+        List<Tournament> t = tournamentService.getUserEligibleTournament(elo);
+        return new ResponseEntity<List<Tournament>>(t, HttpStatus.OK);
+    }
+    
 }

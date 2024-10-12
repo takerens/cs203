@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import csd.grp3.match.Match;
@@ -38,7 +39,19 @@ public class Round {
     @JsonBackReference // Prevents infinite recursion
     private Tournament tournament;
 
-    @OneToMany(mappedBy = "round", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "round", orphanRemoval = true, cascade = CascadeType.ALL)
     @JsonManagedReference // Prevents infinite recursion
     private List<Match> matches = new ArrayList<>();
+
+    public boolean isOver() {
+        boolean isOver = true;
+        for (Match m : matches) {
+            if (m.getResult() == 0) {
+                isOver = false;
+                break;
+            }
+        }
+        return !matches.isEmpty() && isOver;
+    }
+    
 }

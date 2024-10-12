@@ -1,0 +1,97 @@
+### get user details (only if logged in)
+GET http://localhost:8080/user
+
+### Register a new user
+POST http://localhost:8080/signup
+Content-Type: application/json
+
+{
+    "username": "User1",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
+}
+
+### Register a user with a duplicated username
+POST http://localhost:8080/signup
+Content-Type: application/json
+
+{
+    "username": "user1",
+    "password": "pwd2aaaaaaa",
+    "authorities": "ROLE_USER"
+}
+
+### Register a user with password too short
+POST http://localhost:8080/signup
+Content-Type: application/json
+
+{
+    "username": "user",
+    "password": "pwd",
+    "authorities": "ROLE_USER"
+}
+
+### Register a user with null username
+POST http://localhost:8080/signup
+Content-Type: application/json
+
+{
+    "password": "pasdfawds",
+    "authorities": "ROLE_USER"
+}
+
+### Login a user
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+    "username": "User100",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
+}
+
+### Login a user - password mismatch
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+    "username": "user1",
+    "password": "badpassword",
+    "authorities": "ROLE_USER"
+}
+
+### Login a user - user not found
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+    "username": "usernotexist",
+    "password": "badpassword",
+    "authorities": "ROLE_USER"
+}
+
+### Get User Profile
+GET http://localhost:8080/profile/User100
+
+### Get User Profile - not exist
+GET http://localhost:8080/profile/Usernotexist
+
+### Change Password
+PUT http://localhost:8080/user/changePassword
+Content-Type: application/json
+
+{
+    "username": "User100",
+    "password": "newpassw",
+    "authorities": "ROLE_USER"
+}
+
+### Change Password - user not exist
+PUT http://localhost:8080/user/changePassword
+Content-Type: application/json
+
+{
+    "username": "Usernotexist",
+    "password": "newpassw",
+    "authorities": "ROLE_USER"
+}

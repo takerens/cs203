@@ -1,0 +1,97 @@
+### Get tourn by ID
+GET http://localhost:8080/tournaments/2
+
+### Register for tournament
+POST http://localhost:8080/tournaments/2/register
+Content-Type: application/json
+
+{
+    "username": "User0",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
+}
+
+### Register for tournament 100
+POST http://localhost:8080/tournaments/2/register
+Content-Type: application/json
+
+{
+    "username": "User100",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
+}
+
+### Register for tournament 110
+POST http://localhost:8080/tournaments/2/register
+Content-Type: application/json
+
+{
+    "username": "User110",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
+}
+
+### update tournament (0, 0, 1) - player: 0, wait: 100, 110
+# kicked out via elo + replacement - player: 100, wait:110
+PUT http://localhost:8080/tournaments/2
+Content-Type: application/json
+
+{
+    "title": "New Tournament",
+    "minElo": 10,
+    "maxElo": 200,
+    "date": "2024-12-15T15:30:00",
+    "size": 1
+}
+
+# player: 100, wait:110 -> player: 100, wait: 
+### update tournament - kicked out via elo
+PUT http://localhost:8080/tournaments/2
+Content-Type: application/json
+
+{
+    "title": "New Tournament",
+    "minElo": 0,
+    "maxElo": 100,
+    "date": "2024-12-15T15:30:00",
+    "size": 1
+}
+
+# player: 100, wait: 0, 110 -> player : 100, 0, 110
+### update tournament - added via size
+PUT http://localhost:8080/tournaments/2
+Content-Type: application/json
+
+{
+    "title": "New Tournament",
+    "minElo": 0,
+    "maxElo": 200,
+    "date": "2024-12-15T15:30:00",
+    "size": 5
+}
+
+# player : 100, 0, 110 -> player : 100, 0, wait: 110
+### update tournament - kicked via size
+PUT http://localhost:8080/tournaments/2
+Content-Type: application/json
+
+{
+    "title": "New Tournament",
+    "minElo": 0,
+    "maxElo": 200,
+    "date": "2024-12-15T15:30:00",
+    "size": 2
+}
+
+# player : 100, 0, wait: 110 -> player: 100, wait: 0
+### update tournament - kicked via size, kick via elo (wait)
+PUT http://localhost:8080/tournaments/2
+Content-Type: application/json
+
+{
+    "title": "New Tournament",
+    "minElo": 0,
+    "maxElo": 100,
+    "date": "2024-12-15T15:30:00",
+    "size": 1
+}

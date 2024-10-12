@@ -1,7 +1,5 @@
 package csd.grp3.match;
 
-import csd.grp3.user.User;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -42,11 +40,11 @@ public class Match {
     @ManyToOne
     @JoinColumn(name = "white") // Foreign key referencing User
     private User white;
-
+    
     private boolean isBYE = false;
 
     @Getter (AccessLevel.NONE)
-    private Integer result = 0;
+    private double result = 0;
 
     @JsonIgnore
     public Tournament getTournament() {
@@ -61,7 +59,7 @@ public class Match {
      *  0 (unplayed/ongoing)
      * @return Integer value
      */
-    public Integer getResult() {
+    public double getResult() {
         return result;
     }
 }

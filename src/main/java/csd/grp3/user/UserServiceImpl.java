@@ -62,4 +62,11 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encoder.encode(password));
         return userRepository.save(user);
     }
+
+    @Override
+    public void updateELO(User tempUser, int ELO) {
+        User user = findByUsername(tempUser.getUsername());
+        user.setELO(ELO);
+        userRepository.save(user);
+    }
 }

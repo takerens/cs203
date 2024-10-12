@@ -34,7 +34,6 @@ import lombok.*;
 @Table(name = "AppUsers")
 
 public class User implements UserDetails{
-
     private Integer ELO = 100;
 
     @Id @NotNull(message = "Username should not be null")
@@ -42,9 +41,11 @@ public class User implements UserDetails{
 
     @NotNull (message = "Password should not be null")
     @Size(min = 8, message = "Password should be at least 8 characters long")
+    // @JsonIgnore
     private String password;
 
     @NotNull(message = "Authorities should not be null")
+    // @JsonIgnore
     private String authorities;
 
     // @OneToMany(mappedBy = "user",   fetch = FetchType.EAGER) // cascade = CascadeType.ALL,orphanRemoval = true,
@@ -65,17 +66,14 @@ public class User implements UserDetails{
         this.ELO = ELO;
     }
 
+    // @JsonIgnore
     public String getUserRole() {
         return authorities;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true; // Check for reference equality
-        if (obj == null || getClass() != obj.getClass()) return false; // Check for null and class match
-        User user = (User) obj; // Cast to User
-        return username.equals(user.username); // Compare usernames
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
+    private List<UserTournament> userTournaments = new ArrayList<>();
   
     // Return a collection of authorities (roles) granted to the user.
     @Override
@@ -84,21 +82,25 @@ public class User implements UserDetails{
     }
     
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true; // Implement as needed
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true; // Implement as needed
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true; // Implement as needed
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return true; // Implement as needed
     }

@@ -10,8 +10,9 @@ public interface UserTournamentService {
     List<User> getPlayers(Long tourneyID);
     List<User> getWaitingList(Long tourneyID);
     double getGamePoints(Long tourneyID, String username);
-    void updateGamePoints(Long tourneyID, String username, double gamePoints);
+    void updateMatchPoints(Long tourneyID, String username, double matchPoints);
+    void updateGamePoints(Long tourneyID, String username);
     UserTournament updatePlayerStatus(Long tourneyID, String username, char status);
     UserTournament add(Tournament tourneyID, User username, char status);
-    void delete(Long tourneyID, String username);
+    void delete(Tournament tourney, User user);
 }
