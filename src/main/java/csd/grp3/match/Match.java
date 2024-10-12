@@ -3,6 +3,7 @@ package csd.grp3.match;
 import csd.grp3.user.User;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import csd.grp3.round.Round;
 import csd.grp3.tournament.Tournament;
@@ -34,13 +35,20 @@ public class Match {
     @JsonBackReference // Prevents infinite recursion
     private Round round;
 
-    private User white;
+    @ManyToOne
+    @JoinColumn(name = "black") // Foreign key referencing User
     private User black;
+
+    @ManyToOne
+    @JoinColumn(name = "white") // Foreign key referencing User
+    private User white;
+
     private boolean isBYE = false;
 
     @Getter (AccessLevel.NONE)
     private Integer result = 0;
 
+    @JsonIgnore
     public Tournament getTournament() {
         return this.round.getTournament();
     }

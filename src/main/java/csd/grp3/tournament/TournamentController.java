@@ -3,7 +3,6 @@ package csd.grp3.tournament;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import csd.grp3.user.User;
@@ -12,9 +11,6 @@ import java.util.*;
 
 @RestController
 public class TournamentController {
-
-    @Autowired
-    private TournamentRepository tournamentRepo;
 
     @Autowired
     private TournamentService tournamentService;

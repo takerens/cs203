@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
-import Navbar from '../components/NavBar';
+import Navbar from '../components/Navbar';
 import SecondaryNavbar from '../components/SecondaryNavbar';
 
 const TournamentStandings = () => {

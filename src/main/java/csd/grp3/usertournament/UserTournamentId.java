@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserTournamentId implements Serializable {
+public class UserTournamentId {
     private Long tournamentId;
     private String username;
 

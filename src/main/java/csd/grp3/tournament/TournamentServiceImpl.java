@@ -4,7 +4,6 @@ import csd.grp3.match.Match;
 import csd.grp3.match.MatchRepository;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
-import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentServiceImpl;
 import csd.grp3.exception.MatchNotCompletedException;
 
@@ -13,8 +12,6 @@ import java.util.*;
 import java.util.stream.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service

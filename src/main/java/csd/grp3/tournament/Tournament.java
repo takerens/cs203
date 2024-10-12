@@ -3,14 +3,12 @@ package csd.grp3.tournament;
 import java.time.LocalDateTime;
 
 import csd.grp3.round.Round;
-import csd.grp3.usertournament.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.*;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -45,7 +43,7 @@ public class Tournament {
     @NotNull(message = "size: put a valid tournament size")
     private int size;
 
-    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference(value = "tournamentUserTournament") // Prevents infinite recursion
-    private List<UserTournament> userTournaments;
+    // @OneToMany(mappedBy = "tournament",  fetch = FetchType.EAGER) // , cascade = CascadeType.ALL,orphanRemoval = true,
+    // @JsonManagedReference(value = "tournamentUserTournament") // Prevents infinite recursion
+    // private List<UserTournament> userTournaments;
 }

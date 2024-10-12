@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../components/NavBar';
+import Navbar from '../components/Navbar';
 import ErrorMessage from '../components/ErrorMessage';
 
 const TournamentManagement = () => {
@@ -66,7 +66,7 @@ const TournamentManagement = () => {
         setErrorMessage(''); // Clear previous error message
 
         try {
-            const response = await fetch(`http://localhost:8080/register/${tournamentId}`, {
+            const response = await fetch(`http://localhost:8080/tournament/${tournamentId}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(user),
@@ -92,7 +92,7 @@ const TournamentManagement = () => {
         setErrorMessage(''); // Clear previous error message
 
         try {
-            const response = await fetch(`http://localhost:8080/withdraw/${tournamentId}`, {
+            const response = await fetch(`http://localhost:8080/tournament/${tournamentId}/withdraw`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(user),

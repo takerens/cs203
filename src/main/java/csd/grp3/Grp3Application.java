@@ -11,9 +11,12 @@ import csd.grp3.user.UserRepository;
 import csd.grp3.tournament.Tournament;
 import csd.grp3.tournament.TournamentRepository;
 import csd.grp3.tournament.TournamentService;
+import csd.grp3.round.Round;
 import csd.grp3.round.RoundRepository;
 import csd.grp3.match.MatchRepository;
 import csd.grp3.user.User;
+import csd.grp3.match.Match;
+import java.util.Arrays;
 
 @SpringBootApplication
 public class Grp3Application {
@@ -38,6 +41,7 @@ public class Grp3Application {
 		t.setTitle("Tournament A");
 		t.setSize(2);
 		t.setDate(LocalDateTime.of(2024, 9, 30, 15, 45));
+		t.setId(1L);
 		System.out.println("[Add Tournament]: " + ts.save(t).getTitle());
 		Tournament t1 = new Tournament();
 		t1.setTitle("Tournament B");
@@ -45,14 +49,22 @@ public class Grp3Application {
 		t1.setSize(4);
 		System.out.println("[Add Tournament]: " + ts.save(t1).getTitle());
 		
-		TournamentService Ts = ctx.getBean(TournamentService.class);
 		RoundRepository rs = ctx.getBean(RoundRepository.class);
 		MatchRepository ms = ctx.getBean(MatchRepository.class);
-		Ts.registerPlayer(admin, 1L);
-		Ts.registerPlayer(user, 1L);
-		Ts.addRound(1L);
-		System.out.println("[Add Round]: added to Tournament Id 1");
-		System.out.println(t.getRounds());
+		Round r1 = new Round();
+		r1.setTournament(t);
+		t.getRounds().add(r1);
+		ts.save(t);
+		System.out.println("[Add Round]: " + rs.save(r1).getId());
+
+		Match m1 = new Match();
+		m1.setWhite(admin);
+		m1.setBlack(user);
+		r1.getMatches().add(m1);
+		m1.setRound(r1);
+		rs.save(r1);
+		System.out.println("[Add Match]: " + ms.save(m1).getId());
+		System.out.println("[T1 Rounds]: " + t.getRounds().size());
 	}
 
 }

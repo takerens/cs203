@@ -13,7 +13,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -44,9 +46,9 @@ public class User implements UserDetails{
     @NotNull(message = "Authorities should not be null")
     private String authorities;
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
-    private List<UserTournament> userTournaments = new ArrayList<>();
+    // @OneToMany(mappedBy = "user",   fetch = FetchType.EAGER) // cascade = CascadeType.ALL,orphanRemoval = true,
+    // @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
+    // private List<UserTournament> userTournaments = new ArrayList<>();
 
     public User(String username, String password) {
         this.username = username;

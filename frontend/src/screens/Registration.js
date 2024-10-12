@@ -15,7 +15,7 @@ const Registration = () => {
     const userData = {
       username,
       password,
-      // authorities: "ROLE_USER", // Account creation only for user
+      authorities : "ROLE_USER" // Signup only for User
     };
 
     try {

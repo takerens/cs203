@@ -1,14 +1,16 @@
 package csd.grp3.round;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import csd.grp3.match.Match;
 import csd.grp3.tournament.Tournament;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -26,7 +28,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-
 public class Round {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,9 +38,8 @@ public class Round {
     @JsonBackReference // Prevents infinite recursion
     private Tournament tournament;
 
-    @OneToMany(mappedBy = "round", orphanRemoval = true)
-    @JsonIgnore
+    @OneToMany(mappedBy = "round", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference // Prevents infinite recursion
-    private List<Match> matches;
+    private List<Match> matches = new ArrayList<>();
     
 }
