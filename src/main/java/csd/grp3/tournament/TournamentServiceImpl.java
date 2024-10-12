@@ -168,16 +168,10 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void addRound(Long id) throws TournamentNotFoundException {
-        Optional<Tournament> tournament = tournaments.findById(id);
-
-        if (tournament.isPresent()) {
-            Tournament tournamentData = tournament.get();
-            List<Round> rounds = tournamentData.getRounds();
-            rounds.add(createPairings(tournamentData));
-            tournaments.save(tournamentData);
-        } else {
-            throw new TournamentNotFoundException(id);
-        }
+        Tournament tournament = getTournament(id);
+        List<Round> rounds = tournament.getRounds();
+        rounds.add(createPairings(tournament));
+        tournaments.save(tournament);
     }
 
     @Override

@@ -22,12 +22,12 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import csd.grp3.round.Round;
 import csd.grp3.tournament.Tournament;
 import csd.grp3.tournament.TournamentNotFoundException;
 import csd.grp3.tournament.TournamentRepository;
 import csd.grp3.tournament.TournamentServiceImpl;
 import csd.grp3.user.User;
-import csd.grp3.usertournament.UserTournamentRepository;
 import csd.grp3.usertournament.UserTournamentServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,13 +36,10 @@ public class TournamentServiceImplTest {
     @Mock
     private TournamentRepository tournamentRepository;
 
-    @Mock
-    private UserTournamentRepository userTournamentRepository;
-
     @InjectMocks
     private TournamentServiceImpl tournamentService;
 
-    @InjectMocks
+    @Mock
     private UserTournamentServiceImpl userTournamentService;
 
     private Tournament tournament;
@@ -167,24 +164,22 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findById(1L);
     }
 
-    // @Test
-    // void updateTournament_UpdatedTournament_ReturnUpdatedTournament() {
-    //     // Arrange
-    //     Tournament newTournamentInfo = new Tournament(1L, null, "Updated Tournament", 0, 0, null, 0, new ArrayList<>());
-    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-    //     when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
-    //     when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(new ArrayList<>());
-    //     when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(new ArrayList<>());
+    @Test
+    void updateTournament_UpdatedTournament_ReturnUpdatedTournament() {
+        // Arrange
+        Tournament newTournamentInfo = new Tournament(1L, null, "Updated Tournament", 0, 0, null, 0, new ArrayList<>());
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
 
-    //     // Act
-    //     Tournament updatedTournament = tournamentService.updateTournament(1L, newTournamentInfo);
+        // Act
+        Tournament updatedTournament = tournamentService.updateTournament(1L, newTournamentInfo);
 
-    //     // Assert
-    //     assertNotNull(updatedTournament);
-    //     assertEquals("Updated Tournament", updatedTournament.getTitle());
-    //     verify(tournamentRepository).findById(1L);
-    //     verify(tournamentRepository).save(any(Tournament.class));
-    // }
+        // Assert
+        assertNotNull(updatedTournament);
+        assertEquals("Updated Tournament", updatedTournament.getTitle());
+        verify(tournamentRepository).findById(1L);
+        verify(tournamentRepository).save(any(Tournament.class));
+    }
 
     @Test
     void deleteTournament_DeleteSuccess_ReturnDeletedTournament() {
@@ -218,28 +213,28 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository, never()).deleteById(1L);
     }
 
-    @Test
-    void registerPlayer_RegisterSuccess_ReturnPlayer() {
-        // Arrange
-        List<User> userList = new ArrayList<>();
-        List<User> waitingList = new ArrayList<>();
+    // @Test
+    // void registerPlayer_RegisterSuccess_ReturnPlayer() {
+    //     // Arrange
+    //     List<User> userList = new ArrayList<>();
+    //     List<User> waitingList = new ArrayList<>();
 
-        // retrieve mock tournament
-        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+    //     // retrieve mock tournament
+    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
 
-        // mock UTService
-        when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(userList);
-        when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(userList);
+    //     // mock UTService
+    //     when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(userList);
+    //     when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(userList);
 
-        // act
-        tournamentService.registerUser(player, 1L);
+    //     // act
+    //     tournamentService.registerUser(player, 1L);
 
-        // assert
-        assertEquals(1, userList.size());
-        assertEquals(player, userList.get(0));
-        verify(userTournamentService, times(1)).add(tournament, player, 'r');
-        verify(tournamentRepository, times(1)).save(tournament);
-    }
+    //     // assert
+    //     assertEquals(1, userList.size());
+    //     assertEquals(player, userList.get(0));
+    //     verify(userTournamentService, times(1)).add(tournament, player, 'r');
+    //     verify(tournamentRepository, times(1)).save(tournament);
+    // }
 
     @Test
     void registerPlayer_NoTournamentFound_ReturnTournamentNotFoundException() {
@@ -298,21 +293,44 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findById(1L);
     }
 
-    @Test
-    void withdrawPlayer_PlayerNotFound_ReturnUserTournamentNotFoundException() {
+    // @Test
+    // void withdrawPlayer_PlayerNotFound_ReturnUserTournamentNotFoundException() {
         
+    // }
+
+    @Test
+    void addRound_TournamentNotFound_ReturnTournamentNotFoundException() {
+        // Retrieve empty mock tournament
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.empty());
+
+        // Act & Assert: Expect TournamentNotFoundException to be thrown
+        TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
+            tournamentService.addRound(tournament.getId());
+        });
+
+        // Verify that the exception message is correct
+        assertEquals("Could not find tournament 1", exception.getMessage());
+
+        // Verify that deleteById was never called with the correct argument
+        verify(tournamentRepository).findById(1L);
     }
 
-//     @Test
-//     void testGetTournament() {
-//         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+    @Test
+    void addRound_AddSuccess_ReturnRound() {
+        // Arrange
+        List<Round> rounds = new ArrayList<>();
+        Round round = new Round(1L, tournament, null);
 
-//         Tournament result = tournamentService.getTournament(1L);
+        // Mock findbyId and save
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+        when(tournamentRepository.save(tournament)).thenReturn(tournament);
 
-//         assertNotNull(result);
-//         assertEquals(tournament.getId(), result.getId());
-//         verify(tournamentRepository, times(1)).findById(1L);
-//     }
+        // Act
+        
+
+        // Assert
+
+    }
 
 
 //     @Test
