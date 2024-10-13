@@ -41,19 +41,19 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(new User(username, encodedPassword));
     }
 
-    // @Override
-    // public User login(String username, String password) throws UserNotFoundException, BadCredentialsException{
-    //     //Get the password associated with the searched username
-    //     User user = findByUsername(username);
-    //     String encodedPassword = user.getPassword();
+    @Override
+    public User login(String username, String password) throws UserNotFoundException, BadCredentialsException{
+        //Get the password associated with the searched username
+        User user = findByUsername(username);
+        String encodedPassword = user.getPassword();
 
-    //     //Return the user if the password matches
-    //     if (encoder.matches(password, encodedPassword)) {
-    //         return user;
-    //     }
-    //     //Else throw exception
-    //     throw new BadCredentialsException("Password does not match");
-    // }
+        //Return the user if the password matches
+        if (encoder.matches(password, encodedPassword)) {
+            return user;
+        }
+        //Else throw exception
+        throw new BadCredentialsException("Password does not match");
+    }
 
     @Override
     public User changePassword(String username, String password) {
