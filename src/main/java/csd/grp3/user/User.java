@@ -36,9 +36,11 @@ public class User implements UserDetails{
 
     @NotNull (message = "Password should not be null")
     @Size(min = 8, message = "Password should be at least 8 characters long")
+    // @JsonIgnore
     private String password;
 
     @NotNull(message = "Authorities should not be null")
+    // @JsonIgnore
     private String authorities;
 
     public User(String username, String password) {
@@ -55,7 +57,7 @@ public class User implements UserDetails{
         this.ELO = ELO;
     }
 
-    @JsonIgnore
+    // @JsonIgnore
     public String getUserRole() {
         return authorities;
     }
@@ -71,21 +73,25 @@ public class User implements UserDetails{
     }
     
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true; // Implement as needed
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true; // Implement as needed
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true; // Implement as needed
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return true; // Implement as needed
     }

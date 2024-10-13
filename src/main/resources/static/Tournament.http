@@ -1,83 +1,167 @@
+######### Focus: Player and Waiting List
 ### Get all tournaments
 GET http://localhost:8080/tournaments
 
-### 
-GET http://localhost:8080/user
-
 ### Get tourn by ID
-GET http://localhost:8080/tournaments/1
+GET http://localhost:8080/tournaments/2
 
 ### Get tourn by ID - not found
 GET http://localhost:8080/tournaments/9
 
-### add tourn - success
-POST http://localhost:8080/tournaments
+### delete tournament
+DELETE http://localhost:8080/tournaments/2
+
+### delete tournament - not found
+DELETE http://localhost:8080/tournaments/9
+
+######## Register for tournament after Date
+## Again - already registered - fail
+POST http://localhost:8080/tournaments/1/register
 Content-Type: application/json
 
 {
-    "title": "New Tournament",
-    "minElo": 10,
-    "maxElo": 100,
-    "date": "2024-10-15T15:30:00",
-    "size": 3
+    "username": "user1",
+    "password": "pass1234",
+    "authorities": "ROLE_USER"
 }
 
-### add tounr - min > max
-POST http://localhost:8080/tournaments
+## Withdraw from tournament - t started - js remove player no move wait
+DELETE http://localhost:8080/tournaments/1/withdraw
 Content-Type: application/json
 
 {
-    "title": "New Tournament",
-    "minElo": 100,
-    "maxElo": 10,
-    "date": "2024-10-15T15:30:00",
-    "size": 3
+    "username": "user1",
+    "password": "pass1234",
+    "authorities": "ROLE_USER"
 }
 
-### add tounr - min = max
-POST http://localhost:8080/tournaments
+######### Register Before Start Date ####
+### Register for tournament - before start date
+POST http://localhost:8080/tournaments/2/register
 Content-Type: application/json
 
 {
-    "title": "New Tournament",
-    "minElo": 10,
-    "maxElo": 10,
-    "date": "2024-10-15T15:30:00",
-    "size": 3
+    "username": "user1",
+    "password": "pass1234",
+    "authorities": "ROLE_USER"
 }
-
-### add tounr - DATE B4 TDY
-POST http://localhost:8080/tournaments
+### Register for tournament - wait list - check get
+POST http://localhost:8080/tournaments/2/register
 Content-Type: application/json
 
 {
-    "title": "New Tournament",
-    "minElo": 100,
-    "maxElo": 10,
-    "date": "2024-08-15T15:30:00",
-    "size": 3
+    "username": "User",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
 }
-
-### add tounr - negative size / minmax elo
-POST http://localhost:8080/tournaments
+### Withdraw from tournament - move wait to registered - check get
+DELETE http://localhost:8080/tournaments/2/withdraw
 Content-Type: application/json
 
 {
-    "title": "New Tournament",
-    "minElo": 100,
-    "maxElo": 10,
-    "date": "2024-08-15T15:30:00",
-    "size": -1
+    "username": "user1",
+    "password": "pass1234",
+    "authorities": "ROLE_USER"
 }
 
-### update tournament
-PUT http://localhost:8080/tournaments/1
+######### TEST ADD ROUND FROM HERE
+# Register for tournament - wait list - check get
+POST http://localhost:8080/tournaments/1/register
 Content-Type: application/json
 
 {
-    "title": "New Tournament",
-    "minElo": 10,
-    "maxElo": 200,
-    "date": "2024-12-15T15:30:00",
-    "size": 5
+    "username": "User100",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
 }
+
+### Register for tournament - wait list - check get
+POST http://localhost:8080/tournaments/1/register
+Content-Type: application/json
+
+{
+    "username": "User110",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
+}
+
+### Register for tournament - wait list - check get
+POST http://localhost:8080/tournaments/1/register
+Content-Type: application/json
+
+{
+    "username": "User120",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
+}
+
+### Register for tournament - wait list - check get
+POST http://localhost:8080/tournaments/1/register
+Content-Type: application/json
+
+{
+    "username": "User150",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
+}
+
+### Withdraw from tournament - aft date - remove wait list
+DELETE http://localhost:8080/tournaments/1/withdraw
+Content-Type: application/json
+
+{
+    "username": "User",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
+}
+
+### Get Round data for tournament
+GET http://localhost:8080/tournaments/1/rounds
+
+### Get standings
+GET http://localhost:8080/tournaments/1/standings
+
+### Get Tournament by ELO
+GET http://localhost:8080/tournaments/byElo/200
+
+### Update Match Result - update all - check /rounds should have round 2 + gamepoints updated
+PUT http://localhost:8080/match/updateList
+Content-Type: application/json
+
+[
+    {
+        "id": 1,
+        "isBYE": false,
+        "result": 1
+    },
+    {
+        "id": 2,
+        "isBYE": false,
+        "result": -1
+    }
+]
+
+### Update Match Result - update 1 - check /rounds should be half done
+PUT http://localhost:8080/match/updateList
+Content-Type: application/json
+
+[
+    {
+        "id": 3,
+        "isBYE": false,
+        "result": 1
+    }
+]
+
+### Update Match Result - update 1 - check /rounds should be done
+### endTournament called check /rounds for updated elo? or standings
+PUT http://localhost:8080/match/updateList
+Content-Type: application/json
+
+[
+    {
+        "id": 4,
+        "isBYE": false,
+        "result": -1
+    }
+]
