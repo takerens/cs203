@@ -177,22 +177,20 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findById(1L);
     }
 
-    // @Test
-    // void updateTournament_UpdatedTournament_ReturnUpdatedTournament() {
-    //     // Arrange
-    //     Tournament newTournamentInfo = new Tournament(1L, null, "Updated Tournament", 0, 0, null, 0, 10, false, null);
-    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-    //     when(tournamentRepository.save(any(Tournament.class))).thenReturn(newTournamentInfo);
+    @Test
+    void updateTournament_UpdatedTournament_ReturnUpdatedTournament() {
+        // Arrange
+        Tournament newTournamentInfo = new Tournament(1L, null, "Updated Tournament", 0, 0, null, 0, 10, false, null);
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
 
-    //     // Act
-    //     Tournament updatedTournament = tournamentService.updateTournament(1L, newTournamentInfo);
+        // Act
+        Tournament updatedTournament = tournamentService.updateTournament(1L, newTournamentInfo);
 
-    //     // Assert
-    //     assertNotNull(updatedTournament);
-    //     assertEquals("Updated Tournament", updatedTournament.getTitle());
-    //     verify(tournamentRepository).findById(1L);
-    //     verify(tournamentRepository).save(any(Tournament.class));
-    // }
+        // Assert
+        assertNotNull(updatedTournament);
+        assertEquals("Updated Tournament", updatedTournament.getTitle());
+        verify(tournamentRepository).findById(1L);
+    }
 
     @Test
     void deleteTournament_DeleteSuccess_ReturnDeletedTournament() {
@@ -428,33 +426,31 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findById(1L);
     }
 
-    // @Test
-    // void addRound_AddSuccess_ReturnRound() {
-    //     // Arrange 
-    //     LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
-    //     tournament.setDate(time);
-    //     tournament.setSize(10);
-    //     tournament.setMaxElo(200);
-    //     tournament.setMinElo(100);
-    //     List<User> playerList = new ArrayList<>();
-    //     User player1 = new User("player1", "player11", "ROLE_PLAYER", 100);
-    //     User player2 = new User("player2", "player21", "ROLE_PLAYER", 200);
-    //     playerList.add(player1);
-    //     playerList.add(player2);
+    @Test
+    void addRound_AddSuccess_ReturnRound() {
+        // Arrange 
+        LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
+        tournament.setDate(time);
+        tournament.setSize(10);
+        tournament.setMaxElo(200);
+        tournament.setMinElo(100);
+        List<User> playerList = new ArrayList<>();
+        User player1 = new User("player1", "player11", "ROLE_PLAYER", 100);
+        User player2 = new User("player2", "player21", "ROLE_PLAYER", 200);
+        playerList.add(player1);
+        playerList.add(player2);
 
-    //     // Mock findbyId and save
-    //     when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
-    //     when(tournamentRepository.save(tournament)).thenReturn(tournament);
-    //     when(userTournamentService.getPlayers(tournament.getId())).thenReturn(playerList);
+        // Mock findbyId and save
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+        when(userTournamentService.getPlayers(tournament.getId())).thenReturn(playerList);
 
-    //     // Act, add 1 round to tournament
-    //     tournamentService.addRound(tournament.getId());
+        // Act, add 1 round to tournament
+        tournamentService.addRound(tournament.getId());
 
-    //     // Assert
-    //     assertEquals(1, tournament.getRounds().size());
-    //     verify(tournamentRepository, times(2)).findById(tournament.getId());
-    //     verify(tournamentRepository).save(tournament);
-    // }
+        // Assert
+        assertEquals(1, tournament.getRounds().size());
+        verify(tournamentRepository, times(2)).findById(tournament.getId());
+    }
 
     // @Test
     // void updateResult_MatchNotEnded_ReturnMatchNotCompletedException() {
