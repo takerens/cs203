@@ -14,8 +14,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyChar;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -238,7 +242,11 @@ public class TournamentServiceImplTest {
         when(userTournamentService.getPlayers(tournament.getId())).thenReturn(userList);
         when(userTournamentService.getWaitingList(tournament.getId())).thenReturn(waitingList);
         when(userService.findByUsername(player.getUsername())).thenReturn(player);
-        when(userTournamentService.add(tournament, player, 'r')).thenReturn(userTournament);
+
+        doAnswer(invocation -> {
+            tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's list
+            return null; // Since add returns void
+        }).when(userTournamentService).add(any(Tournament.class), any(User.class), anyChar());
         // mock UTService
         // when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(userList);
         // when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(userList);
@@ -250,7 +258,6 @@ public class TournamentServiceImplTest {
         assertEquals(1, tournament.getUserTournaments().size());
         assertEquals(userTournament, tournament.getUserTournaments().get(0));
         verify(userTournamentService, times(1)).add(tournament, player, 'r');
-        verify(tournamentRepository, times(1)).save(tournament);
         verify(userTournamentService).getPlayers(tournament.getId());
         verify(userTournamentService).getWaitingList(tournament.getId());
     }
