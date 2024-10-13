@@ -55,7 +55,26 @@ public class Tournament {
     @NotNull(message = "size: put a valid tournament size")
     private int size;
 
+    @NotNull(message = "totalRounds: put a valid number of rounds")
+    private int totalRounds;
+
+    private boolean isCalculated = false;
+
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonManagedReference(value = "tournamentUserTournament") // Prevents infinite recursion
     private List<UserTournament> userTournaments = new ArrayList<>();
+
+    public void setTotalRounds(int totalRounds) {
+        this.totalRounds = totalRounds;
+
+        // Check if the rounds list exceeds the new totalRounds limit
+        if (this.rounds.size() > totalRounds) {
+            // Shorten the rounds list to the new totalRounds limit
+            this.rounds = new ArrayList<>(this.rounds.subList(0, totalRounds));
+        }
+    }
+
+    public boolean isOver() {
+        return rounds.size() == totalRounds && rounds.get(rounds.size() - 1).isOver();
+    }
 }

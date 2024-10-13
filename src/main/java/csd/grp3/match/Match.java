@@ -45,7 +45,7 @@ public class Match {
     private boolean isBYE = false;
 
     @Getter (AccessLevel.NONE)
-    private Integer result = 0;
+    private double result = 0;
 
     @JsonIgnore
     public Tournament getTournament() {
@@ -60,7 +60,7 @@ public class Match {
      *  0 (unplayed/ongoing)
      * @return Integer value
      */
-    public Integer getResult() {
+    public double getResult() {
         return result;
     }
 }
