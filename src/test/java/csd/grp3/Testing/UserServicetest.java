@@ -15,11 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import csd.grp3.user.UserServiceImpl;
 import csd.grp3.user.UserRepository;
 import csd.grp3.user.User;
-import csd.grp3.user.UserNotFoundException;
-
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 
 
 public class UserServicetest {
