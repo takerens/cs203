@@ -27,6 +27,8 @@ import csd.grp3.tournament.TournamentNotFoundException;
 import csd.grp3.tournament.TournamentRepository;
 import csd.grp3.tournament.TournamentServiceImpl;
 import csd.grp3.user.User;
+import csd.grp3.user.UserServiceImpl;
+import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,6 +42,9 @@ public class TournamentServiceImplTest {
 
     @Mock
     private UserTournamentServiceImpl userTournamentService;
+
+    @Mock
+    private UserServiceImpl userService;
 
     private Tournament tournament;
     private User player;
@@ -212,28 +217,34 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository, never()).deleteById(1L);
     }
 
-    // @Test
-    // void registerPlayer_RegisterSuccess_ReturnPlayer() {
-    //     // Arrange
-    //     List<User> userList = new ArrayList<>();
-    //     List<User> waitingList = new ArrayList<>();
+    @Test
+    void registerPlayer_RegisterToUserListSuccess_ReturnPlayer() {
+        // Arrange
+        List<User> userList = new ArrayList<>();
+        List<User> waitingList = new ArrayList<>();
 
-    //     // retrieve mock tournament
-    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        // retrieve mock tournament
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        when(userTournamentService.getPlayers(1L)).thenReturn(userList);
+        when(userTournamentService.getWaitingList(1L)).thenReturn(waitingList);
+        when(userTournamentService.add(tournament, player, 'r')).thenReturn(new UserTournament(1, tournament, player, 'r', 0));
+        when(userService.findByUsername(player.getUsername())).thenReturn(player);
 
-    //     // mock UTService
-    //     when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(userList);
-    //     when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(userList);
+        // mock UTService
+        // when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(userList);
+        // when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(userList);
 
-    //     // act
-    //     tournamentService.registerUser(player, 1L);
+        // act
+        tournamentService.registerUser(player, 1L);
 
-    //     // assert
-    //     assertEquals(1, userList.size());
-    //     assertEquals(player, userList.get(0));
-    //     verify(userTournamentService, times(1)).add(tournament, player, 'r');
-    //     verify(tournamentRepository, times(1)).save(tournament);
-    // }
+        // assert
+        assertEquals(1, userList.size());
+        assertEquals(player, userList.get(0));
+        verify(userTournamentService, times(1)).add(tournament, player, 'r');
+        verify(tournamentRepository, times(1)).save(tournament);
+        verify(userTournamentService).getPlayers(1L);
+        verify(userTournamentService).getWaitingList(1L);
+    }
 
     @Test
     void registerPlayer_NoTournamentFound_ReturnTournamentNotFoundException() {
