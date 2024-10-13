@@ -9,6 +9,7 @@ const UpdateTournament = () => {
     const [maxElo, setMaxElo] = useState('');
     const [date, setDate] = useState('');
     const [size, setSize] = useState('');
+    const [totalRounds, setTotalRounds] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
@@ -35,7 +36,7 @@ const UpdateTournament = () => {
                 setMaxElo(tournamentData.maxElo);
                 setDate(tournamentData.date);
                 setSize(tournamentData.size);
-    
+                setTotalRounds(tournamentData.totalRounds);
             } catch (error) {
                 setErrorMessage(error.message);
             }
@@ -54,6 +55,7 @@ const UpdateTournament = () => {
             maxElo,
             date,
             size,
+            totalRounds
         };
 
         try {
@@ -76,6 +78,12 @@ const UpdateTournament = () => {
         } catch (error) {
             setErrorMessage(error.message);
         }
+    };
+
+    const handleDateChange = (e) => {
+        const selectedDate = e.target.value; // Get the date in YYYY-MM-DD format
+        const formattedDateTime = `${selectedDate}T00:00:00`; // Append T00:00:00
+        setDate(formattedDateTime); // Set the date state
     };
 
     return (
@@ -122,8 +130,8 @@ const UpdateTournament = () => {
                     <input
                         type="date"
                         id="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
+                        value={date ? date.split('T')[0] : ''} // Display only the date part in input
+                        onChange={handleDateChange}
                         required
                     />
                 </div>
@@ -135,6 +143,17 @@ const UpdateTournament = () => {
                         id="size"
                         value={size}
                         onChange={(e) => setSize(e.target.value)}
+                        required
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label>Total Rounds:</label>
+                    <input
+                        type="number"
+                        id="totalRounds"
+                        value={totalRounds}
+                        onChange={(e) => setTotalRounds(e.target.value)}
                         required
                     />
                 </div>

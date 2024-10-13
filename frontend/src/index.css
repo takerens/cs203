@@ -171,14 +171,14 @@ h1, h2, p {
 .pagination {
   margin-bottom: 20px;
 }
-.pagination Link {
+.pagination a {
   margin: 0 5px;
   text-decoration: underline;
   color: lightblue
   (63, 63, 190);
 
 }
-.pagination Link.current {
+.pagination a.current {
   text-decoration: none;
   font-weight: bold;
   color: red;

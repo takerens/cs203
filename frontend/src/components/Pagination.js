@@ -11,7 +11,7 @@ const Pagination = ({ tournamentId, inProgressRounds, currentRound }) => {
                     <Link
                         key={roundIndex}
                         to={`/tournaments/${tournamentId}/rounds/${roundIndex}`}
-                        className={roundIndex === currentRound ? 'current' : ''}
+                        className={roundIndex === Number(currentRound) ? 'current' : ''}
                     >
                         {roundIndex}
                     </Link>

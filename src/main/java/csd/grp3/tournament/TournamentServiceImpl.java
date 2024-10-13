@@ -46,7 +46,14 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Tournament addTournament(Tournament tournament) {
+    public Tournament addTournament(Tournament newTournamentInfo) {
+        Tournament tournament = new Tournament();
+        tournament.setTitle(newTournamentInfo.getTitle());
+        tournament.setDate(newTournamentInfo.getDate());
+        tournament.setMaxElo(newTournamentInfo.getMaxElo());
+        tournament.setMinElo(newTournamentInfo.getMinElo());
+        tournament.setSize(newTournamentInfo.getSize());
+        tournament.setTotalRounds(newTournamentInfo.getTotalRounds());
         return tournaments.save(tournament);
     }
 
@@ -152,7 +159,7 @@ public class TournamentServiceImpl implements TournamentService {
 
         UTService.delete(tournament, user); // Remove player
 
-        if (tournament.getDate().isAfter(LocalDateTime.now()) && userList.contains(user)) { // Before and in player list
+        if (tournament.getDate().isAfter(LocalDateTime.now()) && userList.contains(user) && !waitingList.isEmpty()) { // Before and in player list
             User moveUser = waitingList.remove(0);
             UTService.updatePlayerStatus(id, moveUser.getUsername(), 'r');
         }
@@ -584,5 +591,17 @@ public class TournamentServiceImpl implements TournamentService {
         
         userService.updateELO(user, userELO + developmentCoefficient * (wins - loss) / 2
                 - (developmentCoefficient / 4 * classInterval) * totalDiffRating);
+    }
+
+    @Override
+    public List<Tournament> getTournamentByUser(String username) {
+        List<Tournament> list = new ArrayList<>();
+        User user = userService.findByUsername(username);
+        for (UserTournament ut : user.getUserTournaments()) {
+            if (ut.getTournament().isOver()) {
+                list.add(ut.getTournament());
+            }
+        }
+        return list;
     }
 }

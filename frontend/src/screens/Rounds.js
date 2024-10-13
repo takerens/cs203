@@ -13,6 +13,7 @@ const TournamentRounds = () => {
     const [user, setUser] = useState({});
     const [editing, setEditing] = useState(false);
     const [newResults, setNewResults] = useState({});
+    const [loading, setLoading] = useState(true); // Add loading state
     const [errorMessage, setErrorMessage] = useState('');
 
     // When page loaded, fetch user data
@@ -36,8 +37,8 @@ const TournamentRounds = () => {
             }
         };
 
-        // Fetch rounds data
-        const fetchRoundsAndMatches = async () => {
+        // Fetch Tournamet data
+        const fetchTournamentData = async () => {
             try {
                 const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
                     method: 'GET',
@@ -53,30 +54,66 @@ const TournamentRounds = () => {
                 const tournamentData = await response.json(); // Tournament
                 console.log("Tournament Data: " + JSON.stringify(tournamentData, null, 2)); // View Data for Debugging
                 setTournament(tournamentData);
-                setRounds(tournamentData.rounds);
-                console.log("Tournament Rounds: " + JSON.stringify(tournamentData.rounds));
-                // Check if roundNumber is a valid index
-                if (tournamentData.rounds && tournamentData.rounds.length > roundNumber) {
-                    setMatches(tournamentData.rounds[roundNumber].matches); // Assuming matches are within each round
-                } else {
-                    // No Matches yet
-                    setMatches([]); // Or handle this case as needed
-                }
             } catch (error) {
                 setErrorMessage("Fetch Tournament Data Error: " + error.message);
+            } finally {
+                setLoading(false);
             }
-        };
+        }
 
         fetchUserData();
+        fetchTournamentData();
+        // fetchRoundsAndMatches();
+    }, []);
+
+    useEffect(() => {
         fetchRoundsAndMatches();
-    }, [roundNumber, tournamentId]);
+    }, [roundNumber]);
+
+    // Fetch rounds data
+    const fetchRoundsAndMatches = async () => {
+        try {
+            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}/rounds`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (!response.ok) {
+                const errorResponse = await response.json(); // Get error message from response
+                console.error('Fetching Tournament Data:', errorResponse); // Log error for debugging
+                throw new Error(errorResponse.message); // General error message
+            }
+
+            const roundData = await response.json(); // Tournament
+            console.log("Round Data: " + JSON.stringify(roundData, null, 2)); // View Data for Debugging
+            setRounds(roundData);
+            // Check if roundNumber is a valid index
+            if (roundData && roundData.length >= roundNumber) {
+                setMatches(roundData[roundNumber - 1].matches); // Assuming matches are within each round
+            } else {
+                // No Matches yet
+                setMatches([]); // Or handle this case as needed
+            }
+        } catch (error) {
+            setErrorMessage("Fetch Round Data Error: " + error.message);
+        }
+    };
 
     const handleResultChange = async () => {
         try {
+            const updatedMatches = matches.map(match => {
+                const result = newResults[match.id] !== undefined ? parseFloat(newResults[match.id]) : match.result;
+                return {
+                    id: match.id,
+                    isBYE: result > 1, // Assuming BYE is represented as a result > 1
+                    result: result
+                };
+            });
+
             const response = await fetch(`http://localhost:8080/match/updateList`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newResults),
+                body: JSON.stringify(updatedMatches),
             });
 
             if (!response.ok) {
@@ -85,9 +122,7 @@ const TournamentRounds = () => {
                 throw new Error(errorResponse.message); // General error message
             }
 
-            // Optionally refetch matches or update state accordingly
-            const updatedMatches = await response.json();
-            setMatches(updatedMatches);
+            fetchRoundsAndMatches();
             setEditing(false); // Exit edit mode
         } catch (error) {
             setErrorMessage(error.message);
@@ -102,23 +137,28 @@ const TournamentRounds = () => {
     };
 
     const displayResult = (result) => {
-        return result === 1 ? '1:0' : result === -1 ? '0:1' : result === 0.5 ? '0.5:0.5' : 'N/A'
+        return result === 1 ? '1:0' : result === -1 ? '0:1' : result === 0.5 ? '0.5:0.5' : result === 2 ? '1:BYE' : result === 3 ? 'BYE:1' : 'N/A'
+    }
+
+    if (loading) {
+        return <div>Loading...</div>; // Display a loading message while user data is being fetched
     }
 
     return (
         <><Navbar userRole={user.userRole} />
             <SecondaryNavbar userRole={user.userRole} tournament={tournament} />
+            
             <main>
                 <h3>Round</h3>
 
                 <Pagination tournamentId={tournamentId} inProgressRounds={rounds.length} currentRound={roundNumber} />
                 <ErrorMessage message={errorMessage} />
                 <div>
-                    {user.userRole === 'ROLE_ADMIN' && !editing && (
+                    {user.userRole === 'ROLE_ADMIN' && !editing && !rounds[roundNumber - 1]?.over &&(
                         <button onClick={() => setEditing(true)}>Edit Match Details</button>
                     )}
                     {editing && (
-                        <button onClick={handleResultChange}>Done</button>
+                        <button onClick={handleResultChange}>Save</button>
                     )}
                 </div>
 
@@ -128,11 +168,9 @@ const TournamentRounds = () => {
                             <th>No.</th>
                             <th>White Player</th>
                             <th>Rating</th>
-                            <th>Points</th>
                             <th>Results</th>
                             <th>Black Player</th>
                             <th>Rating</th>
-                            <th>Points</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -141,29 +179,28 @@ const TournamentRounds = () => {
                                 <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{match.white.username}</td>
-                                    <td>{match.white.rating}</td>
-                                    <td>{match.white.points}</td>
+                                    <td>{match.white.elo}</td>
                                     <td>
                                         {editing ? (
                                             <select
-                                                defaultValue={displayResult(newResults[match.id]) || displayResult(match.result)}
+                                            value={newResults[match.id] !== undefined ? newResults[match.id] : match.result}
                                                 onChange={(e) => handleDropdownChange(match.id, e.target.value)}
                                             >
-                                                <option value="0">N/A</option>
+                                                <option value="0.0">N/A</option>
                                                 <option value="1">1:0</option>
                                                 <option value="-1">0:1</option>
                                                 <option value="0.5">0.5:0.5</option>
-                                                {/* Option for BYE needed */}
+                                                <option value="2">1:BYE</option>
+                                                <option value="3">BYE:1</option>
                                             </select>
                                         ) : (
                                             <span>
-                                                {match.result === 1 ? '1:0' : match.result === -1 ? '0:1' : match.result === 0.5 ? '0.5:0.5' : 'N/A'}
+                                                {displayResult(match.result)}
                                             </span>
                                         )}
                                     </td>
                                     <td>{match.black.username}</td>
-                                    <td>{match.black.rating}</td>
-                                    <td>{match.black.points}</td>
+                                    <td>{match.black.elo}</td>
                                 </tr>
                             ))
                         ) : (

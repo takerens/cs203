@@ -25,6 +25,7 @@ public interface TournamentService {
     List<Tournament> getTournamentBelowMax(int ELO);
     List<Tournament> getTournamentAboveMinBelowMax(int minELO, int maxELO);
     List<Tournament> getUserEligibleTournament(int ELO);
+    List<Tournament> getTournamentByUser(String username);
     double calculateBuchholzInTournament(User user, Tournament tournament);
     double calculateBuchholzCut1InTournament(User user, Tournament tournament);
     void createPairings(Tournament tournament);

@@ -58,21 +58,21 @@ public class RestExceptionHandler {
     @ExceptionHandler(UserNotRegisteredException.class)
     public ResponseEntity<Object> handleUserNotRegisteredException(UserNotRegisteredException ex) {
         Map<String, Object> body = new HashMap<>();
-        body.put("error", ex.getMessage());
+        body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(TournamentNotFoundException.class)
     public ResponseEntity<Object> handleTournamentNotFoundException(TournamentNotFoundException ex) {
         Map<String, Object> body = new HashMap<>();
-        body.put("error", "Tournament not found with ID: " + ex.getMessage());
+        body.put("message", "Tournament not found with ID: " + ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(InvalidTournamentStatus.class)
     public ResponseEntity<Object> handleInvalidTournamentStatus(InvalidTournamentStatus ex) {
         Map<String, Object> body = new HashMap<>();
-        body.put("error", ex.getMessage());
+        body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 }

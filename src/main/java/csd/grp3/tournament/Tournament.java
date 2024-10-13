@@ -39,6 +39,7 @@ public class Tournament {
     @NotNull(message = "maxElo: put a valid Elo")
     private int maxElo;
 
+    @NotNull(message = "Date: put a valid Date")
     private LocalDateTime date;
 
     @NotNull(message = "size: put a valid tournament size")

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import csd.grp3.match.Match;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -62,7 +64,7 @@ public class TournamentController {
 
     @PostMapping
     // @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HttpStatus> addTournament(@RequestBody Tournament tournament) {
+    public ResponseEntity<HttpStatus> addTournament(@Valid @RequestBody Tournament tournament) {
         tournamentService.addTournament(tournament);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -103,6 +105,12 @@ public class TournamentController {
     @GetMapping("/byElo/{elo}")
     public ResponseEntity<List<Tournament>> getTournamentByElo(@PathVariable int elo) {
         List<Tournament> t = tournamentService.getUserEligibleTournament(elo);
+        return new ResponseEntity<List<Tournament>>(t, HttpStatus.OK);
+    }
+
+    @GetMapping("/byUser/{username}")
+    public ResponseEntity<List<Tournament>> getTournamentByUser(@PathVariable String username) {
+        List<Tournament> t = tournamentService.getTournamentByUser(username);
         return new ResponseEntity<List<Tournament>>(t, HttpStatus.OK);
     }
     
