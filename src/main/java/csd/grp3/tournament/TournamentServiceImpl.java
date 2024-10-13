@@ -152,7 +152,7 @@ public class TournamentServiceImpl implements TournamentService {
 
         UTService.delete(tournament, user); // Remove player
 
-        if (tournament.getDate().isAfter(LocalDateTime.now()) && userList.contains(user)) { // Before and in player list
+        if (tournament.getDate().isAfter(LocalDateTime.now()) && userList.contains(user) && !waitingList.isEmpty()) { // Before and in player list
             User moveUser = waitingList.remove(0);
             UTService.updatePlayerStatus(id, moveUser.getUsername(), 'r');
         }
