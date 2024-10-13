@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService {
 
         // Encode password given by user to store
         String encodedPassword = encoder.encode(password);
-        User user = new User(username, encodedPassword);
-        return userRepository.save(user);
+
+        return userRepository.save(new User(username, encodedPassword));
     }
 
     // @Override
@@ -60,5 +60,12 @@ public class UserServiceImpl implements UserService {
         User user = findByUsername(username);
         user.setPassword(encoder.encode(password));
         return userRepository.save(user);
+    }
+
+    @Override
+    public void updateELO(User tempUser, int ELO) {
+        User user = findByUsername(tempUser.getUsername());
+        user.setELO(ELO);
+        userRepository.save(user);
     }
 }
