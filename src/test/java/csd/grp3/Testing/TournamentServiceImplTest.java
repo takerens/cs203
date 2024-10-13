@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -229,7 +230,7 @@ public class TournamentServiceImplTest {
     }
 
     @Test
-    void registerPlayer_RegisterToUserListSuccess_ReturnPlayer() {
+    void registerPlayer_RegisterToUserListSuccess_ReturnUserTournamentListSizeMoreByOne() {
         // Arrange
         List<User> userList = new ArrayList<>();
         List<User> waitingList = new ArrayList<>();
@@ -327,28 +328,43 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findById(1L);
     }
 
-    // @Test
-    // void withdrawPlayer_WithdrawSuccess_ReturnPlayer() {
-    //     // Arrange
-    //     List<User> userList = new ArrayList<>();
-    //     List<User> waitingList = new ArrayList<>();
+    @Test
+    void withdrawPlayer_UserListWithdrawSuccess_ReturnUserListSmallerByOne() {
+        // Arrange
+        List<User> userList = new ArrayList<>();
+        List<User> waitingList = new ArrayList<>();
+        UserTournamentId UTId = new UserTournamentId(tournament.getId(), player.getUsername());
+        UserTournament userTournament = new UserTournament(UTId, tournament, player, null, 0, 0);
+        LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
+        userList.add(player);
+        tournament.setDate(time);
+        tournament.setSize(10);
 
-    //     // retrieve mock tournament
-    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        // retrieve mock tournament
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+        when(userTournamentService.getPlayers(tournament.getId())).thenReturn(userList);
+        when(userTournamentService.getWaitingList(tournament.getId())).thenReturn(waitingList);
+        when(userService.findByUsername(player.getUsername())).thenReturn(player);
 
-    //     // mock UTService
-    //     when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(userList);
-    //     when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(userList);
+        doAnswer(invocation -> {
+            userList.remove(player); // Directly add the user tournament to the tournament's list
+            return null; // Since add returns void
+        }).when(userTournamentService).delete(tournament, player);
 
-    //     // act
-    //     tournamentService.withdrawUser(player, 1L);
+        // mock UTService
+        // when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(userList);
+        // when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(userList);
 
-    //     // assert
-    //     assertEquals(1, userList.size());
-    //     assertEquals(player, userList.get(0));
-    //     verify(userTournamentService, times(1)).add(tournament, player, 'r');
-    //     verify(tournamentRepository, times(1)).save(tournament);
-    // }
+        // act
+        tournamentService.withdrawUser(player, tournament.getId());
+
+        // assert
+        assertEquals(0, userList.size());
+        verify(userTournamentService, times(1)).getPlayers(tournament.getId());
+        verify(userTournamentService, times(1)).getWaitingList(tournament.getId());
+        verify(tournamentRepository, times(1)).findById(tournament.getId());
+        verify(userService).findByUsername(player.getUsername());
+    }
 
     @Test
     void withdrawPlayer_TournamentNotFound_ReturnTournamentNotFoundException() {
