@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import csd.grp3.usertournament.UserTournament;
 import jakarta.validation.constraints.NotNull;
@@ -28,16 +29,18 @@ import lombok.*;
 @Table(name = "AppUsers")
 
 public class User implements UserDetails{
-    private Integer ELO;
+    private Integer ELO = 100;
 
     @Id @NotNull(message = "Username should not be null")
     private String username;
 
     @NotNull (message = "Password should not be null")
     @Size(min = 8, message = "Password should be at least 8 characters long")
+    // @JsonIgnore
     private String password;
 
     @NotNull(message = "Authorities should not be null")
+    // @JsonIgnore
     private String authorities;
 
     public User(String username, String password) {
@@ -54,12 +57,13 @@ public class User implements UserDetails{
         this.ELO = ELO;
     }
 
+    // @JsonIgnore
     public String getUserRole() {
         return authorities;
     }
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
     private List<UserTournament> userTournaments = new ArrayList<>();
   
     // Return a collection of authorities (roles) granted to the user.
@@ -69,21 +73,25 @@ public class User implements UserDetails{
     }
     
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true; // Implement as needed
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true; // Implement as needed
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true; // Implement as needed
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return true; // Implement as needed
     }
