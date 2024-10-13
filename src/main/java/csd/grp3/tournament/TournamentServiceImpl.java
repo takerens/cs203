@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import csd.grp3.exception.MatchNotCompletedException;
 import csd.grp3.match.Match;
 import csd.grp3.match.MatchService;
 import csd.grp3.round.Round;
