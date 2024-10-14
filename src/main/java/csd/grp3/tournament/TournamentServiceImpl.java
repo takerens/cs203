@@ -384,8 +384,7 @@ public class TournamentServiceImpl implements TournamentService {
                 if (!isColourSuitable(user2, tournament, isUser1White ? "black" : "white"))
                     continue;
 
-                Match newPair = createMatchWithUserColour(user1, isUser1White ? "white" : "black", user2,
-                        nextRound);
+                Match newPair = createMatchWithUserColour(user1, isUser1White ? "white" : "black", user2);
                 newPair.setRound(nextRound);
                 matches.add(newPair);
                 pairedUsers.add(user1);
@@ -487,9 +486,8 @@ public class TournamentServiceImpl implements TournamentService {
      * @param round
      * @return
      */
-    private Match createMatchWithUserColour(User user1, String user1Colour, User user2, Round round) {
+    private Match createMatchWithUserColour(User user1, String user1Colour, User user2) {
         Match match = new Match();
-        match.setRound(round);
 
         if (user1Colour.equals("white")) {
             match.setWhite(user1);
@@ -498,7 +496,6 @@ public class TournamentServiceImpl implements TournamentService {
             match.setBlack(user1);
             match.setWhite(user2);
         }
-
         matchService.addMatch(match);
         return match;
     }
@@ -531,7 +528,8 @@ public class TournamentServiceImpl implements TournamentService {
 
     private Match handleBYE(User worst, String color, Round round) { // color is color of worst player
         User bot = userService.findByUsername("DEFAULT_BOT");
-        Match match = createMatchWithUserColour(worst, color, bot, round);
+        Match match = createMatchWithUserColour(worst, color, bot);
+        match.setRound(round);
         match.setBYE(true);
         match.setResult(color.equals("white") ? 1 : -1);
         matchService.addMatch(match); // is this necessary

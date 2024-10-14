@@ -32,6 +32,7 @@ public class Match {
     @ManyToOne
     @JoinColumn(name = "round_id", nullable = false)
     @JsonBackReference // Prevents infinite recursion
+    @ToString.Exclude
     private Round round;
 
     @ManyToOne
