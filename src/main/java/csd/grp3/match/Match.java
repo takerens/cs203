@@ -47,6 +47,12 @@ public class Match {
     @Getter (AccessLevel.NONE)
     private double result = 0;
 
+    public Match(User white, User black, Round round) {
+        this.white = white;
+        this.black = black;
+        this.round = round;
+    }
+
     @JsonIgnore
     public Tournament getTournament() {
         return this.round.getTournament();
