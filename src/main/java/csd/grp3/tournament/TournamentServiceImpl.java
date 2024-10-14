@@ -547,7 +547,7 @@ public class TournamentServiceImpl implements TournamentService {
         Integer opponents = 0;
         Integer wins = 0;
         Integer loss = 0;
-        Integer developmentCoefficient = 40; // TODO 1: placeholder for now
+        Integer developmentCoefficient = 3; // TODO 1: placeholder for now
         Integer classInterval = 200; // TODO 2: placeholder for now
 
         for (Match match : matches) {
@@ -574,8 +574,10 @@ public class TournamentServiceImpl implements TournamentService {
 
             opponents++;
         }
-        
-        userService.updateELO(user, userELO + developmentCoefficient * (wins - loss) / 2
+
+        user.setELO(userELO + developmentCoefficient * (wins - loss) / 2
                 - (developmentCoefficient / 4 * classInterval) * totalDiffRating);
+        
+        userService.updateELO(user, user.getELO());
     }
 }

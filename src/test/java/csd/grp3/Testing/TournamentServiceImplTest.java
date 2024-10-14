@@ -11,7 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -434,6 +436,103 @@ public class TournamentServiceImplTest {
 
         assertNotNull(returnedRound);
         assertEquals(2, returnedRound.getMatches().size());
+        verify(matchService, times(2)).createMatch(Mockito.any(User.class), Mockito.any(User.class), Mockito.any(Round.class));
+    }
+
+    @Test
+    void createPairings_SecondRound() {
+        // Arrange
+        tournament.setMaxElo(100);
+        tournament.setSize(10);
+        tournamentService.addTournament(tournament);
+        
+        User user1 = new User("player1", "player11", "ROLE_PLAYER", 40);
+        User user2 = new User("player2", "player22", "ROLE_PLAYER", 35);
+        User user3 = new User("player3", "player33", "ROLE_PLAYER", 15);
+        User user4 = new User("player4", "player44", "ROLE_PLAYER", 10);
+        List<User> userList = java.util.Arrays.asList(user1, user2, user3, user4);
+
+        Round firstRound = new Round(tournament);
+        Match match1 = new Match(user1, user2, firstRound);
+        match1.setResult(1);
+        Match match2 = new Match(user3, user4, firstRound);
+        match2.setResult(1);
+        List<Match> match1List = List.of(match1);
+        List<Match> match2List = List.of(match2);
+        when(matchService.getUserMatches(user1)).thenReturn(match1List);
+        when(matchService.getUserMatches(user2)).thenReturn(match1List);
+        when(matchService.getUserMatches(user3)).thenReturn(match2List);
+        when(matchService.getUserMatches(user4)).thenReturn(match2List);
+
+        // mock the sorting of users
+        when(userTournamentService.getPlayers(tournament.getId())).thenReturn(userList);
+        when(userTournamentService.getGamePoints(tournament.getId(),user1.getUsername())).thenReturn(1.0);
+        when(userTournamentService.getGamePoints(tournament.getId(),user2.getUsername())).thenReturn(0.0);
+        when(userTournamentService.getGamePoints(tournament.getId(),user3.getUsername())).thenReturn(1.0);
+        when(userTournamentService.getGamePoints(tournament.getId(),user4.getUsername())).thenReturn(0.0);
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+
+        // when(matchService.getMatchesBetweenTwoUsers(user1, user2)).thenReturn(match1List);
+        when(matchService.getMatchesBetweenTwoUsers(user1, user3)).thenReturn(Collections.emptyList());
+        when(matchService.getMatchesBetweenTwoUsers(user2, user4)).thenReturn(Collections.emptyList());
+
+        Round secondRound = new Round(tournament);
+        when(roundService.createRound(tournament)).thenReturn(secondRound);
+        Match match3 = new Match(user3, user1, secondRound);
+        Match match4 = new Match(user2, user4, secondRound);
+        when(matchService.createMatch(user3, user1, secondRound)).thenReturn(match3);
+        when(matchService.createMatch(user2, user4, secondRound)).thenReturn(match4);
+
+        tournamentService.createPairings(tournament);
+        Round returnedRound = tournament.getRounds().get(0);
+
+        assertNotNull(returnedRound);
+        assertEquals(2, returnedRound.getMatches().size());
+        verify(matchService, times(2)).createMatch(Mockito.any(User.class), Mockito.any(User.class), Mockito.any(Round.class));
+    }
+
+    @Test
+    void endTournamentCalculateElo() {
+        // arrange
+        tournament.setMaxElo(100);
+        tournament.setSize(10);
+        tournamentService.addTournament(tournament);
+        
+        User user1 = new User("player1", "player11", "ROLE_PLAYER", 40);
+        User user2 = new User("player2", "player22", "ROLE_PLAYER", 35);
+        User user3 = new User("player3", "player33", "ROLE_PLAYER", 15);
+        User user4 = new User("player4", "player44", "ROLE_PLAYER", 10);
+        List<User> userList = java.util.Arrays.asList(user1, user2, user3, user4);
+
+        Round firstRound = new Round(tournament);
+        Match match1 = new Match(user1, user2, firstRound);
+        match1.setResult(1);
+        Match match2 = new Match(user3, user4, firstRound);
+        match2.setResult(1);
+        firstRound.getMatches().addAll(List.of(match1, match2));
+
+        Round secondRound = new Round(tournament);
+        Match match3 = new Match(user3, user1, secondRound);
+        match3.setResult(-1);
+        Match match4 = new Match(user2, user4, secondRound);
+        match4.setResult(-1);
+        secondRound.getMatches().addAll(List.of(match3, match4));
+
+        tournament.getRounds().addAll(List.of(firstRound, secondRound));
+        // mock the get players in UT service
+        when(userTournamentService.getPlayers(tournament.getId())).thenReturn(userList);
+
+        // mock the find tournament
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+
+        // act
+        tournamentService.endTournament(tournament.getId());
+        
+        // assert
+        assertTrue(user1.getELO()>40);
+        assertTrue(user2.getELO()<35);
+        assertTrue(user3.getELO()>15);
+        assertTrue(user4.getELO()>10);
     }
 
     @Test
