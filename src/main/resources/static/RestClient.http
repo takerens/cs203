@@ -31,6 +31,10 @@ Content-Type: application/json
 ### Retrieve all users
 GET http://localhost:8080/users
 
+### Get tournaments
+GET http://localhost:8080/tournaments
+
+
 ### Update match
 PUT http://localhost:8080/match/updateList
 Content-Type: application/json

@@ -167,7 +167,7 @@ public class TournamentServiceImplTest {
     @Test
     void updateTournament_UpdatedTournament_ReturnUpdatedTournament() {
         // Arrange
-        Tournament newTournamentInfo = new Tournament(1L, null, "Updated Tournament", 0, 0, null, 0, new ArrayList<>());
+        Tournament newTournamentInfo = new Tournament(1L, null, "Updated Tournament", 0, 0, null, 0, 0, false, null);
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
         when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
 

@@ -91,6 +91,7 @@ class SpringBootIntegrationTest {
 		List<Match> resultList = result.getBody();
 
 		// assert
+		assertNotNull(resultList);
 		assertEquals(200, result.getStatusCode().value());
 		assertEquals(3, resultList.size());
 		assertTrue(resultList.contains(match1));
