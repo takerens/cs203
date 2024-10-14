@@ -80,7 +80,7 @@ const TournamentRounds = () => {
 
             if (!response.ok) {
                 const errorResponse = await response.json(); // Get error message from response
-                console.error('Fetching Tournament Data:', errorResponse); // Log error for debugging
+                console.error('Fetching Round Data:', errorResponse); // Log error for debugging
                 throw new Error(errorResponse.message); // General error message
             }
 
@@ -105,7 +105,7 @@ const TournamentRounds = () => {
                 const result = newResults[match.id] !== undefined ? parseFloat(newResults[match.id]) : match.result;
                 return {
                     id: match.id,
-                    isBYE: result > 1, // Assuming BYE is represented as a result > 1
+                    bye: match.bye,
                     result: result
                 };
             });
@@ -174,14 +174,16 @@ const TournamentRounds = () => {
                         </tr>
                     </thead>
                     <tbody>
+                    
                         {matches && matches.length > 0 ? (
+                            
                             matches.map((match, index) => (
                                 <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{match.white.username}</td>
                                     <td>{match.white.elo}</td>
                                     <td>
-                                        {editing ? (
+                                        {editing && !match.bye ? (
                                             <select
                                             value={newResults[match.id] !== undefined ? newResults[match.id] : match.result}
                                                 onChange={(e) => handleDropdownChange(match.id, e.target.value)}
@@ -190,8 +192,6 @@ const TournamentRounds = () => {
                                                 <option value="1">1:0</option>
                                                 <option value="-1">0:1</option>
                                                 <option value="0.5">0.5:0.5</option>
-                                                <option value="2">1:BYE</option>
-                                                <option value="3">BYE:1</option>
                                             </select>
                                         ) : (
                                             <span>

@@ -251,7 +251,7 @@ const TournamentManagement = () => {
                                             <td>{tournament.minElo}</td>
                                             <td>{tournament.maxElo}</td>
                                             <td>{formatDate(tournament.date)}</td>
-                                            <td>{tournament.size}</td> {/* - tournament.participants.length*/}
+                                            <td>{tournament.size - 1}</td> {/* - tournament.participants.length*/}
                                             <td>
                                                 {user.userRole === 'ROLE_USER' && (
                                                     <>

@@ -49,9 +49,9 @@ public class User implements UserDetails{
     // @JsonIgnore
     private String authorities;
 
-    // @OneToMany(mappedBy = "user",   fetch = FetchType.EAGER) // cascade = CascadeType.ALL,orphanRemoval = true,
-    // @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
-    // private List<UserTournament> userTournaments = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
+    private List<UserTournament> userTournaments = new ArrayList<>();
 
     public User(String username, String password) {
         this.username = username;
@@ -71,10 +71,6 @@ public class User implements UserDetails{
     public String getUserRole() {
         return authorities;
     }
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
-    @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
-    private List<UserTournament> userTournaments = new ArrayList<>();
   
     // Return a collection of authorities (roles) granted to the user.
     @Override

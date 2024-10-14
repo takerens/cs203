@@ -37,6 +37,6 @@ public interface TournamentService {
     // boolean hasPlayedBefore(User user1, User user2, Tournament tournament)
     // boolean isColourSuitable(User user, Tournament tournament, String nextColour)
     // Match createMatchWithUserColour(User user1, String user1Colour, User user2, Round round)
-    // Match handleBYE(User worst, String color, Round round);
+    // void handleBYE(User worst, String color, Round round);
 
 }

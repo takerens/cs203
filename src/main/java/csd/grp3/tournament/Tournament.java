@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import csd.grp3.round.Round;
 import csd.grp3.usertournament.UserTournament;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -43,14 +44,16 @@ public class Tournament {
     private LocalDateTime date;
 
     @NotNull(message = "size: put a valid tournament size")
+    @Min(value = 2, message = "needs at least 2 players")
     private int size;
 
     @NotNull(message = "totalRounds: put a valid number of rounds")
+    @Min(value = 1, message = "tournament should have at least 1 round")
     private int totalRounds;
 
     private boolean isCalculated = false;
 
-    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference(value = "tournamentUserTournament") // Prevents infinite recursion
     private List<UserTournament> userTournaments = new ArrayList<>();
 
@@ -66,5 +69,9 @@ public class Tournament {
 
     public boolean isOver() {
         return rounds.size() == totalRounds && rounds.get(rounds.size() - 1).isOver();
+    }
+
+    public boolean hasStarted() {
+        return !(LocalDateTime.now().isBefore(date) || userTournaments.size() < 3); // 1 player is bot, need 2 other players
     }
 }
