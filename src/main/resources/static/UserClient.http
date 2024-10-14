@@ -6,7 +6,7 @@ POST http://localhost:8080/signup
 Content-Type: application/json
 
 {
-    "username": "User1",
+    "username": "user1",
     "password": "user1234",
     "authorities": "ROLE_USER"
 }

@@ -162,10 +162,13 @@ public class TournamentServiceImpl implements TournamentService {
             throw new UserNotRegisteredException("User has not registered for tournament");
         }
 
-        if (tournament.getDate().isBefore(LocalDateTime.now()) && userList.contains(user)) {
+        if (tournament.getRounds().size() != 0 && userList.contains(user)) {
             UTService.updatePlayerStatus(id, user.getUsername(), 'b');
             List<Round> rounds = tournament.getRounds();
             handleBYE(rounds.get(rounds.size() - 1), user); // give opp win for current round
+            if (UTService.getPlayers(id).size() < 3) {
+                endTournament(id);
+            }
             return;
         }
 
