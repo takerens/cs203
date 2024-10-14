@@ -37,6 +37,7 @@ import csd.grp3.tournament.TournamentServiceImpl;
 import csd.grp3.user.User;
 import csd.grp3.user.UserServiceImpl;
 import csd.grp3.match.MatchServiceImpl;
+import csd.grp3.round.Round;
 import csd.grp3.tournament.PlayerAlreadyRegisteredException;
 import csd.grp3.usertournament.UserTournamentServiceImpl;
 import csd.grp3.usertournament.UserTournament;
@@ -386,6 +387,64 @@ public class TournamentServiceImplTest {
     // @Test
     // void withdrawPlayer_PlayerNotFound_ReturnUserTournamentNotFoundException() {
         
+    // }
+
+    // @Test
+    // void createPairings_PairCreated_ReturnMatch() {
+    //     // Arrange
+    //     List<Round> rounds = new ArrayList<>();
+    //     tournament.setRounds(rounds);
+    //     tournament.setMaxElo(100);
+    //     tournament.setSize(10);
+        
+    //     // Mock users
+    //     User user1 = new User("player1", "player11", "ROLE_PLAYER", 10);
+    //     User user2 = new User("player1", "player11", "ROLE_PLAYER", 10);
+    //     User user3 = new User("player1", "player11", "ROLE_PLAYER", 10);
+    //     User user4 = new User("player1", "player11", "ROLE_PLAYER", 10);
+        
+    //     List<User> users = Arrays.asList(user1, user2, user3, user4);
+
+    //     // Mock sorted users
+    //     when(tournamentService.getSortedUsers(tournament.getId())).thenReturn(users);
+
+    //     // Mock color preferences and previous matches
+    //     when(tournamentService.isNextColourWhite(user1, tournament)).thenReturn(true);
+    //     when(tournamentService.isNextColourWhite(user2, tournament)).thenReturn(false);
+    //     when(tournamentService.hasPlayedBefore(user1, user2, tournament)).thenReturn(false);
+    //     when(tournamentService.hasPlayedBefore(user3, user4, tournament)).thenReturn(false);
+    //     when(tournamentService.isColourSuitable(user2, tournament, "black")).thenReturn(true);
+    //     when(tournamentService.isColourSuitable(user3, tournament, "white")).thenReturn(true);
+
+    //     // Act
+    //     tournamentService.createPairings(tournament);
+
+    //     // Assert
+    //     // Verify that a new round was added to the tournament
+    //     assertEquals(1, tournament.getRounds().size());
+    //     Round createdRound = tournament.getRounds().get(0);
+        
+    //     // Verify that matches were created
+    //     List<Match> matches = createdRound.getMatches();
+    //     assertEquals(2, matches.size());
+
+    //     // Verify pairing was done correctly
+    //     Match match1 = matches.get(0);
+    //     Match match2 = matches.get(1);
+
+    //     assertEquals(user1, match1.getWhitePlayer());
+    //     assertEquals(user2, match1.getBlackPlayer());
+    //     assertEquals(user3, match2.getWhitePlayer());
+    //     assertEquals(user4, match2.getBlackPlayer());
+
+    //     // Verify the methods were called with correct parameters
+    //     verify(tournamentService).getSortedUsers(tournament.getId());
+    //     verify(tournamentService).isNextColourWhite(user1, tournament);
+    //     verify(tournamentService).isNextColourWhite(user3, tournament);
+    //     verify(tournamentService).hasPlayedBefore(user1, user2, tournament);
+    //     verify(tournamentService).hasPlayedBefore(user3, user4, tournament);
+    //     verify(tournamentService).isColourSuitable(user2, tournament, "black");
+    //     verify(tournamentService).isColourSuitable(user3, tournament, "white");
     // }
 
     @Test
