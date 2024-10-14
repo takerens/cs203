@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import csd.grp3.match.Match;
 import csd.grp3.match.MatchService;
 import csd.grp3.round.Round;
+import csd.grp3.round.RoundService;
 import csd.grp3.user.User;
 import csd.grp3.user.UserService;
 import csd.grp3.usertournament.UserTournamentService;
@@ -36,6 +37,9 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RoundService roundService;
 
     @Override
     public List<Tournament> listTournaments() {
@@ -353,7 +357,7 @@ public class TournamentServiceImpl implements TournamentService {
         Set<User> pairedUsers = new HashSet<>();
 
         // New round
-        Round nextRound = new Round();
+        Round nextRound = roundService.createRound(tournament);
         nextRound.setTournament(tournament);
         tournament.getRounds().add(nextRound);
         List<Match> matches = nextRound.getMatches();
@@ -384,8 +388,7 @@ public class TournamentServiceImpl implements TournamentService {
                 if (!isColourSuitable(user2, tournament, isUser1White ? "black" : "white"))
                     continue;
 
-                Match newPair = createMatchWithUserColour(user1, isUser1White ? "white" : "black", user2);
-                newPair.setRound(nextRound);
+                Match newPair = createMatchWithUserColour(user1, isUser1White ? "white" : "black", user2, nextRound);
                 matches.add(newPair);
                 pairedUsers.add(user1);
                 pairedUsers.add(user2);
@@ -486,18 +489,12 @@ public class TournamentServiceImpl implements TournamentService {
      * @param round
      * @return
      */
-    private Match createMatchWithUserColour(User user1, String user1Colour, User user2) {
-        Match match = new Match();
-
+    private Match createMatchWithUserColour(User user1, String user1Colour, User user2, Round round) {
         if (user1Colour.equals("white")) {
-            match.setWhite(user1);
-            match.setBlack(user2);
+            return matchService.createMatch(user1, user2, round);
         } else {
-            match.setBlack(user1);
-            match.setWhite(user2);
+            return matchService.createMatch(user2, user1, round);
         }
-        matchService.addMatch(match);
-        return match;
     }
 
     /**
@@ -528,7 +525,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     private Match handleBYE(User worst, String color, Round round) { // color is color of worst player
         User bot = userService.findByUsername("DEFAULT_BOT");
-        Match match = createMatchWithUserColour(worst, color, bot);
+        Match match = createMatchWithUserColour(worst, color, bot, round);
         match.setRound(round);
         match.setBYE(true);
         match.setResult(color.equals("white") ? 1 : -1);
