@@ -3,6 +3,7 @@ package csd.grp3.Testing;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,11 +20,11 @@ import static org.mockito.ArgumentMatchers.anyChar;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,18 +38,28 @@ import csd.grp3.tournament.TournamentRepository;
 import csd.grp3.tournament.TournamentServiceImpl;
 import csd.grp3.user.User;
 import csd.grp3.user.UserServiceImpl;
+import csd.grp3.match.Match;
+import csd.grp3.match.MatchRepository;
 import csd.grp3.match.MatchServiceImpl;
 import csd.grp3.round.Round;
 import csd.grp3.tournament.PlayerAlreadyRegisteredException;
 import csd.grp3.usertournament.UserTournamentServiceImpl;
 import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentId;
+import csd.grp3.usertournament.UserTournamentRepository;
+import csd.grp3.usertournament.UserTournamentService;
 
 @ExtendWith(MockitoExtension.class)
 public class TournamentServiceImplTest {
 
     @Mock
     private TournamentRepository tournamentRepository;
+
+    @Mock
+    private UserTournamentRepository utRepository;
+
+    @Mock
+    private MatchRepository matchRepository;
 
     @InjectMocks
     private TournamentServiceImpl tournamentService;
@@ -389,63 +401,61 @@ public class TournamentServiceImplTest {
         
     // }
 
-    // @Test
-    // void createPairings_PairCreated_ReturnMatch() {
-    //     // Arrange
-    //     List<Round> rounds = new ArrayList<>();
-    //     tournament.setRounds(rounds);
-    //     tournament.setMaxElo(100);
-    //     tournament.setSize(10);
+    @Test
+    void createPairings_FirstRound() {
+        // Arrange
+        tournament.setMaxElo(100);
+        tournament.setSize(10);
+        tournamentService.addTournament(tournament);
         
-    //     // Mock users
-    //     User user1 = new User("player1", "player11", "ROLE_PLAYER", 10);
-    //     User user2 = new User("player1", "player11", "ROLE_PLAYER", 10);
-    //     User user3 = new User("player1", "player11", "ROLE_PLAYER", 10);
-    //     User user4 = new User("player1", "player11", "ROLE_PLAYER", 10);
+        User user1 = new User("player1", "player11", "ROLE_PLAYER", 40);
+        User user2 = new User("player2", "player22", "ROLE_PLAYER", 35);
+        User user3 = new User("player3", "player33", "ROLE_PLAYER", 15);
+        User user4 = new User("player4", "player44", "ROLE_PLAYER", 10);
+        List<User> userList = java.util.Arrays.asList(user1, user2, user3, user4);
+
+        when(userTournamentService.getPlayers(tournament.getId())).thenReturn(userList);
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+        when(matchService.getUserMatches(Mockito.any(User.class))).thenReturn(Collections.emptyList());
+        when(matchService.getMatchesBetweenTwoUsers(Mockito.any(User.class), Mockito.any(User.class))).thenReturn(Collections.emptyList());
+        Match match1 = new Match(null, Mockito.any(Round.class), user2, user1, false, 0);
+        Match match2 = new Match(null, Mockito.any(Round.class), user4, user3, false, 0);
+        when(matchService.addMatch(match1)).thenReturn(match1);
+        when(matchService.addMatch(match2)).thenReturn(match2);
+
+        tournamentService.createPairings(tournament);
+        Round returnedRound = tournament.getRounds().get(0);
+
+        assertNotNull(returnedRound);
+        assertEquals(2, returnedRound.getMatches().size());
+
+        // // Assert
+        // // Verify that a new round was added to the tournament
+        // assertEquals(1, tournament.getRounds().size());
+        // Round createdRound = tournament.getRounds().get(0);
         
-    //     List<User> users = Arrays.asList(user1, user2, user3, user4);
+        // // Verify that matches were created
+        // List<Match> matches = createdRound.getMatches();
+        // assertEquals(2, matches.size());
 
-    //     // Mock sorted users
-    //     when(tournamentService.getSortedUsers(tournament.getId())).thenReturn(users);
+        // // Verify pairing was done correctly
+        // Match match1 = matches.get(0);
+        // Match match2 = matches.get(1);
 
-    //     // Mock color preferences and previous matches
-    //     when(tournamentService.isNextColourWhite(user1, tournament)).thenReturn(true);
-    //     when(tournamentService.isNextColourWhite(user2, tournament)).thenReturn(false);
-    //     when(tournamentService.hasPlayedBefore(user1, user2, tournament)).thenReturn(false);
-    //     when(tournamentService.hasPlayedBefore(user3, user4, tournament)).thenReturn(false);
-    //     when(tournamentService.isColourSuitable(user2, tournament, "black")).thenReturn(true);
-    //     when(tournamentService.isColourSuitable(user3, tournament, "white")).thenReturn(true);
+        // assertEquals(user1, match1.getWhitePlayer());
+        // assertEquals(user2, match1.getBlackPlayer());
+        // assertEquals(user3, match2.getWhitePlayer());
+        // assertEquals(user4, match2.getBlackPlayer());
 
-    //     // Act
-    //     tournamentService.createPairings(tournament);
-
-    //     // Assert
-    //     // Verify that a new round was added to the tournament
-    //     assertEquals(1, tournament.getRounds().size());
-    //     Round createdRound = tournament.getRounds().get(0);
-        
-    //     // Verify that matches were created
-    //     List<Match> matches = createdRound.getMatches();
-    //     assertEquals(2, matches.size());
-
-    //     // Verify pairing was done correctly
-    //     Match match1 = matches.get(0);
-    //     Match match2 = matches.get(1);
-
-    //     assertEquals(user1, match1.getWhitePlayer());
-    //     assertEquals(user2, match1.getBlackPlayer());
-    //     assertEquals(user3, match2.getWhitePlayer());
-    //     assertEquals(user4, match2.getBlackPlayer());
-
-    //     // Verify the methods were called with correct parameters
-    //     verify(tournamentService).getSortedUsers(tournament.getId());
-    //     verify(tournamentService).isNextColourWhite(user1, tournament);
-    //     verify(tournamentService).isNextColourWhite(user3, tournament);
-    //     verify(tournamentService).hasPlayedBefore(user1, user2, tournament);
-    //     verify(tournamentService).hasPlayedBefore(user3, user4, tournament);
-    //     verify(tournamentService).isColourSuitable(user2, tournament, "black");
-    //     verify(tournamentService).isColourSuitable(user3, tournament, "white");
-    // }
+        // // Verify the methods were called with correct parameters
+        // verify(tournamentService).getSortedUsers(tournament.getId());
+        // verify(tournamentService).isNextColourWhite(user1, tournament);
+        // verify(tournamentService).isNextColourWhite(user3, tournament);
+        // verify(tournamentService).hasPlayedBefore(user1, user2, tournament);
+        // verify(tournamentService).hasPlayedBefore(user3, user4, tournament);
+        // verify(tournamentService).isColourSuitable(user2, tournament, "black");
+        // verify(tournamentService).isColourSuitable(user3, tournament, "white");
+    }
 
     @Test
     void addRound_TournamentNotFound_ReturnTournamentNotFoundException() {

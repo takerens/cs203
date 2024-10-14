@@ -39,6 +39,7 @@ public class Tournament {
 
     @OneToMany(mappedBy = "tournament", orphanRemoval = true, cascade = CascadeType.ALL)
     @JsonManagedReference // Prevents infinite recursion
+    @ToString.Exclude
     private List<Round> rounds = new ArrayList<>();
 
     @NotNull(message = "Title: not null")
