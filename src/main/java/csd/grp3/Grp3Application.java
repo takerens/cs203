@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import csd.grp3.user.UserRepository;
 import csd.grp3.tournament.Tournament;
 import csd.grp3.tournament.TournamentRepository;
+import csd.grp3.tournament.TournamentService;
 import csd.grp3.user.User;
 
 @SpringBootApplication
@@ -29,19 +30,19 @@ public class Grp3Application {
 		System.out.println("[Add Bot]: " + users.save(new User("DEFAULT_BOT", encoder.encode("goodpassword"), "ROLE_USER", 0)).getUsername());
 
 		// JPA User Repository init
-		TournamentRepository ts = ctx.getBean(TournamentRepository.class);
+		TournamentService Ts = ctx.getBean(TournamentService.class);
 		Tournament t = new Tournament();
 		t.setTitle("Tournament A");
 		t.setSize(4);
 		t.setTotalRounds(2);
 		t.setDate(LocalDateTime.of(2024, 9, 30, 15, 45));
-		System.out.println("[Add Tournament]: " + ts.save(t).getTitle());
+		System.out.println("[Add Tournament]: " + Ts.addTournament(t).getTitle());
 		Tournament t1 = new Tournament();
 		t1.setTitle("Tournament B");
 		t1.setSize(1);
 		t1.setTotalRounds(1);
 		t1.setDate(LocalDateTime.of(2024, 12, 20, 15, 0));
-		System.out.println("[Add Tournament]: " + ts.save(t1).getTitle());
+		System.out.println("[Add Tournament]: " + Ts.addTournament(t1).getTitle());
 	}
 
 }

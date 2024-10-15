@@ -3,6 +3,7 @@ package csd.grp3.usertournament;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import csd.grp3.tournament.Tournament;
@@ -14,6 +15,7 @@ import lombok.AllArgsConstructor;
 @Service
 public class UserTournamentServiceImpl implements UserTournamentService {
 
+    @Autowired
     private UserTournamentRepository userTournamentRepo;
 
     public UserTournament findRecord(Long tourneyID, String username) throws UserTournamentNotFoundException {
