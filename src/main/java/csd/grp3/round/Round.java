@@ -1,7 +1,7 @@
 package csd.grp3.round;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -42,6 +42,10 @@ public class Round {
     @OneToMany(mappedBy = "round", orphanRemoval = true, cascade = CascadeType.ALL)
     @JsonManagedReference // Prevents infinite recursion
     private List<Match> matches = new ArrayList<>();
+
+    public Round(Tournament tournament) {
+        this.tournament = tournament;
+    }
 
     public boolean isOver() {
         boolean isOver = true;

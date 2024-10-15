@@ -4,23 +4,25 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import java.lang.Math;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import csd.grp3.exception.MatchNotCompletedException;
 import csd.grp3.match.Match;
 import csd.grp3.match.MatchService;
 import csd.grp3.round.Round;
+import csd.grp3.round.RoundService;
 import csd.grp3.user.User;
 import csd.grp3.user.UserService;
-import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -42,6 +44,9 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RoundService roundService;
 
     @Override
     public List<Tournament> listTournaments() {
@@ -190,11 +195,7 @@ public class TournamentServiceImpl implements TournamentService {
         UTService.delete(tournament, user); // Remove player
 
         // handling for before tournament start
-        if (tournament.getDate().isAfter(LocalDateTime.now()) && userList.contains(user) && !waitingList.isEmpty()) { // Before
-                                                                                                                      // and
-                                                                                                                      // in
-                                                                                                                      // player
-                                                                                                                      // list
+        if (tournament.getDate().isAfter(LocalDateTime.now()) && userList.contains(user) && !waitingList.isEmpty()) { // Before and in player list
             User moveUser = waitingList.remove(0);
             UTService.updatePlayerStatus(id, moveUser.getUsername(), 'r');
         }
@@ -274,6 +275,7 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentListAboveMin;
     }
 
+    @Override
     public List<Tournament> getTournamentBelowMax(int ELO) {
         List<Tournament> tournamentList = listTournaments();
         List<Tournament> tournamentListBelowMax = new ArrayList<>();
@@ -393,7 +395,7 @@ public class TournamentServiceImpl implements TournamentService {
         Set<User> pairedUsers = new HashSet<>();
 
         // New round
-        Round nextRound = new Round();
+        Round nextRound = roundService.createRound(tournament);
         nextRound.setTournament(tournament);
         tournament.getRounds().add(nextRound);
         List<Match> matches = nextRound.getMatches();
@@ -436,9 +438,7 @@ public class TournamentServiceImpl implements TournamentService {
                 if (!isColourSuitable(user2, tournament, isUser1White ? "black" : "white"))
                     continue;
 
-                Match newPair = createMatchWithUserColour(user1, isUser1White ? "white" : "black", user2,
-                        nextRound);
-                newPair.setRound(nextRound);
+                Match newPair = createMatchWithUserColour(user1, isUser1White ? "white" : "black", user2, nextRound);
                 matches.add(newPair);
                 pairedUsers.add(user1);
                 pairedUsers.add(user2);
@@ -540,19 +540,11 @@ public class TournamentServiceImpl implements TournamentService {
      * @return
      */
     private Match createMatchWithUserColour(User user1, String user1Colour, User user2, Round round) {
-        Match match = new Match();
-        match.setRound(round);
-
         if (user1Colour.equals("white")) {
-            match.setWhite(user1);
-            match.setBlack(user2);
+            return matchService.createMatch(user1, user2, round);
         } else {
-            match.setBlack(user1);
-            match.setWhite(user2);
+            return matchService.createMatch(user2, user1, round);
         }
-
-        matchService.addMatch(match);
-        return match;
     }
 
     /**
@@ -565,6 +557,7 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = getTournament(id);
         tournament.setCalculated(true);
         tournaments.save(tournament); // set Calculated
+        Map<User, Integer> newELOMap = new HashMap<>();
 
         for (User user : UTService.getPlayers(id)) {
             List<Match> userMatches = new ArrayList<>();
@@ -576,8 +569,14 @@ public class TournamentServiceImpl implements TournamentService {
                     }
                 }
             }
+            newELOMap.put(user, update(userMatches, user));
+        }
+        
 
-            update(userMatches, user);
+        for (Map.Entry<User, Integer> entry : newELOMap.entrySet()) {
+            User user = entry.getKey();
+            user.setELO(user.getELO() + entry.getValue());
+            userService.updateELO(user, user.getELO());
         }
     }
 
@@ -607,14 +606,11 @@ public class TournamentServiceImpl implements TournamentService {
      * @param user    - User's ELO to update
      * @return none
      */
-    public void update(List<Match> matches, User user) {
+    public Integer update(List<Match> matches, User user) {
         Integer userELO = user.getELO();
-        Integer totalDiffRating = 0;
-        Integer opponents = 0;
-        Integer wins = 0;
-        Integer loss = 0;
-        Integer developmentCoefficient = 40; // TODO 1: placeholder for now
-        Integer classInterval = 200; // TODO 2: placeholder for now
+        Double changeInRating = 0.0;
+        Integer developmentCoefficient = 5; // TODO 1: placeholder for now
+        Double classInterval = 50.0; // TODO 2: placeholder for now
 
         for (Match match : matches) {
             // void match results as both users didnt play tgt
@@ -622,27 +618,36 @@ public class TournamentServiceImpl implements TournamentService {
                 continue;
 
             if (match.getWhite().equals(user)) {
-                if (match.getResult() == 1)
-                    wins++;
-                else if (match.getResult() == -1)
-                    loss++;
-
-                totalDiffRating += match.getBlack().getELO() - userELO;
-
+                Integer oppELO = match.getBlack().getELO();
+                Double expected = 1.0 / (1 + Math.pow(10, (oppELO - userELO) / classInterval));
+                if (match.getResult() == 1) {
+                    changeInRating += developmentCoefficient * (1 - expected);
+                }
+                else if (match.getResult() == -1) {
+                    changeInRating += developmentCoefficient * (0 - expected);
+                } 
+                else {
+                    changeInRating += developmentCoefficient * (0.5 - expected);
+                }
+                System.out.println(expected);
             } else {
-                if (match.getResult() == 1)
-                    loss++;
-                else if (match.getResult() == -1)
-                    wins++;
-
-                totalDiffRating += match.getWhite().getELO() - userELO;
+                Integer oppELO = match.getWhite().getELO();
+                Double expected = 1.0 / (1 + Math.pow(10, (oppELO - userELO) / classInterval));
+                if (match.getResult() == 1) {
+                    changeInRating += developmentCoefficient * (0 - expected);
+                }
+                else if (match.getResult() == -1) {
+                    changeInRating += developmentCoefficient * (1 - expected);
+                } 
+                else {
+                    changeInRating += developmentCoefficient * (0.5 - expected);
+                }
+                System.out.println(expected);
             }
-
-            opponents++;
+            System.out.println(changeInRating);
         }
 
-        userService.updateELO(user, userELO + developmentCoefficient * (wins - loss) / 2
-                - (developmentCoefficient / 4 * classInterval) * totalDiffRating);
+        return (int)(changeInRating + 0.5);
     }
 
     @Override
