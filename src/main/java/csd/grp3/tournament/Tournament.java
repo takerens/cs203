@@ -1,16 +1,28 @@
 package csd.grp3.tournament;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import csd.grp3.round.Round;
 import csd.grp3.usertournament.UserTournament;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
-import java.util.*;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name="Tournaments")
@@ -28,6 +40,7 @@ public class Tournament {
 
     @OneToMany(mappedBy = "tournament", orphanRemoval = true, cascade = CascadeType.ALL)
     @JsonManagedReference // Prevents infinite recursion
+    @ToString.Exclude
     private List<Round> rounds = new ArrayList<>();
 
     @NotNull(message = "Title: not null")
@@ -49,7 +62,7 @@ public class Tournament {
 
     private boolean isCalculated = false;
 
-    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference(value = "tournamentUserTournament") // Prevents infinite recursion
     private List<UserTournament> userTournaments = new ArrayList<>();
 
@@ -65,5 +78,10 @@ public class Tournament {
 
     public boolean isOver() {
         return rounds.size() == totalRounds && rounds.get(rounds.size() - 1).isOver();
+    }
+
+
+    public boolean hasStarted() {
+        return !(LocalDateTime.now().isBefore(date) || userTournaments.size() < 3); // 1 player is bot, need 2 other players
     }
 }

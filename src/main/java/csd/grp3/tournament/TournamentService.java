@@ -1,11 +1,11 @@
 package csd.grp3.tournament;
 
-import csd.grp3.user.User;
-import csd.grp3.round.Round;
-
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+
+import csd.grp3.round.Round;
+import csd.grp3.user.User;
 
 @Service
 public interface TournamentService {

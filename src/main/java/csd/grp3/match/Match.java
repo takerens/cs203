@@ -32,20 +32,27 @@ public class Match {
     @ManyToOne
     @JoinColumn(name = "round_id", nullable = false)
     @JsonBackReference // Prevents infinite recursion
+    @ToString.Exclude
     private Round round;
-
-    @ManyToOne
-    @JoinColumn(name = "black") // Foreign key referencing User
-    private User black;
 
     @ManyToOne
     @JoinColumn(name = "white") // Foreign key referencing User
     private User white;
+
+    @ManyToOne
+    @JoinColumn(name = "black") // Foreign key referencing User
+    private User black;
     
     private boolean BYE = false;
 
     @Getter (AccessLevel.NONE)
     private double result = 0;
+
+    public Match(User white, User black, Round round) {
+        this.white = white;
+        this.black = black;
+        this.round = round;
+    }
 
     @JsonIgnore
     public Tournament getTournament() {
