@@ -10,6 +10,7 @@ import csd.grp3.round.Round;
 import csd.grp3.usertournament.UserTournament;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -61,7 +62,7 @@ public class Tournament {
 
     private boolean isCalculated = false;
 
-    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference(value = "tournamentUserTournament") // Prevents infinite recursion
     private List<UserTournament> userTournaments = new ArrayList<>();
 
@@ -77,5 +78,10 @@ public class Tournament {
 
     public boolean isOver() {
         return rounds.size() == totalRounds && rounds.get(rounds.size() - 1).isOver();
+    }
+
+
+    public boolean hasStarted() {
+        return !(LocalDateTime.now().isBefore(date) || userTournaments.size() < 3); // 1 player is bot, need 2 other players
     }
 }

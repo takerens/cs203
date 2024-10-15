@@ -51,8 +51,12 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Tournament addTournament(Tournament tournament) {
-        return tournaments.save(tournament);
+    @Transactional
+    public Tournament addTournament(Tournament newTournamentInfo) {
+        newTournamentInfo.setSize(newTournamentInfo.getSize() + 1);
+        tournaments.save(newTournamentInfo);
+        registerUser(userService.findByUsername("DEFAULT_BOT"), newTournamentInfo.getId());
+        return newTournamentInfo;
     }
 
     @Override
@@ -82,6 +86,10 @@ public class TournamentServiceImpl implements TournamentService {
         // modify list of players based on new Elo limits and new Size limits
         // firstly, we change based on Elo limits
         for (User user : users) {
+            if (user.getUsername().equals("DEFAULT_BOT")) {
+                continue;
+            }
+
             if (user.getELO() < minElo || user.getELO() > maxElo) {
                 UTService.delete(tournament, user);
             }
@@ -92,6 +100,10 @@ public class TournamentServiceImpl implements TournamentService {
         int usersSize = users.size();
         if (usersSize > size) {
             for (int i = usersSize - 1; i >= size; i--) {
+                if (users.get(i).getUsername().equals("DEFAULT_BOT")) {
+                    continue;
+                }
+
                 if (users.get(i).getELO() >= minElo && users.get(i).getELO() <= maxElo) { // eligible
                     UTService.updatePlayerStatus(id, users.get(i).getUsername(), 'w');
                 } else {
@@ -155,8 +167,19 @@ public class TournamentServiceImpl implements TournamentService {
             throw new UserNotRegisteredException("User has not registered for tournament");
         }
 
+        if (tournament.getRounds().size() != 0 && userList.contains(user)) {
+            UTService.updatePlayerStatus(id, user.getUsername(), 'b');
+            List<Round> rounds = tournament.getRounds();
+            handleBYE(rounds.get(rounds.size() - 1), user); // give opp win for current round
+            if (UTService.getPlayers(id).size() < 3) {
+                endTournament(id);
+            }
+            return;
+        }
+
         UTService.delete(tournament, user); // Remove player
 
+        // handling for before tournament start
         if (tournament.getDate().isAfter(LocalDateTime.now()) && userList.contains(user) && !waitingList.isEmpty()) { // Before and in player list
             User moveUser = waitingList.remove(0);
             UTService.updatePlayerStatus(id, moveUser.getUsername(), 'r');
@@ -169,14 +192,6 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = getTournament(id);
         int currentRounds = tournament.getRounds().size();
 
-        if (LocalDateTime.now().isBefore(tournament.getDate())) {
-            throw new InvalidTournamentStatus("Wait for Tournament Start Date");
-        }
-
-        if (UTService.getPlayers(id).size() < 2) {
-            throw new InvalidTournamentStatus("Need at least 2 Players registered");
-        }
-
         if (currentRounds > 0) {
             Round lastRound = tournament.getRounds().get(currentRounds - 1);
             updateMatchResults(lastRound); // results for this round only
@@ -185,7 +200,12 @@ public class TournamentServiceImpl implements TournamentService {
             }
             updateResults(lastRound); // update tournament gamepoints
         }
-        createPairings(tournament);
+
+        if (tournament.hasStarted()) {
+            createPairings(tournament);
+        } else {
+            throw new InvalidTournamentStatus("Tournament has not started or less than 2 players");
+        }
     }
 
     @Override
@@ -525,6 +545,7 @@ public class TournamentServiceImpl implements TournamentService {
             }
             newELOMap.put(user, update(userMatches, user));
         }
+        
 
         for (Map.Entry<User, Integer> entry : newELOMap.entrySet()) {
             User user = entry.getKey();
@@ -533,14 +554,22 @@ public class TournamentServiceImpl implements TournamentService {
         }
     }
 
-    private Match handleBYE(User worst, String color, Round round) { // color is color of worst player
-        User bot = userService.findByUsername("DEFAULT_BOT");
-        Match match = createMatchWithUserColour(worst, color, bot, round);
-        match.setRound(round);
-        match.setBYE(true);
-        match.setResult(color.equals("white") ? 1 : -1);
-        matchService.addMatch(match); // is this necessary
-        return match;
+    @Transactional
+    private void handleBYE(Round round, User user) { // color is color of worst player
+        List<Match> matches = round.getMatches();
+        for (Match match : matches) {
+            if (match.getBlack().equals(user) || match.getWhite().equals(user)) {
+                User opponent = match.getBlack().equals(user) ? match.getWhite() : match.getBlack();
+                if (opponent.getUsername().equals("DEFAULT_BOT")) {
+                    matches.remove(match);
+                    break;
+                }
+                String colorWin = match.getBlack().equals(user) ? "white" : "black";
+                match.setResult(colorWin.equals("white") ? 1 : -1);
+                match.setBYE(true);
+                break;
+            }
+        }
     }
 
     /**
