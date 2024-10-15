@@ -52,7 +52,7 @@ public class Tournament {
     @NotNull(message = "maxElo: put a valid Elo")
     private int maxElo;
 
-    private LocalDateTime date;
+    private LocalDateTime startDateTime;
 
     @NotNull(message = "size: put a valid tournament size")
     private int size;
@@ -61,6 +61,15 @@ public class Tournament {
     private int totalRounds;
 
     private boolean isCalculated = false;
+
+    public Tournament(String title, int minELO, int maxELO, LocalDateTime startDateTime, int size, int totalRounds) {
+        this.title = title;
+        this.minElo = minELO;
+        this.maxElo = maxELO;
+        this.startDateTime = startDateTime;
+        this.size = size;
+        this.totalRounds = totalRounds;
+    }
 
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference(value = "tournamentUserTournament") // Prevents infinite recursion
@@ -82,6 +91,6 @@ public class Tournament {
 
 
     public boolean hasStarted() {
-        return !(LocalDateTime.now().isBefore(date) || userTournaments.size() < 3); // 1 player is bot, need 2 other players
+        return !(LocalDateTime.now().isBefore(startDateTime) || userTournaments.size() < 3); // 1 player is bot, need 2 other players
     }
 }

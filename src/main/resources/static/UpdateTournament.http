@@ -31,6 +31,26 @@ Content-Type: application/json
     "authorities": "ROLE_USER"
 }
 
+### Register for tournament 120
+POST http://localhost:8080/tournaments/2/register
+Content-Type: application/json
+
+{
+    "username": "User120",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
+}
+
+### Register for tournament 150
+POST http://localhost:8080/tournaments/2/register
+Content-Type: application/json
+
+{
+    "username": "User150",
+    "password": "user1234",
+    "authorities": "ROLE_USER"
+}
+
 ### update tournament (0, 0, 1) - player: 0, wait: 100, 110
 # kicked out via elo + replacement - player: 100, wait:110
 PUT http://localhost:8080/tournaments/2

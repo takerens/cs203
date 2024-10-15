@@ -8,11 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import csd.grp3.user.UserRepository;
-import csd.grp3.match.Match;
-import csd.grp3.match.MatchRepository;
-import csd.grp3.round.Round;
 import csd.grp3.tournament.Tournament;
-import csd.grp3.tournament.TournamentRepository;
 import csd.grp3.tournament.TournamentService;
 import csd.grp3.user.User;
 
@@ -39,13 +35,14 @@ public class Grp3Application {
 		t.setTitle("Tournament A");
 		t.setSize(4);
 		t.setTotalRounds(2);
-		t.setDate(LocalDateTime.of(2024, 9, 30, 15, 45));
+		t.setStartDateTime(LocalDateTime.of(2024, 9, 30, 15, 45));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t).getTitle());
 		Tournament t1 = new Tournament();
 		t1.setTitle("Tournament B");
-		t1.setSize(1);
+		t1.setSize(5);
+		t1.setMaxElo(200);
 		t1.setTotalRounds(1);
-		t1.setDate(LocalDateTime.of(2024, 12, 20, 15, 0));
+		t1.setStartDateTime(LocalDateTime.of(2024, 12, 20, 15, 0));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t1).getTitle());
 	}
 }

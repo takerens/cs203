@@ -356,7 +356,7 @@ public class TournamentServiceImplTest {
         UserTournament userTournament = new UserTournament(UTId, tournament, player, null, 0, 0);
         LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
         userList.add(player);
-        tournament.setDate(time);
+        tournament.setStartDateTime(time);
         tournament.setSize(10);
 
         // retrieve mock tournament
@@ -556,7 +556,7 @@ public class TournamentServiceImplTest {
     void addRound_InvalidTournamentStatusTime_ReturnInvalidTournamentStatus() {
         // Arrange
         LocalDateTime time = LocalDateTime.of(2999, Month.JANUARY, 1, 10, 10, 30);
-        tournament.setDate(time);
+        tournament.setStartDateTime(time);
         tournament.setSize(3);
 
         // Retrieve empty mock tournament
@@ -578,7 +578,7 @@ public class TournamentServiceImplTest {
     void addRound_InvalidTournamentStatusPlayerSize_ReturnInvalidTournamentStatus() {
         // Arrange
         LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
-        tournament.setDate(time);
+        tournament.setStartDateTime(time);
 
         // Retrieve empty mock tournament
         when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
@@ -600,7 +600,7 @@ public class TournamentServiceImplTest {
     void addRound_AddSuccess_ReturnRound() {
         // Arrange 
         LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
-        tournament.setDate(time);
+        tournament.setStartDateTime(time);
         tournament.setSize(10);
         tournament.setMaxElo(200);
         tournament.setMinElo(100);
