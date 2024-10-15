@@ -226,7 +226,7 @@ const TournamentManagement = () => {
                             </form>
                         </p>
                     )}
-                    <p>Available Tournaments.</p>
+                    <h3>Available Tournaments.</h3>
                     {tournaments.length === 0 ? (
                         <p>No available tournaments at the moment.</p> // Message for empty tournaments
                     ) : (

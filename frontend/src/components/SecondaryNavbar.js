@@ -19,11 +19,9 @@ const SecondaryNavbar = ({ tournament, userRole }) => {
                     <li className="nav-item">
                         <Link className="nav-link" to={`/tournaments/${tournament.id}/rounds/1`}>Rounds</Link>
                     </li>
-                    {userRole === 'ROLE_USER' && (
-                        <li className="nav-item">
-                            <Link className="nav-link" to={`/tournaments/${tournament.id}/standings`}>Standings</Link>
-                        </li>
-                    ) }
+                    <li className="nav-item">
+                        <Link className="nav-link" to={`/tournaments/${tournament.id}/standings`}>Standings</Link>
+                    </li>
                 </ul>
                 <button onClick={handleBack}>Back</button>
             </div>

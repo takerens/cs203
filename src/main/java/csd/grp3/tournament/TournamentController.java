@@ -100,7 +100,7 @@ public class TournamentController {
     @GetMapping("/{id}/standings")
     public ResponseEntity<List<User>> getStandings(@PathVariable Long id) {
         List<User> users = tournamentService.getSortedUsers(id);
-        return new ResponseEntity<List<User>>(users, HttpStatus.OK);
+        return new ResponseEntity<List<User>>(users.subList(0, users.size() - 1), HttpStatus.OK); // excl bot
     }
 
     @GetMapping("/byElo/{elo}")
@@ -110,8 +110,8 @@ public class TournamentController {
     }
 
     @GetMapping("/byUser/{username}")
-    public ResponseEntity<List<Tournament>> getTournamentByUser(@PathVariable String username) {
-        List<Tournament> t = tournamentService.getTournamentByUser(username);
+    public ResponseEntity<List<Tournament>> getHistoryByUser(@PathVariable String username) {
+        List<Tournament> t = tournamentService.getHistoryByUser(username);
         return new ResponseEntity<List<Tournament>>(t, HttpStatus.OK);
     }
     

@@ -10,8 +10,29 @@ const TournamentStandings = () => {
     const [tournament, setTournament] = useState({});
     const [userTournaments, setUserTournaments] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
+    const [user, setUser] = useState({});
+
 
     useEffect(() => { // Fetch Tournament Standings
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/user", { method: 'GET' });
+
+                if (!response.ok) {
+                    const errorResponse = await response.json(); // Get error message from response
+                    console.error('Fetching User:', errorResponse); // Log error for debugging
+                    throw new Error(errorResponse.message); // General error message
+                }
+
+                const userData = await response.json();
+                console.log("User Data: " + userData); // View Data for Debugging
+                const { username, password, userRole } = userData; // Destructure to get the needed properties
+                setUser({ username, password, userRole }); // Set user state
+            } catch (error) {
+                setErrorMessage(error.message);
+            }
+        };
+
         // Fetch Tournamet data
         const fetchTournamentData = async () => {
             try {
@@ -55,6 +76,7 @@ const TournamentStandings = () => {
             }
         };
 
+        fetchUserData();
         fetchTournamentData();
         fetchStandings();
     }, [tournamentId]);
@@ -67,8 +89,8 @@ const TournamentStandings = () => {
     };
 
     return (
-        <><Navbar userRole="ROLE_USER" />
-            <SecondaryNavbar userRole="ROLE_USER" tournament={tournament} />
+        <><Navbar userRole={user.userRole} />
+            <SecondaryNavbar userRole={user.userRole} tournament={tournament} />
             <main>
                 <h3>Standings</h3>
                 <ErrorMessage message={errorMessage} />

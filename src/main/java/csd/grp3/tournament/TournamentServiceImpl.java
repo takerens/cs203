@@ -23,6 +23,7 @@ import csd.grp3.round.Round;
 import csd.grp3.round.RoundService;
 import csd.grp3.user.User;
 import csd.grp3.user.UserService;
+import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -304,7 +305,7 @@ public class TournamentServiceImpl implements TournamentService {
         List<Tournament> eligibleTournamentList = new ArrayList<>();
 
         for (Tournament tournament : tournamentList) {
-            if (tournament.getMaxElo() >= userELO && tournament.getMinElo() <= userELO) {
+            if (!tournament.isOver() && tournament.getMaxElo() >= userELO && tournament.getMinElo() <= userELO) {
                 eligibleTournamentList.add(tournament);
             }
         }
@@ -651,7 +652,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> getTournamentByUser(String username) {
+    public List<Tournament> getHistoryByUser(String username) {
         List<Tournament> list = new ArrayList<>();
         User user = userService.findByUsername(username);
         for (UserTournament ut : user.getUserTournaments()) {
