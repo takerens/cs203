@@ -35,7 +35,7 @@ const UpdateTournament = () => {
                 setMinElo(tournamentData.minElo);
                 setMaxElo(tournamentData.maxElo);
                 setDate(tournamentData.date);
-                setSize(tournamentData.size);
+                setSize(Number(tournamentData.size) - 1);
                 setTotalRounds(tournamentData.totalRounds);
             } catch (error) {
                 setErrorMessage(error.message);
@@ -49,12 +49,12 @@ const UpdateTournament = () => {
         e.preventDefault();
         setErrorMessage('');
 
-        const tournamentData = {
+        const tournament = {
             title,
             minElo,
             maxElo,
             date,
-            size,
+            size : Number(size) + 1,
             totalRounds
         };
 
@@ -62,7 +62,7 @@ const UpdateTournament = () => {
             const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(tournamentData),
+                body: JSON.stringify(tournament),
             });
 
             if (!response.ok) {

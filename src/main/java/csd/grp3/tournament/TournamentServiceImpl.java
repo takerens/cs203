@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,6 +22,8 @@ import csd.grp3.user.User;
 import csd.grp3.user.UserService;
 import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -123,11 +126,23 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
+    @Transactional
     public void deleteTournament(Long id) {
-        getTournament(id);
-        tournaments.deleteById(id);
-    }
+        Tournament tournament = getTournament(id);
 
+        // Collect the UserTournament IDs to be deleted
+        List<UserTournament> userTournamentsToDelete = new ArrayList<>(tournament.getUserTournaments());
+        
+        // Now iterate over the collected UserTournament list
+        for (UserTournament userTournament : userTournamentsToDelete) {
+            // Perform the deletion logic, which may include setting the tournament reference to null
+            UTService.delete(tournament, userTournament.getUser()); // Adjust according to your service
+        }
+
+        // Now delete the tournament
+        tournaments.delete(tournament);
+    }
+    
     @Override
     @Transactional
     public void registerUser(User tempUser, Long id) throws TournamentNotFoundException {
@@ -175,7 +190,11 @@ public class TournamentServiceImpl implements TournamentService {
         UTService.delete(tournament, user); // Remove player
 
         // handling for before tournament start
-        if (tournament.getDate().isAfter(LocalDateTime.now()) && userList.contains(user) && !waitingList.isEmpty()) { // Before and in player list
+        if (tournament.getDate().isAfter(LocalDateTime.now()) && userList.contains(user) && !waitingList.isEmpty()) { // Before
+                                                                                                                      // and
+                                                                                                                      // in
+                                                                                                                      // player
+                                                                                                                      // list
             User moveUser = waitingList.remove(0);
             UTService.updatePlayerStatus(id, moveUser.getUsername(), 'r');
         }
@@ -241,7 +260,6 @@ public class TournamentServiceImpl implements TournamentService {
             UTService.updateGamePoints(tournament.getId(), match.getWhite().getUsername());
         }
     }
-
 
     public List<Tournament> getTournamentAboveMin(int ELO) {
         List<Tournament> tournamentList = listTournaments();
@@ -384,14 +402,14 @@ public class TournamentServiceImpl implements TournamentService {
 
         if (users.size() % 2 == 0) {
             User bot = users.get(users.size() - 1);
-            User worst = users.get(users.size() - 2); //  avoid bot
+            User worst = users.get(users.size() - 2); // avoid bot
             String color = "white";
             Match match = createMatchWithUserColour(worst, color, bot, nextRound);
             match.setBYE(true);
             match.setResult(color.equals("white") ? 1 : -1);
             match.setRound(nextRound);
             matches.add(match);
-            pairedUsers.add(users.get(users.size()-1));
+            pairedUsers.add(users.get(users.size() - 1));
         }
 
         for (int i = 0; i < users.size(); i++) {
@@ -622,7 +640,7 @@ public class TournamentServiceImpl implements TournamentService {
 
             opponents++;
         }
-        
+
         userService.updateELO(user, userELO + developmentCoefficient * (wins - loss) / 2
                 - (developmentCoefficient / 4 * classInterval) * totalDiffRating);
     }
