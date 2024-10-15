@@ -70,7 +70,7 @@ public class TournamentServiceImpl implements TournamentService {
     public Tournament updateTournament(Long id, Tournament newTournamentInfo) {
         Tournament tournament = getTournament(id);
         tournament.setTitle(newTournamentInfo.getTitle());
-        tournament.setDate(newTournamentInfo.getDate());
+        tournament.setStartDateTime(newTournamentInfo.getStartDateTime());
         tournament.setMaxElo(newTournamentInfo.getMaxElo());
         tournament.setMinElo(newTournamentInfo.getMinElo());
         tournament.setSize(newTournamentInfo.getSize());
@@ -180,7 +180,7 @@ public class TournamentServiceImpl implements TournamentService {
         UTService.delete(tournament, user); // Remove player
 
         // handling for before tournament start
-        if (tournament.getDate().isAfter(LocalDateTime.now()) && userList.contains(user) && !waitingList.isEmpty()) { // Before and in player list
+        if (tournament.getStartDateTime().isAfter(LocalDateTime.now()) && userList.contains(user) && !waitingList.isEmpty()) { // Before and in player list
             User moveUser = waitingList.remove(0);
             UTService.updatePlayerStatus(id, moveUser.getUsername(), 'r');
         }

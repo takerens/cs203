@@ -9,7 +9,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import csd.grp3.user.UserRepository;
 import csd.grp3.tournament.Tournament;
-import csd.grp3.tournament.TournamentRepository;
 import csd.grp3.tournament.TournamentService;
 import csd.grp3.user.User;
 
@@ -19,6 +18,7 @@ public class Grp3Application {
 	public static void main(String[] args) {
 		ApplicationContext ctx = SpringApplication.run(Grp3Application.class, args);
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
 		// JPA User Repository init
 		UserRepository users = ctx.getBean(UserRepository.class);
 		System.out.println("[Add Admin]: " + users.save(new User("Admin", encoder.encode("password123"), "ROLE_ADMIN", 0)).getUsername());
@@ -35,14 +35,14 @@ public class Grp3Application {
 		t.setTitle("Tournament A");
 		t.setSize(4);
 		t.setTotalRounds(2);
-		t.setDate(LocalDateTime.of(2024, 9, 30, 15, 45));
+		t.setStartDateTime(LocalDateTime.of(2024, 9, 30, 15, 45));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t).getTitle());
 		Tournament t1 = new Tournament();
 		t1.setTitle("Tournament B");
-		t1.setSize(1);
+		t1.setSize(5);
+		t1.setMaxElo(200);
 		t1.setTotalRounds(1);
-		t1.setDate(LocalDateTime.of(2024, 12, 20, 15, 0));
+		t1.setStartDateTime(LocalDateTime.of(2024, 12, 20, 15, 0));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t1).getTitle());
 	}
-
 }

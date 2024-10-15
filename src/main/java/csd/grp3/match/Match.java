@@ -43,7 +43,7 @@ public class Match {
     @JoinColumn(name = "black") // Foreign key referencing User
     private User black;
     
-    private boolean isBYE = false;
+    private boolean BYE = false;
 
     @Getter (AccessLevel.NONE)
     private double result = 0;

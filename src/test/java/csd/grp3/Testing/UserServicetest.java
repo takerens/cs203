@@ -1,4 +1,4 @@
-package csd.grp3.Testing;
+package csd.grp3.testing;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

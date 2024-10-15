@@ -19,7 +19,6 @@ public interface TournamentService {
     void addRound(Long id);
     void updateMatchResults(Round round);
     void updateResults(Round round);
-    String directEncounterResultInTournament(Tournament tournament, User user1, User user2);
     void endTournament(Long id);
     List<Tournament> getTournamentAboveMin(int ELO);
     List<Tournament> getTournamentBelowMax(int ELO);
