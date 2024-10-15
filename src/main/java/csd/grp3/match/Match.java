@@ -36,12 +36,12 @@ public class Match {
     private Round round;
 
     @ManyToOne
-    @JoinColumn(name = "black") // Foreign key referencing User
-    private User black;
-
-    @ManyToOne
     @JoinColumn(name = "white") // Foreign key referencing User
     private User white;
+
+    @ManyToOne
+    @JoinColumn(name = "black") // Foreign key referencing User
+    private User black;
     
     private boolean isBYE = false;
 

@@ -4,10 +4,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import java.lang.Math;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -507,6 +511,7 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = getTournament(id);
         tournament.setCalculated(true);
         tournaments.save(tournament); // set Calculated
+        Map<User, Integer> newELOMap = new HashMap<>();
 
         for (User user : UTService.getPlayers(id)) {
             List<Match> userMatches = new ArrayList<>();
@@ -518,8 +523,13 @@ public class TournamentServiceImpl implements TournamentService {
                     }
                 }
             }
+            newELOMap.put(user, update(userMatches, user));
+        }
 
-            update(userMatches, user);
+        for (Map.Entry<User, Integer> entry : newELOMap.entrySet()) {
+            User user = entry.getKey();
+            user.setELO(user.getELO() + entry.getValue());
+            userService.updateELO(user, user.getELO());
         }
     }
 
@@ -541,14 +551,11 @@ public class TournamentServiceImpl implements TournamentService {
      * @param user    - User's ELO to update
      * @return none
      */
-    public void update(List<Match> matches, User user) {
+    public Integer update(List<Match> matches, User user) {
         Integer userELO = user.getELO();
-        Integer totalDiffRating = 0;
-        Integer opponents = 0;
-        Integer wins = 0;
-        Integer loss = 0;
-        Integer developmentCoefficient = 3; // TODO 1: placeholder for now
-        Integer classInterval = 200; // TODO 2: placeholder for now
+        Double changeInRating = 0.0;
+        Integer developmentCoefficient = 5; // TODO 1: placeholder for now
+        Double classInterval = 50.0; // TODO 2: placeholder for now
 
         for (Match match : matches) {
             // void match results as both users didnt play tgt
@@ -556,28 +563,35 @@ public class TournamentServiceImpl implements TournamentService {
                 continue;
 
             if (match.getWhite().equals(user)) {
-                if (match.getResult() == 1)
-                    wins++;
-                else if (match.getResult() == -1)
-                    loss++;
-
-                totalDiffRating += match.getBlack().getELO() - userELO;
-
+                Integer oppELO = match.getBlack().getELO();
+                Double expected = 1.0 / (1 + Math.pow(10, (oppELO - userELO) / classInterval));
+                if (match.getResult() == 1) {
+                    changeInRating += developmentCoefficient * (1 - expected);
+                }
+                else if (match.getResult() == -1) {
+                    changeInRating += developmentCoefficient * (0 - expected);
+                } 
+                else {
+                    changeInRating += developmentCoefficient * (0.5 - expected);
+                }
+                System.out.println(expected);
             } else {
-                if (match.getResult() == 1)
-                    loss++;
-                else if (match.getResult() == -1)
-                    wins++;
-
-                totalDiffRating += match.getWhite().getELO() - userELO;
+                Integer oppELO = match.getWhite().getELO();
+                Double expected = 1.0 / (1 + Math.pow(10, (oppELO - userELO) / classInterval));
+                if (match.getResult() == 1) {
+                    changeInRating += developmentCoefficient * (0 - expected);
+                }
+                else if (match.getResult() == -1) {
+                    changeInRating += developmentCoefficient * (1 - expected);
+                } 
+                else {
+                    changeInRating += developmentCoefficient * (0.5 - expected);
+                }
+                System.out.println(expected);
             }
-
-            opponents++;
+            System.out.println(changeInRating);
         }
 
-        user.setELO(userELO + developmentCoefficient * (wins - loss) / 2
-                - (developmentCoefficient / 4 * classInterval) * totalDiffRating);
-        
-        userService.updateELO(user, user.getELO());
+        return (int)(changeInRating + 0.5);
     }
 }
