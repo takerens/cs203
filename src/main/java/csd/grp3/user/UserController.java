@@ -63,6 +63,6 @@ public class UserController {
     @DeleteMapping("/profile/{username}")
     public ResponseEntity<String> deleteUser(@PathVariable String username) {
         userService.deleteByUsername(username);
-        return ResponseEntity.status(HttpStatus.OK).body(username);
+        return ResponseEntity.status(HttpStatus.OK).body(username + " has been deleted");
     }
 }
