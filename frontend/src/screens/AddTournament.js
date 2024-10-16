@@ -26,7 +26,7 @@ const AddTournament = () => {
                 totalRounds
             };
 
-            const response = await fetch('http://localhost:8080/tournaments', {
+            const response = await fetch('http://spring-app:8080/tournaments', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(tournamentData),

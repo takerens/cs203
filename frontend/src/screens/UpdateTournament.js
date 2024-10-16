@@ -17,7 +17,7 @@ const UpdateTournament = () => {
     useEffect(() => {
         const fetchTournamentData = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
+                const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
                 });
@@ -59,7 +59,7 @@ const UpdateTournament = () => {
         };
 
         try {
-            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
+            const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(tournament),

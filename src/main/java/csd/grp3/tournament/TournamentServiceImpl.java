@@ -141,8 +141,7 @@ public class TournamentServiceImpl implements TournamentService {
         
         // Now iterate over the collected UserTournament list
         for (UserTournament userTournament : userTournamentsToDelete) {
-            // Perform the deletion logic, which may include setting the tournament reference to null
-            UTService.delete(tournament, userTournament.getUser()); // Adjust according to your service
+            UTService.delete(tournament, userTournament.getUser());
         }
 
         // Now delete the tournament

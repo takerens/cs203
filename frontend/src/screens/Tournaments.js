@@ -15,7 +15,7 @@ const TournamentManagement = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch("http://localhost:8080/user", { method: 'GET' });
+                const response = await fetch("http://spring-app:8080/user", { method: 'GET' });
 
                 if (!response.ok) {
                     const errorResponse = await response.json(); // Get error message from response
@@ -46,7 +46,7 @@ const TournamentManagement = () => {
 
     const fetchAllTournamentData = async () => {
         try {
-            const response = await fetch("http://localhost:8080/tournaments", {
+            const response = await fetch("http://spring-app:8080/tournaments", {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -68,7 +68,7 @@ const TournamentManagement = () => {
 
     const fetchEligibleTournamentData = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/tournaments/byElo/${user.elo}`, {
+            const response = await fetch(`http://spring-app:8080/tournaments/byElo/${user.elo}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -90,7 +90,7 @@ const TournamentManagement = () => {
 
     const fetchHistory = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/tournaments/byUser/${user.username}`, {
+            const response = await fetch(`http://spring-app:8080/tournaments/byUser/${user.username}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -129,7 +129,7 @@ const TournamentManagement = () => {
                 "username": user.username
             }
 
-            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}/register`, {
+            const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData),
@@ -157,7 +157,7 @@ const TournamentManagement = () => {
             const userData = {
                 "username": user.username
             }
-            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}/withdraw`, {
+            const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}/withdraw`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData),
@@ -182,7 +182,7 @@ const TournamentManagement = () => {
         setErrorMessage(''); // Clear previous error message
 
         try {
-            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
+            const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
             });
