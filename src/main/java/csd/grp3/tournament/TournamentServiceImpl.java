@@ -2,7 +2,6 @@ package csd.grp3.tournament;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import java.lang.Math;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -311,72 +308,72 @@ public class TournamentServiceImpl implements TournamentService {
         return eligibleTournamentList;
     }
 
-    /**
-     * Checks if 2 users have played each other in the tournament before.
-     * User order does not matter.
-     * If no winner, returns "draw".
-     * If never faced each other, returns "no direct encounter".
-     * 
-     * @param tournament - Tournament to check
-     * @param user1      - First user
-     * @param user2      - Second user
-     * @return Username of winner
-     */
-    public String directEncounterResultInTournament(Tournament tournament, User user1, User user2) {
-        List<Match> directEncounters = matchService.getMatchesBetweenTwoUsers(user1, user2)
-                .stream()
-                .filter(match -> match.getTournament().equals(tournament))
-                .collect(Collectors.toList());
+    // /**
+    //  * Checks if 2 users have played each other in the tournament before.
+    //  * User order does not matter.
+    //  * If no winner, returns "draw".
+    //  * If never faced each other, returns "no direct encounter".
+    //  * 
+    //  * @param tournament - Tournament to check
+    //  * @param user1      - First user
+    //  * @param user2      - Second user
+    //  * @return Username of winner
+    //  */
+    // public String directEncounterResultInTournament(Tournament tournament, User user1, User user2) {
+    //     List<Match> directEncounters = matchService.getMatchesBetweenTwoUsers(user1, user2)
+    //             .stream()
+    //             .filter(match -> match.getTournament().equals(tournament))
+    //             .collect(Collectors.toList());
 
-        if (directEncounters.size() == 0) {
-            return "no direct encounter";
-        }
+    //     if (directEncounters.size() == 0) {
+    //         return "no direct encounter";
+    //     }
 
-        Match directEncounter = directEncounters.get(0);
+    //     Match directEncounter = directEncounters.get(0);
 
-        if (directEncounter.getResult() == -1) {
-            return directEncounter.getBlack().getUsername();
-        } else if (directEncounter.getResult() == 1) {
-            return directEncounter.getWhite().getUsername();
-        } else {
-            return "draw";
-        }
-    }
+    //     if (directEncounter.getResult() == -1) {
+    //         return directEncounter.getBlack().getUsername();
+    //     } else if (directEncounter.getResult() == 1) {
+    //         return directEncounter.getWhite().getUsername();
+    //     } else {
+    //         return "draw";
+    //     }
+    // }
 
-    // Calculate Buchholz score for a user in a specific tournament (sum of
-    // opponents' match points)
-    public double calculateBuchholzInTournament(User user, Tournament tournament) {
-        List<Match> matchList = matchService.getUserMatches(user).stream()
-                .filter(match -> match.getTournament().equals(tournament))
-                .collect(Collectors.toList());
+    // // Calculate Buchholz score for a user in a specific tournament (sum of
+    // // opponents' match points)
+    // public double calculateBuchholzInTournament(User user, Tournament tournament) {
+    //     List<Match> matchList = matchService.getUserMatches(user).stream()
+    //             .filter(match -> match.getTournament().equals(tournament))
+    //             .collect(Collectors.toList());
 
-        double buchholzScore = 0;
-        for (Match match : matchList) {
-            User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
-            buchholzScore += UTService.getGamePoints(tournament.getId(), opponent.getUsername());
-        }
-        return buchholzScore;
-    }
+    //     double buchholzScore = 0;
+    //     for (Match match : matchList) {
+    //         User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
+    //         buchholzScore += UTService.getGamePoints(tournament.getId(), opponent.getUsername());
+    //     }
+    //     return buchholzScore;
+    // }
 
-    // Calculate Buchholz Cut 1 (exclude lowest opponent score) in a specific
-    // tournament
-    public double calculateBuchholzCut1InTournament(User user, Tournament tournament) {
-        List<Match> matchList = matchService.getUserMatches(user).stream()
-                .filter(match -> match.getTournament().equals(tournament))
-                .collect(Collectors.toList());
+    // // Calculate Buchholz Cut 1 (exclude lowest opponent score) in a specific
+    // // tournament
+    // public double calculateBuchholzCut1InTournament(User user, Tournament tournament) {
+    //     List<Match> matchList = matchService.getUserMatches(user).stream()
+    //             .filter(match -> match.getTournament().equals(tournament))
+    //             .collect(Collectors.toList());
 
-        List<Double> opponentScores = new ArrayList<>();
-        for (Match match : matchList) {
-            User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
-            opponentScores.add(UTService.getGamePoints(tournament.getId(), opponent.getUsername()));
-        }
+    //     List<Double> opponentScores = new ArrayList<>();
+    //     for (Match match : matchList) {
+    //         User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
+    //         opponentScores.add(UTService.getGamePoints(tournament.getId(), opponent.getUsername()));
+    //     }
 
-        if (!opponentScores.isEmpty()) {
-            opponentScores.remove(Collections.min(opponentScores));
-        }
+    //     if (!opponentScores.isEmpty()) {
+    //         opponentScores.remove(Collections.min(opponentScores));
+    //     }
 
-        return opponentScores.stream().mapToDouble(Double::doubleValue).sum();
-    }
+    //     return opponentScores.stream().mapToDouble(Double::doubleValue).sum();
+    // }
 
     @Override
     public List<User> getSortedUsers(Long id) {
@@ -489,7 +486,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param nextColour - either "white" or "black" only
      * @return - true if not same colour for 3 times consecutively
      */
-    private boolean isColourSuitable(User user, Tournament tournament, String nextColour) {
+    public boolean isColourSuitable(User user, Tournament tournament, String nextColour) {
         List<Match> matchList = matchService.getUserMatches(user).stream()
                 .filter(match -> match.getTournament().equals(tournament))
                 .collect(Collectors.toList());
@@ -568,7 +565,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Transactional
-    private void handleBYE(Round round, User user) { // color is color of worst player
+    public void handleBYE(Round round, User user) { // color is color of worst player
         List<Match> matches = round.getMatches();
         for (Match match : matches) {
             if (match.getBlack().equals(user) || match.getWhite().equals(user)) {
