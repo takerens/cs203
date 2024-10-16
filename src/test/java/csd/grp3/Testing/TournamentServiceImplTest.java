@@ -160,33 +160,51 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findById(1L);
     }
 
-    // @Test
-    // void addTournament_NewTitle_ReturnSavedTournament() {
-    //     when(tournamentRepository.save(tournament)).thenReturn(tournament);
-    //     doNothing().when(tournamentService).registerUser(any(User.class), tournament.getId());
+    @Test
+    void addTournament_NewTitle_ReturnSavedTournament() {
 
-    //     Tournament result = tournamentService.addTournament(tournament);
+        when(tournamentRepository.save(tournament)).thenReturn(tournament);
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+        when(userService.findByUsername("DEFAULT_BOT")).thenReturn(new User("DEFAULT_BOT", "goodpassword", "ROLE_USER", 0));
 
-    //     assertEquals(tournament, result);
-    //     verify(tournamentRepository).save(tournament);
-    // }
+        doAnswer(invocation -> {
+            UserTournamentId utId = new UserTournamentId(tournament.getId(), player.getUsername());
+            UserTournament userTournament = new UserTournament(utId, tournament, player, 'r', 0, 0);
+            tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's list
+            return null; // Since add returns void
+        }).when(userTournamentService).add(any(Tournament.class), any(User.class), anyChar());
 
-    // @Test
-    // void addTournament_SameTitle_ReturnSavedTournamentWithDifferentID() {
-    //     // Arrange
-    //     Tournament tournament2 = tournament;
-    //     tournament2.setId(2L);
-    //     when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+        Tournament result = tournamentService.addTournament(tournament);
 
-    //     // Act
-    //     tournamentService.addTournament(tournament);
-    //     Tournament result = tournamentService.addTournament(tournament2);
+        assertEquals(tournament, result);
+        verify(tournamentRepository).save(tournament);
+    }
 
-    //     // Assert
-    //     assertEquals(2L, result.getId());
-    //     assertEquals("Test Tournament", result.getTitle());
-    //     verify(tournamentRepository, times(2)).save(tournament);
-    // }
+    @Test
+    void addTournament_SameTitle_ReturnSavedTournamentWithDifferentID() {
+        // Arrange
+        Tournament tournament2 = tournament;
+        tournament2.setId(2L);
+        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+        when(userService.findByUsername("DEFAULT_BOT")).thenReturn(new User("DEFAULT_BOT", "goodpassword", "ROLE_USER", 0));
+
+        doAnswer(invocation -> {
+            UserTournamentId utId = new UserTournamentId(tournament.getId(), player.getUsername());
+            UserTournament userTournament = new UserTournament(utId, tournament, player, 'r', 0, 0);
+            tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's list
+            return null; // Since add returns void
+        }).when(userTournamentService).add(any(Tournament.class), any(User.class), anyChar());
+
+        // Act
+        tournamentService.addTournament(tournament);
+        Tournament result = tournamentService.addTournament(tournament2);
+
+        // Assert
+        assertEquals(2L, result.getId());
+        assertEquals("Test Tournament", result.getTitle());
+        verify(tournamentRepository, times(2)).save(tournament);
+    }
 
     @Test
     void updateTournament_NotFound_ReturnTournamentNotFoundException() {
