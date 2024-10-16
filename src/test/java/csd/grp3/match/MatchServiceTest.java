@@ -1,5 +1,6 @@
 package csd.grp3.match;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import csd.grp3.round.Round;
+import csd.grp3.tournament.Tournament;
 import csd.grp3.user.User;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +31,26 @@ public class MatchServiceTest {
 
     @InjectMocks
     private MatchServiceImpl matchService;
+
+    @Test
+    void createMatch() {
+        // arrange
+        Tournament tournament = new Tournament("test", 0, 10, LocalDateTime.now(), 0, 0);
+        User white = new User("white", "white", "ROLE_PLAYER", 0);
+        User black = new User("black", "black", "ROLE_PLAYER", 0);
+        Round round = new Round(tournament);
+        Match match = new Match(white, black, round);
+
+        // act
+        // mock the save operation
+        when(matches.save(any(Match.class))).thenReturn(match);
+
+        Match returnedMatch = matchService.createMatch(white, black, round);
+
+        // assert
+        assertEquals(match,returnedMatch);
+        verify(matches).save(match);
+    }
 
     @Test
     void addMatch() {
