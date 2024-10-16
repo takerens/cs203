@@ -629,7 +629,6 @@ public class TournamentServiceImpl implements TournamentService {
                 else {
                     changeInRating += developmentCoefficient * (0.5 - expected);
                 }
-                System.out.println(expected);
             } else {
                 Integer oppELO = match.getWhite().getELO();
                 Double expected = 1.0 / (1 + Math.pow(10, (oppELO - userELO) / classInterval));
@@ -642,9 +641,7 @@ public class TournamentServiceImpl implements TournamentService {
                 else {
                     changeInRating += developmentCoefficient * (0.5 - expected);
                 }
-                System.out.println(expected);
             }
-            System.out.println(changeInRating);
         }
 
         return (int)(changeInRating + 0.5);
