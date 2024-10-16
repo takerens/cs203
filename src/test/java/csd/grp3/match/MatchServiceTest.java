@@ -1,26 +1,25 @@
 package csd.grp3.match;
 
-import csd.grp3.round.Round;
-import csd.grp3.user.User;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Collections;
+import csd.grp3.round.Round;
+import csd.grp3.user.User;
 
 @ExtendWith(MockitoExtension.class)
 public class MatchServiceTest {
@@ -34,7 +33,7 @@ public class MatchServiceTest {
     @Test
     void addMatch() {
         // arrange
-        Match match = new Match();
+        Match match = new Match(null, null, null, null, false, 0);
 
         // act
         // mock the save operation

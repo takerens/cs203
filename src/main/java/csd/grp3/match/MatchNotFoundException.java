@@ -9,8 +9,4 @@ public class MatchNotFoundException extends RuntimeException{
     public MatchNotFoundException() {
         super("match not found");
     }
-
-    public MatchNotFoundException(String message) {
-        super(message);
-    }
 }
