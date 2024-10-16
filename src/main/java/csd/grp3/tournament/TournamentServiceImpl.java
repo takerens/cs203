@@ -22,6 +22,7 @@ import csd.grp3.round.Round;
 import csd.grp3.round.RoundService;
 import csd.grp3.user.User;
 import csd.grp3.user.UserService;
+import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -128,8 +129,20 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
+    @Transactional
     public void deleteTournament(Long id) {
-        getTournament(id);
+        Tournament tournament = getTournament(id);
+
+        // Collect the UserTournament IDs to be deleted
+        List<UserTournament> userTournamentsToDelete = new ArrayList<>(tournament.getUserTournaments());
+        
+        // Now iterate over the collected UserTournament list
+        for (UserTournament userTournament : userTournamentsToDelete) {
+            // Perform the deletion logic, which may include setting the tournament reference to null
+            UTService.delete(tournament, userTournament.getUser()); // Adjust according to your service
+        }
+
+        // Now delete the tournament
         tournaments.deleteById(id);
     }
 

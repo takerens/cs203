@@ -91,6 +91,6 @@ public class Tournament {
 
 
     public boolean hasStarted() {
-        return !(LocalDateTime.now().isBefore(startDateTime) || userTournaments.size() < 3); // 1 player is bot, need 2 other players
+        return !(LocalDateTime.now().isBefore(startDateTime) || userTournaments.size() < 2); // bot has no UT 
     }
 }
