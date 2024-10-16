@@ -5,5 +5,6 @@ public interface UserService {
     User login(String username, String password);
     User findByUsername(String username);
     User changePassword(String username, String password);
+    String deleteByUsername(String username);
     void updateELO(User user, int ELO);
 }

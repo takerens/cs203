@@ -2,6 +2,7 @@ package csd.grp3.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -13,11 +14,11 @@ public class UserController {
     //TEMPORARY
     private User user;
 
-    private void setUser(User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
-    private User getUser() {
+    User getUser() {
         return this.user;
     }
     // Till HERE
@@ -36,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
+    public ResponseEntity<User> registerUser(@Valid @RequestBody User user) throws MethodArgumentNotValidException {
         User createdUser = userService.createNewUser(user.getUsername(), user.getPassword());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
@@ -57,5 +58,11 @@ public class UserController {
     public ResponseEntity<User> changePassword(@Valid @RequestBody User user) {
         User updatedUser = userService.changePassword(user.getUsername(), user.getPassword());
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
+    }
+
+    @DeleteMapping("/profile/{username}")
+    public ResponseEntity<String> deleteUser(@PathVariable String username) {
+        userService.deleteByUsername(username);
+        return ResponseEntity.status(HttpStatus.OK).body(username + " has been deleted");
     }
 }
