@@ -69,4 +69,10 @@ public class UserServiceImpl implements UserService {
         user.setELO(ELO);
         userRepository.save(user);
     }
+
+    @Override
+    public void deleteUser(User user) {
+        User toDelete = login(user.getUsername(), user.getPassword());
+        userRepository.delete(toDelete);
+    }
 }

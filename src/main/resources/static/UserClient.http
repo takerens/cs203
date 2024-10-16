@@ -6,7 +6,7 @@ POST http://localhost:8080/signup
 Content-Type: application/json
 
 {
-    "username": "user1",
+    "username": "User1",
     "password": "user1234",
     "authorities": "ROLE_USER"
 }
@@ -16,8 +16,8 @@ POST http://localhost:8080/signup
 Content-Type: application/json
 
 {
-    "username": "user1",
-    "password": "pwd2aaaaaaa",
+    "username": "User1",
+    "password": "password",
     "authorities": "ROLE_USER"
 }
 
@@ -27,7 +27,16 @@ Content-Type: application/json
 
 {
     "username": "user",
-    "password": "pwd",
+    "password": "1234567",
+    "authorities": "ROLE_USER"
+}
+
+### Register a user with null password
+POST http://localhost:8080/signup
+Content-Type: application/json
+
+{
+    "username": "user",
     "authorities": "ROLE_USER"
 }
 
@@ -36,7 +45,7 @@ POST http://localhost:8080/signup
 Content-Type: application/json
 
 {
-    "password": "pasdfawds",
+    "password": "password",
     "authorities": "ROLE_USER"
 }
 
@@ -45,7 +54,7 @@ POST http://localhost:8080/login
 Content-Type: application/json
 
 {
-    "username": "User100",
+    "username": "User1",
     "password": "user1234",
     "authorities": "ROLE_USER"
 }
@@ -55,7 +64,7 @@ POST http://localhost:8080/login
 Content-Type: application/json
 
 {
-    "username": "user1",
+    "username": "User1",
     "password": "badpassword",
     "authorities": "ROLE_USER"
 }
@@ -71,7 +80,7 @@ Content-Type: application/json
 }
 
 ### Get User Profile
-GET http://localhost:8080/profile/User100
+GET http://localhost:8080/profile/User1
 
 ### Get User Profile - not exist
 GET http://localhost:8080/profile/Usernotexist
@@ -81,8 +90,27 @@ PUT http://localhost:8080/user/changePassword
 Content-Type: application/json
 
 {
-    "username": "User100",
+    "username": "User1",
     "password": "newpassw",
+    "authorities": "ROLE_USER"
+}
+
+### Change Same Password
+PUT http://localhost:8080/user/changePassword
+Content-Type: application/json
+
+{
+    "username": "User1",
+    "password": "newpassw",
+    "authorities": "ROLE_USER"
+}
+
+### Change null Password
+PUT http://localhost:8080/user/changePassword
+Content-Type: application/json
+
+{
+    "username": "User1",
     "authorities": "ROLE_USER"
 }
 
@@ -95,3 +123,45 @@ Content-Type: application/json
     "password": "newpassw",
     "authorities": "ROLE_USER"
 }
+
+### Change Password - password too short
+PUT http://localhost:8080/user/changePassword
+Content-Type: application/json
+
+{
+    "username": "Usernotexist",
+    "password": "short",
+    "authorities": "ROLE_USER"
+}
+
+### Delete User - user not exist
+DELETE http://localhost:8080/user/delete
+Content-Type: application/json
+
+{
+    "username": "usernotexist",
+    "password": "newpassw",
+    "authorities": "ROLE_USER"
+}
+
+### Delete User - bad password
+DELETE http://localhost:8080/user/delete
+Content-Type: application/json
+
+{
+    "username": "User1",
+    "password": "badpassword",
+    "authorities": "ROLE_USER"
+}
+
+### Delete User 
+DELETE http://localhost:8080/user/delete
+Content-Type: application/json
+
+{
+    "username": "User1",
+    "password": "newpassw",
+    "authorities": "ROLE_USER"
+
+}
+

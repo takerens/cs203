@@ -58,4 +58,10 @@ public class UserController {
         User updatedUser = userService.changePassword(user.getUsername(), user.getPassword());
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
+
+    @DeleteMapping("/user/delete")
+    public ResponseEntity<String> deleteUser(@Valid @RequestBody User user) {
+        userService.deleteUser(user);
+        return ResponseEntity.status(HttpStatus.OK).body(user.getUsername() + " has been deleted");
+    }
 }
