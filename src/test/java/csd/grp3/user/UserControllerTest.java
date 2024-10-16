@@ -50,7 +50,7 @@ public class UserControllerTest {
         ResponseEntity<User> response = uc.getUserDetails();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
+        assertEquals(user, response.getBody());
     }
 
     @Test
@@ -58,6 +58,7 @@ public class UserControllerTest {
         ResponseEntity<User> response = userController.getUserDetails();
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(null, response.getBody());
     }
 
     @Test

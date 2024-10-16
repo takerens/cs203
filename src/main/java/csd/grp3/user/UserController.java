@@ -2,7 +2,6 @@ package csd.grp3.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,5 +58,11 @@ public class UserController {
     public ResponseEntity<User> changePassword(@Valid @RequestBody User user) {
         User updatedUser = userService.changePassword(user.getUsername(), user.getPassword());
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
+    }
+
+    @DeleteMapping("/profile/{username}")
+    public ResponseEntity<String> deleteUser(@PathVariable String username) {
+        userService.deleteByUsername(username);
+        return ResponseEntity.status(HttpStatus.OK).body(username);
     }
 }

@@ -53,10 +53,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User changePassword(String username, String password) {
+    public User changePassword(String username, String newPassword) throws UserNotFoundException, BadCredentialsException{
         User user = findByUsername(username);
-        user.setPassword(encoder.encode(password));
-        return userRepository.save(user);
+        //Only change the password if it is different
+        if (!encoder.matches(newPassword, user.getPassword())) {
+            user.setPassword(encoder.encode(newPassword));
+            return userRepository.save(user);
+        }
+
+        throw new BadCredentialsException("Password already in use");        
+    }
+
+    public String deleteByUsername(String username) {
+        User user = findByUsername(username);
+        userRepository.delete(user);
+        return username + " has been deleted";
     }
 
     @Override
