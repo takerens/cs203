@@ -1,11 +1,11 @@
 package csd.grp3.tournament;
 
-import csd.grp3.user.User;
-import csd.grp3.round.Round;
-
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+
+import csd.grp3.round.Round;
+import csd.grp3.user.User;
 
 @Service
 public interface TournamentService {
@@ -19,7 +19,6 @@ public interface TournamentService {
     void addRound(Long id);
     void updateMatchResults(Round round);
     void updateResults(Round round);
-    String directEncounterResultInTournament(Tournament tournament, User user1, User user2);
     void endTournament(Long id);
     List<Tournament> getTournamentAboveMin(int ELO);
     List<Tournament> getTournamentBelowMax(int ELO);

@@ -1,11 +1,9 @@
 package csd.grp3.user;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-
-import jakarta.persistence.*;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,9 +13,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import csd.grp3.usertournament.UserTournament;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
@@ -62,7 +71,7 @@ public class User implements UserDetails{
         return authorities;
     }
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
     private List<UserTournament> userTournaments = new ArrayList<>();
   

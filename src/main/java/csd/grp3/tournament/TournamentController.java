@@ -31,7 +31,7 @@ public class TournamentController {
     @Autowired
     private TournamentService tournamentService;
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<Tournament>> getAllTournaments() {
         List<Tournament> tournamentList = tournamentService.listTournaments();
         return ResponseEntity.status(HttpStatus.OK).body(tournamentList);
