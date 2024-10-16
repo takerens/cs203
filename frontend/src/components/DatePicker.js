@@ -22,6 +22,7 @@ const DatePicker = ({ value, onChange }) => {
       value={value} // Controlled input value
       onChange={onChange} // Event handler passed down as a prop
       min={minDate} // Restrict date selection to tomorrow onwards
+      required
     />
   );
 };

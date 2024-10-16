@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
+import DatePicker from '../components/DatePicker';
 
 const UpdateTournament = () => {
     const { tournamentId } = useParams(); // Get the tournament ID from the URL
@@ -17,7 +18,7 @@ const UpdateTournament = () => {
     useEffect(() => {
         const fetchTournamentData = async () => {
             try {
-                const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}`, {
+                const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
                 });
@@ -59,7 +60,7 @@ const UpdateTournament = () => {
         };
 
         try {
-            const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}`, {
+            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(tournament),

@@ -9,13 +9,14 @@ const TournamentManagement = () => {
     const [history, setHistory] = useState([]);
     const [user, setUser] = useState({});
     const [loading, setLoading] = useState(true); // Add loading state
+    const [standings, setStandings] = useState({});
     const navigate = useNavigate();
 
     // When page loaded, fetch user data
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch("http://spring-app:8080/user", { method: 'GET' });
+                const response = await fetch("http://localhost:8080/user", { method: 'GET' });
 
                 if (!response.ok) {
                     const errorResponse = await response.json(); // Get error message from response
@@ -44,9 +45,32 @@ const TournamentManagement = () => {
         }
     }, [user])
 
+    const fetchStandings = async (tournamentId) => {
+        try {
+            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}/standings`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                console.error('Fetching Tournament Data:', errorResponse);
+                throw new Error(errorResponse.message);
+            }
+
+            const standingsData = await response.json();
+            setStandings(prevStandings => ({
+                ...prevStandings,
+                [tournamentId]: standingsData
+            }));
+        } catch (error) {
+            setErrorMessage("Fetch Standings Data Error: " + error.message);
+        }
+    };
+
     const fetchAllTournamentData = async () => {
         try {
-            const response = await fetch("http://spring-app:8080/tournaments", {
+            const response = await fetch("http://localhost:8080/tournaments", {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -61,6 +85,10 @@ const TournamentManagement = () => {
             console.log("Tournament All Data: " + JSON.stringify(tournamentData, null, 2)); // View Data for Debugging
             setTournaments(tournamentData);
 
+            // Fetch standings for each tournament
+            tournamentData.forEach(tournament => {
+                fetchStandings(tournament.id);
+            });
         } catch (error) {
             setErrorMessage(error.message);
         }
@@ -68,7 +96,7 @@ const TournamentManagement = () => {
 
     const fetchEligibleTournamentData = async () => {
         try {
-            const response = await fetch(`http://spring-app:8080/tournaments/byElo/${user.elo}`, {
+            const response = await fetch(`http://localhost:8080/tournaments/byElo/${user.elo}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -83,6 +111,10 @@ const TournamentManagement = () => {
             console.log("Tournament Eligible Data: " + JSON.stringify(tournamentData, null, 2)); // View Data for Debugging
             setTournaments(tournamentData);
 
+            // Fetch standings for each tournament
+            tournamentData.forEach(tournament => {
+                fetchStandings(tournament.id);
+            });
         } catch (error) {
             setErrorMessage(error.message);
         }
@@ -90,7 +122,7 @@ const TournamentManagement = () => {
 
     const fetchHistory = async () => {
         try {
-            const response = await fetch(`http://spring-app:8080/tournaments/byUser/${user.username}`, {
+            const response = await fetch(`http://localhost:8080/tournaments/byUser/${user.username}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -129,7 +161,7 @@ const TournamentManagement = () => {
                 "username": user.username
             }
 
-            const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}/register`, {
+            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData),
@@ -157,7 +189,7 @@ const TournamentManagement = () => {
             const userData = {
                 "username": user.username
             }
-            const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}/withdraw`, {
+            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}/withdraw`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData),
@@ -182,7 +214,7 @@ const TournamentManagement = () => {
         setErrorMessage(''); // Clear previous error message
 
         try {
-            const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}`, {
+            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -244,6 +276,8 @@ const TournamentManagement = () => {
                             <tbody>
                                 {tournaments.map((tournament) => {
                                     const hasTournamentStarted = new Date() > new Date(tournament.date);
+                                    const tournamentStandings = standings[tournament.id] || [];
+                                    const vacancies = tournament.size - tournamentStandings.length - 1;
 
                                     return (
                                         <tr key={tournament.id}>
@@ -251,7 +285,7 @@ const TournamentManagement = () => {
                                             <td>{tournament.minElo}</td>
                                             <td>{tournament.maxElo}</td>
                                             <td>{formatDate(tournament.date)}</td>
-                                            <td>{tournament.size - 1}</td> {/* - tournament.participants.length*/}
+                                            <td>{vacancies}</td> {/* - tournament.participants.length*/}
                                             <td>
                                                 {user.userRole === 'ROLE_USER' && (
                                                     <>

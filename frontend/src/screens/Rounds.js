@@ -20,7 +20,7 @@ const TournamentRounds = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch("http://spring-app:8080/user", { method: 'GET' });
+                const response = await fetch("http://localhost:8080/user", { method: 'GET' });
 
                 if (!response.ok) {
                     const errorResponse = await response.json(); // Get error message from response
@@ -40,7 +40,7 @@ const TournamentRounds = () => {
         // Fetch Tournamet data
         const fetchTournamentData = async () => {
             try {
-                const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}`, {
+                const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
                 });
@@ -73,7 +73,7 @@ const TournamentRounds = () => {
     // Fetch rounds data
     const fetchRoundsAndMatches = async () => {
         try {
-            const response = await fetch(`http://spring-app:8080/tournaments/${tournamentId}/rounds`, {
+            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}/rounds`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -110,7 +110,7 @@ const TournamentRounds = () => {
                 };
             });
 
-            const response = await fetch(`http://spring-app:8080/match/updateList`, {
+            const response = await fetch(`http://localhost:8080/match/updateList`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedMatches),

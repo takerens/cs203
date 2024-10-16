@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
 import DatePicker from '../components/DatePicker';
 
+
 const AddTournament = () => {
     const [title, setTitle] = useState('');
     const [minElo, setMinElo] = useState('');
@@ -11,13 +12,7 @@ const AddTournament = () => {
     const [size, setSize] = useState('');
     const [totalRounds, setTotalRounds] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [minDate, setMinDate] = useState('');
     const navigate = useNavigate();
-
-    // Set the minimum date to tomorrow when page loads
-    useEffect(() => {
-        setMinDate(getTomorrowDate());
-    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -33,7 +28,7 @@ const AddTournament = () => {
                 totalRounds
             };
 
-            const response = await fetch('http://spring-app:8080/tournaments', {
+            const response = await fetch('http://localhost:8080/tournaments', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(tournamentData),
@@ -58,13 +53,6 @@ const AddTournament = () => {
         const selectedDate = e.target.value; // Get the date in YYYY-MM-DD format
         const formattedDateTime = `${selectedDate}T00:00:00`; // Append T00:00:00
         setDate(formattedDateTime); // Set the date state
-    };
-
-    const getTomorrowDate = () => {
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);  // Add 1 day to today's date
-        return tomorrow.toISOString().split('T')[0];  // Format the date as YYYY-MM-DD
     };
 
     return (
