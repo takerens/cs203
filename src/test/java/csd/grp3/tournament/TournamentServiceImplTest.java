@@ -1,4 +1,4 @@
-package csd.grp3.testing;
+package csd.grp3.tournament;
 
 import java.time.LocalDateTime;
 import java.time.Month;
