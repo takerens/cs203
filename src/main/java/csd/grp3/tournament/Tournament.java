@@ -16,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -48,9 +49,11 @@ public class Tournament {
     private String title;
 
     @NotNull(message = "minElo: put a valid Elo")
+    @Min(value = 0, message = "Minimum value of 0")
     private int minElo;
 
     @NotNull(message = "maxElo: put a valid Elo")
+    @Min(value = 0, message = "Minimum value of 0")
     private int maxElo;
 
     @NotNull(message = "Date: put a valid Date")
@@ -86,5 +89,11 @@ public class Tournament {
 
     public boolean hasStarted() {
         return !(LocalDateTime.now().isBefore(date) || userTournaments.size() < 3); // 1 player is bot, need 2 other players
+    }
+
+    // Custom validation method
+    @AssertTrue(message = "minElo must be less than maxElo")
+    public boolean isMinEloLessThanMaxElo() {
+        return minElo < maxElo;
     }
 }

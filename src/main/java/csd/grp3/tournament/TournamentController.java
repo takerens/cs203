@@ -72,7 +72,7 @@ public class TournamentController {
 
     @PutMapping("/{id}")
     // @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HttpStatus> updateTournamentById(@PathVariable Long id, @RequestBody Tournament newTournamentData) {
+    public ResponseEntity<HttpStatus> updateTournamentById(@PathVariable Long id, @Valid @RequestBody Tournament newTournamentData) {
         tournamentService.updateTournament(id, newTournamentData);
         return new ResponseEntity<>(HttpStatus.OK);
     }

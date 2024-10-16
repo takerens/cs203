@@ -127,13 +127,7 @@ const UpdateTournament = () => {
 
                 <div className="form-group">
                     <label>Date:</label>
-                    <input
-                        type="date"
-                        id="date"
-                        value={date ? date.split('T')[0] : ''} // Display only the date part in input
-                        onChange={handleDateChange}
-                        required
-                    />
+                    <DatePicker value={date ? date.split('T')[0] : ''} onChange={handleDateChange}/>
                 </div>
 
                 <div className="form-group">
