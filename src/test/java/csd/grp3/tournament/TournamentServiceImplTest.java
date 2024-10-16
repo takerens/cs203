@@ -1124,13 +1124,82 @@ public class TournamentServiceImplTest {
         assertTrue(result, "The result should be true since the user has played different colors in the last two matches.");
     }
 
-//     @Test
-//     void testTournamentExists() {
-//         // when(tournamentRepository.existsById(1L)).thenReturn(true);
+    // @Test
+    // void testTournamentExists() {
+    //     // when(tournamentRepository.existsById(1L)).thenReturn(true);
 
-//         // boolean exists = tournamentService.tournamentExists(1L);
+    //     // boolean exists = tournamentService.tournamentExists(1L);
 
-//         // assertTrue(exists);
-//         // verify(tournamentRepository, times(1)).existsById(1L);
-//     }
+    //     // assertTrue(exists);
+    //     // verify(tournamentRepository, times(1)).existsById(1L);
+    // }
+
+    @Test
+    public void testUpdateTournament() {
+        tournament.setTitle("Old Title");
+        tournament.setStartDateTime(LocalDateTime.now());
+        tournament.setMinElo(1000);
+        tournament.setMaxElo(2000);
+        tournament.setSize(5);
+        tournament.setTotalRounds(3);
+
+        Tournament newTournamentInfo = new Tournament();
+        newTournamentInfo.setTitle("New Title");
+        newTournamentInfo.setStartDateTime(LocalDateTime.now().plusDays(1));
+        newTournamentInfo.setMinElo(1200);
+        newTournamentInfo.setMaxElo(1800);
+        newTournamentInfo.setSize(3);
+        newTournamentInfo.setTotalRounds(4);
+
+        List<User> players = new ArrayList<>();
+        User player1 = new User("player1", "player1", "ROLE_PLAYER", 1100); // Below new Elo limit
+        User player2 = new User("player2", "player2", "ROLE_PLAYER", 1300); // Within new Elo limit
+        User player3 = new User("player3", "player3", "ROLE_PLAYER", 1900); // Above new Elo limit
+        User player4 = new User("DEFAULT_BOT", "bot", "ROLE_BOT", 1500); // Bot should be ignored
+
+        players.add(player1);
+        players.add(player2);
+        players.add(player3);
+        players.add(player4);
+
+        List<User> waitingList = new ArrayList<>();
+        User waitingUser1 = new User("waiting1", "waiting1", "ROLE_PLAYER", 1250); // Within new Elo limit
+        User waitingUser2 = new User("waiting2", "waiting2", "ROLE_PLAYER", 2000); // Outside new Elo limit
+
+        waitingList.add(waitingUser1);
+        waitingList.add(waitingUser2);
+
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+        when(userTournamentService.getPlayers(tournament.getId())).thenReturn(players);
+        when(userTournamentService.getWaitingList(tournament.getId())).thenReturn(waitingList);
+
+        // Call the updateTournament method
+        Tournament updatedTournament = tournamentService.updateTournament(tournament.getId(), newTournamentInfo);
+
+        // Verify that the tournament properties were updated
+        assertEquals("New Title", updatedTournament.getTitle());
+        assertEquals(newTournamentInfo.getStartDateTime(), updatedTournament.getStartDateTime());
+        assertEquals(1200, updatedTournament.getMinElo());
+        assertEquals(1800, updatedTournament.getMaxElo());
+        assertEquals(3, updatedTournament.getSize());
+        assertEquals(4, updatedTournament.getTotalRounds());
+
+        verify(tournamentRepository).findById(tournament.getId());
+
+        // Verify that players were processed based on the new Elo limits
+        verify(userTournamentService, times(1)).delete(tournament, player1); // Below new Elo limit
+        verify(userTournamentService, never()).delete(tournament, player2); // Within new Elo limit
+        verify(userTournamentService, times(1)).delete(tournament, player3); // Above new Elo limit
+        verify(userTournamentService, never()).delete(tournament, player4); // Bot should be ignored
+
+        // Verify that players were processed based on the new size limits
+        // verify(userTournamentService, times(1)).updatePlayerStatus(tournament.getId(), player2.getUsername(), 'w');
+
+        // Verify that waiting list players were processed
+        // verify(userTournamentService, times(1)).updatePlayerStatus(tournament.getId(), waitingUser1.getUsername(), 'r'); // Added from waiting list
+        // verify(userTournamentService, times(1)).delete(tournament, waitingUser2); // Outside new Elo limit
+
+        // Ensure no additional calls were made
+        // verifyNoMoreInteractions(userTournamentService);
+    }
 }
