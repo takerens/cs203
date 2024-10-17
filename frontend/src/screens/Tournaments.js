@@ -72,7 +72,7 @@ const TournamentManagement = () => {
         try {
             const response = await fetch("http://localhost:8080/tournaments", {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
+                // headers: { 'Content-Type': 'application/json' },
             });
 
             if (!response.ok) {
@@ -98,7 +98,7 @@ const TournamentManagement = () => {
         try {
             const response = await fetch(`http://localhost:8080/tournaments/byElo/${user.elo}`, {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
+                // headers: { 'Content-Type': 'application/json' },
             });
 
             if (!response.ok) {
