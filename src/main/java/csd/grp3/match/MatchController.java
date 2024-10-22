@@ -21,7 +21,9 @@ public class MatchController {
     public List<Match> updateMatches(@Valid @RequestBody List<Match> matches) {
         List<Match> updatedList = new ArrayList<>();
         for (Match match : matches) {
+            System.out.println("Attempting to update Match with ID: " + match.getId());
             updatedList.add(matchService.updateMatch(match.getId(), match));
+            System.out.println("Successfully updated Match with ID: " + match.getId());
         }
         return updatedList;
     }
