@@ -8,6 +8,7 @@ import TournamentRounds from './screens/Rounds';
 import TournamentStandings from './screens/Standings';
 import AddTournament from './screens/AddTournament';
 import UpdateTournament from './screens/UpdateTournament';
+import Profile from './screens/Profile'
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         {/* User */}
         <Route path="/tournaments/:tournamentId/rounds/:roundNumber" element={<TournamentRounds />} />
         <Route path="/tournaments/:tournamentId/standings" element={<TournamentStandings />} />
+        <Route path='/profile' element={<Profile />} />
         {/* Admin */}
         <Route path='/addTournament' element={<AddTournament />}/>
         <Route path='/updateTournament/:tournamentId' element={<UpdateTournament />}/>
