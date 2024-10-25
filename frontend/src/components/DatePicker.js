@@ -7,8 +7,8 @@ const DatePicker = ({ value, onChange }) => {
   const getTomorrowDate = () => {
     const today = new Date()
     const tomorrow = new Date();
-    tomorrow.setDate(today + 1);  // Add 1 day to today's date
-    return tomorrow.toISOString().split('T')[0];  // Format the date as YYYY-MM-DD
+    tomorrow.setDate(today.getDate() + 1);  // Add 1 day to today's date
+    return tomorrow.toISOString().split("T")[0];  // Format the date as YYYY-MM-DD
   };
 
   // Set the minimum date when page load

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Pagination = ({ tournamentId, inProgressRounds, currentRound }) => {
+const Pagination = ({ tournamentId, inProgressRounds, currentRound, editing }) => {
     return (
         <div className="pagination">
             <span>Rounds:</span>
@@ -11,7 +11,13 @@ const Pagination = ({ tournamentId, inProgressRounds, currentRound }) => {
                     <Link
                         key={roundIndex}
                         to={`/tournaments/${tournamentId}/rounds/${roundIndex}`}
-                        className={roundIndex === Number(currentRound) ? 'current' : ''}
+                        className={
+                            roundIndex === Number(currentRound)
+                                ? 'current'
+                                : editing
+                                ? 'unclickable'
+                                : ''
+                        }
                     >
                         {roundIndex}
                     </Link>

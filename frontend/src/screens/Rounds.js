@@ -5,7 +5,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import Navbar from '../components/Navbar';
 import SecondaryNavbar from '../components/SecondaryNavbar';
 import { fetchUserData } from '../utils/userUtils';
-import { fetchTournamentData, fetchRoundsAndMatches } from '../utils/tournamentUtils';
+import { fetchTournamentData, fetchRoundsAndMatches, handleUpdateMatchResults } from '../utils/tournamentUtils';
 
 const TournamentRounds = () => {
     const { tournamentId, roundNumber } = useParams();
@@ -15,7 +15,6 @@ const TournamentRounds = () => {
     const [user, setUser] = useState({});
     const [editing, setEditing] = useState(false);
     const [newResults, setNewResults] = useState({});
-    // const [loading, setLoading] = useState(true); // Add loading state
     const [errorMessage, setErrorMessage] = useState('');
 
     // When page loaded, fetch user data
@@ -29,33 +28,15 @@ const TournamentRounds = () => {
     }, [roundNumber]);
 
     const handleResultChange = async () => {
-        try {
-            const updatedMatches = matches.map(match => {
-                const result = newResults[match.id] !== undefined ? parseFloat(newResults[match.id]) : match.result;
-                return {
-                    id: match.id,
-                    bye: match.bye,
-                    result: result
-                };
-            });
-
-            const response = await fetch(`http://localhost:8080/match/updateList`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedMatches),
-            });
-
-            if (!response.ok) {
-                const errorResponse = await response.json(); // Get error message from response
-                console.error('Updating Match Results:', errorResponse); // Log error for debugging
-                throw new Error(errorResponse.message); // General error message
-            }
-
-            fetchRoundsAndMatches();
-            setEditing(false); // Exit edit mode
-        } catch (error) {
-            setErrorMessage(error.message);
-        }
+        const updatedMatches = matches.map(match => {
+            const result = newResults[match.id] !== undefined ? parseFloat(newResults[match.id]) : match.result;
+            return {
+                id: match.id,
+                bye: match.bye,
+                result: result
+            };
+        });
+        handleUpdateMatchResults(updatedMatches, setErrorMessage, setEditing, tournamentId, setRounds, setMatches, roundNumber);
     };
 
     const handleDropdownChange = (matchId, value) => {
@@ -66,7 +47,7 @@ const TournamentRounds = () => {
     };
 
     const displayResult = (result) => {
-        return result === 1 ? '1:0' : result === -1 ? '0:1' : result === 0.5 ? '0.5:0.5' : result === 2 ? '1:BYE' : result === 3 ? 'BYE:1' : 'N/A'
+        return result === 1 ? '1:0' : result === -1 ? '0:1' : result === 0.5 ? '0.5:0.5' : 'N/A'
     }
 
     return (
@@ -76,7 +57,7 @@ const TournamentRounds = () => {
             <main>
                 <h3>Round</h3>
 
-                <Pagination tournamentId={tournamentId} inProgressRounds={rounds.length} currentRound={roundNumber} />
+                <Pagination tournamentId={tournamentId} inProgressRounds={rounds.length} currentRound={roundNumber} editing={editing}/>
                 <ErrorMessage message={errorMessage} />
                 <div>
                     {user.userRole === 'ROLE_ADMIN' && !editing && !rounds[roundNumber - 1]?.over &&(

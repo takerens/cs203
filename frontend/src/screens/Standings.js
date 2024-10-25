@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
 import Navbar from '../components/Navbar';
 import SecondaryNavbar from '../components/SecondaryNavbar';
+import { fetchUserData } from '../utils/userUtils';
+import { fetchTournamentData, fetchStandings } from '../utils/tournamentUtils';
 
 const TournamentStandings = () => {
     const { tournamentId } = useParams();
@@ -11,73 +13,10 @@ const TournamentStandings = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [user, setUser] = useState({});
 
-
     useEffect(() => { // Fetch Tournament Standings
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch("http://localhost:8080/user", { method: 'GET' });
-
-                if (!response.ok) {
-                    const errorResponse = await response.json(); // Get error message from response
-                    console.error('Fetching User:', errorResponse); // Log error for debugging
-                    throw new Error(errorResponse.message); // General error message
-                }
-
-                const userData = await response.json();
-                console.log("User Data: " + userData); // View Data for Debugging
-                const { username, password, userRole } = userData; // Destructure to get the needed properties
-                setUser({ username, password, userRole }); // Set user state
-            } catch (error) {
-                setErrorMessage(error.message);
-            }
-        };
-
-        // Fetch Tournamet data
-        const fetchTournamentData = async () => {
-            try {
-                const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
-                });
-
-                if (!response.ok) {
-                    const errorResponse = await response.json(); // Get error message from response
-                    console.error('Fetching Tournament Data:', errorResponse); // Log error for debugging
-                    throw new Error(errorResponse.message); // General error message
-                }
-
-                const tournamentData = await response.json(); // Tournament
-                console.log("Tournament Data: " + JSON.stringify(tournamentData, null, 2)); // View Data for Debugging
-                setTournament(tournamentData);
-            } catch (error) {
-                setErrorMessage("Fetch Tournament Data Error: " + error.message);
-            }
-        }
-
-        const fetchStandings = async () => {
-            try {
-                const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}/standings`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
-                });
-
-                if (!response.ok) {
-                    const errorResponse = await response.json(); // Get error message from response
-                    console.error('Fetching Tournament Data:', errorResponse); // Log error for debugging
-                    throw new Error(errorResponse.message); // General error message
-                }
-
-                const standingsData = await response.json(); // Tournament
-                console.log("Standings Data: " + standingsData); // View Data for Debugging
-                setStandings(standingsData);
-            } catch (error) {
-                setErrorMessage("Fetch Standings Data Error: " + error.message);
-            }
-        };
-
-        fetchUserData();
-        fetchTournamentData();
-        fetchStandings();
+        fetchUserData(setErrorMessage, setUser);
+        fetchTournamentData(tournamentId, setErrorMessage, setTournament);
+        fetchStandings(tournamentId, setErrorMessage, setStandings);
     }, [tournamentId]);
 
     const getUserTournament = (userTournaments, tournamentId, username) => {

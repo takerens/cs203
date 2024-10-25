@@ -183,6 +183,12 @@ h1, h2, p {
   font-weight: bold;
   color: red;
 }
+.pagination a.unclickable {
+  pointer-events: none; /* Disable click events */
+  color: gray; /* Change text color to indicate it's unclickable */
+  cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+}
+
 
 .admin-link {
     text-decoration: none; /* Remove underline */
