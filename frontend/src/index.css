@@ -183,3 +183,17 @@ h1, h2, p {
   font-weight: bold;
   color: red;
 }
+
+.admin-link {
+    text-decoration: none; /* Remove underline */
+}
+
+.admin-link button {
+    padding: 100; /* Optional: Adjust padding if needed */
+    cursor: pointer; /* Optional: Change cursor to pointer */
+}
+
+.admin-buttons button {
+    margin-bottom: 10px; /* Add spacing between buttons */
+    display: block; /* Ensure buttons are displayed in block format */
+}

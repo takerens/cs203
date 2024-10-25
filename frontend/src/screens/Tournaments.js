@@ -301,17 +301,17 @@ const TournamentManagement = () => {
                                                     </>
                                                 )}
                                                 {user.userRole === 'ROLE_ADMIN' && (
-                                                    <>
-                                                        <Link to={`/tournaments/${tournament.id}/rounds/1`}>
+                                                    <div className="admin-buttons">
+                                                        <Link to={`/tournaments/${tournament.id}/rounds/1`} className="admin-link">
                                                             <button>View Match Details</button>
                                                         </Link>
-                                                        <Link to={`/updateTournament/${tournament.id}`}>
-                                                            <button type="submit">Update Tournament</button>
+                                                        <Link to={`/updateTournament/${tournament.id}`} className="admin-link">
+                                                            <button type="button">Update Tournament</button>
                                                         </Link>
                                                         <form onSubmit={(e) => handleDelete(e, tournament.id)}>
                                                             <button type="submit">Delete Tournament</button>
                                                         </form>
-                                                    </>
+                                                    </div>
                                                 )}
                                             </td>
                                         </tr>

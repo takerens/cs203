@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import TournamentForm from '../components/TournamentForm';
 import ErrorMessage from '../components/ErrorMessage';
-import DatePicker from '../components/DatePicker';
-
 
 const AddTournament = () => {
     const [title, setTitle] = useState('');
@@ -35,97 +34,41 @@ const AddTournament = () => {
             });
 
             if (!response.ok) {
-                const errorResponse = await response.json(); // Get error message from response
-                console.error('Trying to Add Tournament:', errorResponse); // Log error for debugging
-                throw new Error(errorResponse.message); // General error message
+                const errorResponse = await response.json();
+                throw new Error(errorResponse.message || 'Failed to add tournament');
             }
 
-            // Tournament added successfully
-            alert(`You have successfuly created ${title}.`)
+            alert(`You have successfully created ${title}.`);
             navigate('/tournaments');
 
         } catch (error) {
-            setErrorMessage(error.message); // Display error message
+            setErrorMessage(error.message);
         }
     };
 
-    const handleDateChange = (e) => {
-        const selectedDate = e.target.value; // Get the date in YYYY-MM-DD format
-        const formattedDateTime = `${selectedDate}T00:00:00`; // Append T00:00:00
-        setDate(formattedDateTime); // Set the date state
-    };
+    // const handleDateChange = (date) => setDate(date ? `${date}T00:00:00` : '');
 
     return (
         <div className="container">
-            <ErrorMessage message={errorMessage} />
             <h1>Add Tournament</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label>Title:</label>
-                    <input
-                        type="text"
-                        id="title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        autoComplete="off"
-                        required
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label>Min Elo:</label>
-                    <input
-                        type="number"
-                        id="minElo"
-                        value={minElo}
-                        onChange={(e) => setMinElo(e.target.value)}
-                        required
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label>Max Elo:</label>
-                    <input
-                        type="number"
-                        id="maxElo"
-                        value={maxElo}
-                        onChange={(e) => setMaxElo(e.target.value)}
-                        required
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label>Date:</label>
-                    <DatePicker value={date ? date.split('T')[0] : ''} onChange={handleDateChange}/>
-                </div>
-
-                <div className="form-group">
-                    <label>Size:</label>
-                    <input
-                        type="number"
-                        id="size"
-                        value={size}
-                        onChange={(e) => setSize(e.target.value)}
-                        required
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label>Total Rounds:</label>
-                    <input
-                        type="number"
-                        id="totalRounds"
-                        value={totalRounds}
-                        onChange={(e) => setTotalRounds(e.target.value)}
-                        required
-                    />
-                </div>
-
-                <input className='login-button' type="submit" value="Add" />
-            </form>
-            <p>
-                <Link to="/tournaments">Cancel</Link>
-            </p>
+            <TournamentForm
+                title={title}
+                setTitle={setTitle}
+                minElo={minElo}
+                setMinElo={setMinElo}
+                maxElo={maxElo}
+                setMaxElo={setMaxElo}
+                date={date}
+                setDate={setDate}
+                size={size}
+                setSize={setSize}
+                totalRounds={totalRounds}
+                setTotalRounds={setTotalRounds}
+                errorMessage={errorMessage}
+                onSubmit={handleSubmit}
+                submitButtonText="Add"
+                cancelLink="/tournaments"
+            />
         </div>
     );
 };
