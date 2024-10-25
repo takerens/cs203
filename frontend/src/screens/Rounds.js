@@ -15,7 +15,7 @@ const TournamentRounds = () => {
     const [user, setUser] = useState({});
     const [editing, setEditing] = useState(false);
     const [newResults, setNewResults] = useState({});
-    const [loading, setLoading] = useState(true); // Add loading state
+    // const [loading, setLoading] = useState(true); // Add loading state
     const [errorMessage, setErrorMessage] = useState('');
 
     // When page loaded, fetch user data
@@ -67,10 +67,6 @@ const TournamentRounds = () => {
 
     const displayResult = (result) => {
         return result === 1 ? '1:0' : result === -1 ? '0:1' : result === 0.5 ? '0.5:0.5' : result === 2 ? '1:BYE' : result === 3 ? 'BYE:1' : 'N/A'
-    }
-
-    if (loading) {
-        return <div>Loading...</div>; // Display a loading message while user data is being fetched
     }
 
     return (
