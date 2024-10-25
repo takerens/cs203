@@ -46,8 +46,6 @@ const AddTournament = () => {
         }
     };
 
-    // const handleDateChange = (date) => setDate(date ? `${date}T00:00:00` : '');
-
     return (
         <div className="container">
             <h1>Add Tournament</h1>

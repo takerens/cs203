@@ -5,9 +5,9 @@ const DatePicker = ({ value, onChange }) => {
 
   // Function to get tomorrow's date in YYYY-MM-DD format
   const getTomorrowDate = () => {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);  // Add 1 day to today's date
+    const today = new Date()
+    const tomorrow = new Date();
+    tomorrow.setDate(today + 1);  // Add 1 day to today's date
     return tomorrow.toISOString().split('T')[0];  // Format the date as YYYY-MM-DD
   };
 
