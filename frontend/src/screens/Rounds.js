@@ -4,6 +4,8 @@ import Pagination from '../components/Pagination';
 import ErrorMessage from '../components/ErrorMessage';
 import Navbar from '../components/Navbar';
 import SecondaryNavbar from '../components/SecondaryNavbar';
+import { fetchUserData } from '../utils/userUtils';
+import { fetchTournamentData, fetchRoundsAndMatches } from '../utils/tournamentUtils';
 
 const TournamentRounds = () => {
     const { tournamentId, roundNumber } = useParams();
@@ -18,86 +20,13 @@ const TournamentRounds = () => {
 
     // When page loaded, fetch user data
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch("http://localhost:8080/user", { method: 'GET' });
-
-                if (!response.ok) {
-                    const errorResponse = await response.json(); // Get error message from response
-                    console.error('Fetching User:', errorResponse); // Log error for debugging
-                    throw new Error(errorResponse.message); // General error message
-                }
-
-                const userData = await response.json();
-                console.log("User Data: " + userData); // View Data for Debugging
-                const { username, password, userRole } = userData; // Destructure to get the needed properties
-                setUser({ username, password, userRole }); // Set user state
-            } catch (error) {
-                setErrorMessage(error.message);
-            }
-        };
-
-        // Fetch Tournamet data
-        const fetchTournamentData = async () => {
-            try {
-                const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
-                });
-
-                if (!response.ok) {
-                    const errorResponse = await response.json(); // Get error message from response
-                    console.error('Fetching Tournament Data:', errorResponse); // Log error for debugging
-                    throw new Error(errorResponse.message); // General error message
-                }
-
-                const tournamentData = await response.json(); // Tournament
-                console.log("Tournament Data: " + JSON.stringify(tournamentData, null, 2)); // View Data for Debugging
-                setTournament(tournamentData);
-            } catch (error) {
-                setErrorMessage("Fetch Tournament Data Error: " + error.message);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchUserData();
-        fetchTournamentData();
-        // fetchRoundsAndMatches();
+        fetchUserData(setErrorMessage, setUser);
+        fetchTournamentData(tournamentId, setErrorMessage, setTournament);
     }, []);
 
     useEffect(() => {
-        fetchRoundsAndMatches();
+        fetchRoundsAndMatches(tournamentId, setErrorMessage, setRounds, setMatches, roundNumber);
     }, [roundNumber]);
-
-    // Fetch rounds data
-    const fetchRoundsAndMatches = async () => {
-        try {
-            const response = await fetch(`http://localhost:8080/tournaments/${tournamentId}/rounds`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-            });
-
-            if (!response.ok) {
-                const errorResponse = await response.json(); // Get error message from response
-                console.error('Fetching Round Data:', errorResponse); // Log error for debugging
-                throw new Error(errorResponse.message); // General error message
-            }
-
-            const roundData = await response.json(); // Tournament
-            console.log("Round Data: " + JSON.stringify(roundData, null, 2)); // View Data for Debugging
-            setRounds(roundData);
-            // Check if roundNumber is a valid index
-            if (roundData && roundData.length >= roundNumber) {
-                setMatches(roundData[roundNumber - 1].matches); // Assuming matches are within each round
-            } else {
-                // No Matches yet
-                setMatches([]); // Or handle this case as needed
-            }
-        } catch (error) {
-            setErrorMessage("Fetch Round Data Error: " + error.message);
-        }
-    };
 
     const handleResultChange = async () => {
         try {

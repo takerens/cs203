@@ -128,7 +128,7 @@ const UpdateTournament = () => {
 
                 <div className="form-group">
                     <label>Date:</label>
-                    <DatePicker value={date ? date.split('T')[0] : ''} onChange={handleDateChange}/>
+                    <DatePicker value={date ? date.split('T')[0] : ''} onChange={(e) => setDate(`${e.target.value}T00:00:00`)}/>
                 </div>
 
                 <div className="form-group">

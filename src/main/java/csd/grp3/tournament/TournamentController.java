@@ -67,33 +67,33 @@ public class TournamentController {
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> addTournament(@Valid @RequestBody Tournament tournament) {
         tournamentService.addTournament(tournament);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> updateTournamentById(@PathVariable Long id, @Valid @RequestBody Tournament newTournamentData) {
         tournamentService.updateTournament(id, newTournamentData);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteTournamentById(@PathVariable Long id) {
         tournamentService.deleteTournament(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}/withdraw")
-    public ResponseEntity<Void> withdraw(@RequestBody User user, @PathVariable Long id) {
+    public ResponseEntity<HttpStatus> withdraw(@RequestBody User user, @PathVariable Long id) {
         tournamentService.withdrawUser(user, id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/{id}/register")
-    public ResponseEntity<Void> registerUser(@RequestBody User user, @PathVariable Long id) {
+    public ResponseEntity<HttpStatus> registerUser(@RequestBody User user, @PathVariable Long id) {
         tournamentService.registerUser(user, id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // TODO

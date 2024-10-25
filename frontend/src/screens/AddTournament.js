@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
 import DatePicker from '../components/DatePicker';
+import { handleAddTournament } from '../utils/tournamentUtils';
 
 
 const AddTournament = () => {
@@ -12,41 +13,19 @@ const AddTournament = () => {
     const [size, setSize] = useState('');
     const [totalRounds, setTotalRounds] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const navigate = useNavigate();
+    const navigate = useNavigate();    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setErrorMessage('');
-
-        try {
-            const tournamentData = {
-                title,
-                minElo,
-                maxElo,
-                date,
-                size,
-                totalRounds
-            };
-
-            const response = await fetch('http://localhost:8080/tournaments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(tournamentData),
-            });
-
-            if (!response.ok) {
-                const errorResponse = await response.json(); // Get error message from response
-                console.error('Trying to Add Tournament:', errorResponse); // Log error for debugging
-                throw new Error(errorResponse.message); // General error message
-            }
-
-            // Tournament added successfully
-            alert(`You have successfuly created ${title}.`)
-            navigate('/tournaments');
-
-        } catch (error) {
-            setErrorMessage(error.message); // Display error message
-        }
+        const tournamentData = {
+            title,
+            minElo,
+            maxElo,
+            date,
+            size,
+            totalRounds
+        };
+        handleAddTournament(tournamentData, setErrorMessage, navigate);
     };
 
     const handleDateChange = (e) => {

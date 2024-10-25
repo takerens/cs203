@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
+import { handleLogin } from '../utils/userUtils';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -10,33 +11,11 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setErrorMessage('');
-
         const userData = {
             username,
             password,
         };
-
-        try {
-            const response = await fetch('http://localhost:8080/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData),
-            });
-
-            if (!response.ok) {
-                const errorResponse = await response.json(); // Get error message from response
-                console.error('Trying to Login:', errorResponse); // Log error for debugging
-                throw new Error(errorResponse.message); // General error message
-            }
-
-            // User login successfully (200)
-            // Redirect to the login page
-            navigate('/tournaments');
-
-        } catch (error) {
-            setErrorMessage(error.message); // Display error message
-        }
+        handleLogin(userData, setErrorMessage, navigate);
     };
 
     return (

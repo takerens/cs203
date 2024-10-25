@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ErrorMessage from '../components/ErrorMessage';
 import Navbar from '../components/Navbar';
+import { fetchUserData, handlePassword } from '../utils/userUtils';
 
 const Profile = () => {
     const [errorMessage, setErrorMessage] = useState('');
@@ -8,50 +9,50 @@ const Profile = () => {
     const [newPassword, setNewPassword] = useState('');
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch("http://localhost:8080/user", { method: 'GET' });
-
-                if (!response.ok) {
-                    const errorResponse = await response.json();
-                    console.error('Fetching User:', errorResponse);
-                    throw new Error(errorResponse.message);
-                }
-
-                const userData = await response.json();
-                console.log("User Data: ", userData);
-                setUser(userData);
-            } catch (error) {
-                setErrorMessage(error.message);
-            }
-        };
-
-        fetchUserData(); // Call the fetch function
+        fetchUserData(setErrorMessage, setUser);
     }, []);
 
-    const handlePassword = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const response = await fetch("http://localhost:8080/user/changePassword", {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username: user.username, password: newPassword, authorities: "ROLE_USER"}),
-            });
-
-            if (!response.ok) {
-                const errorResponse = await response.json();
-                throw new Error(errorResponse.message);
-            }
-
-            alert('Password changed successfully!');
-            setErrorMessage('');
-            setNewPassword(''); // Reset password input
-        } catch (error) {
-            setErrorMessage(error.message);
-        }
+        const userData = {
+            username: user.username,
+            password: newPassword,
+            authorities: "ROLE_USER"
+        };
+        await handlePassword(userData, setErrorMessage, setNewPassword);
     };
+
+    const renderUserInfo = () => (
+        <table>
+            <tbody>
+                <tr>
+                    <td><strong>Username:</strong></td>
+                    <td>{user.username}</td>
+                </tr>
+                <tr>
+                    <td><strong>Change Password:</strong></td>
+                    <td>{renderPasswordChangeForm()}</td>
+                </tr>
+                <tr>
+                    <td><strong>Rating:</strong></td>
+                    <td>{user.elo}</td>
+                </tr>
+            </tbody>
+        </table>
+    );
+
+    const renderPasswordChangeForm = () => (
+        <form onSubmit={handleSubmit}>
+            <input 
+                type="password" // Use "password" type for security
+                placeholder="Enter New Password" 
+                value={newPassword} 
+                onChange={(e) => setNewPassword(e.target.value)} 
+                required 
+            />
+            <button type="submit">Change Password</button>
+        </form>
+    );
 
     return (
         <>
@@ -59,37 +60,7 @@ const Profile = () => {
             <main>
                 <h1>Profile</h1>
                 <ErrorMessage message={errorMessage} />
-                {user.username ? (
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td><strong>Username:</strong></td>
-                                <td>{user.username}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Change Password:</strong></td>
-                                <td>
-                                    <form onSubmit={handlePassword}>
-                                        <input 
-                                            type="text" // New password input
-                                            placeholder="Enter New Password" 
-                                            value={newPassword} 
-                                            onChange={(e) => setNewPassword(e.target.value)} 
-                                            required 
-                                        />
-                                        <button type="submit">Change Password</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>Rating:</strong></td>
-                                <td>{user.elo}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                ) : (
-                    <p>No user data available.</p>
-                )}
+                {user.username ? renderUserInfo() : <p>No user data available.</p>}
             </main>
         </>
     );

@@ -53,7 +53,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findByUsername(username));
     }
 
-    @PutMapping("/user/changePassword")
+    @PutMapping("/user")
     public ResponseEntity<User> changePassword(@Valid @RequestBody User user) {
         User updatedUser = userService.changePassword(user.getUsername(), user.getPassword());
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
