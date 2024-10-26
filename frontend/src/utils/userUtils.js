@@ -1,10 +1,12 @@
 import { apiRequest } from './apiUtils';
 
+const createSuccessCallbackWithAlert = (message, navigate) => () => {
+    alert(message);
+    if (navigate) navigate(); // Navigate if a navigation function is provided
+};
+
 export const handleSignup = async (userData, setErrorMessage, navigate) => {
-    const onSuccess = (newUser) => {
-        alert(`${newUser.username} has successfully created an account.`)
-        navigate('/login') // Redirect to Login Page
-    };
+    const onSuccess = createSuccessCallbackWithAlert(`${userData.username} has successfully created an account.`, () => navigate('/login'));
 
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/signup`,
@@ -16,9 +18,7 @@ export const handleSignup = async (userData, setErrorMessage, navigate) => {
 };
 
 export const handleLogin = async (userData, setErrorMessage, navigate) => {
-    const onSuccess = () => {
-        navigate('/tournaments') // Navigate to Home Page
-    };
+    const onSuccess = createSuccessCallbackWithAlert('Login successful.', () => navigate('/tournaments'));
 
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/login`,
@@ -44,10 +44,7 @@ export const fetchUserData = async (setErrorMessage, setUser) => {
 };
 
 export const handlePassword = async (userData, setErrorMessage, setNewPassword) => {
-    const onSuccess = () => {
-        alert('Password changed successfully.');
-        setNewPassword(''); // Clear password input
-    };
+    const onSuccess = createSuccessCallbackWithAlert('Password changed successfully.', null);
 
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/user`,
@@ -55,5 +52,7 @@ export const handlePassword = async (userData, setErrorMessage, setNewPassword) 
         body: userData,
         successCallback: onSuccess,
         setErrorMessage,
+    }).then(() => {
+        setNewPassword(''); // Clear password input after successful password change
     });
-}
+};

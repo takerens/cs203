@@ -1,7 +1,7 @@
-// components/TournamentForm.js
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import DatePicker from './DatePicker';
+import FormField from './FormField';
 
 const TournamentForm = ({ tournament, onSubmit }) => {
     const [title, setTitle] = useState('');
@@ -24,7 +24,6 @@ const TournamentForm = ({ tournament, onSubmit }) => {
     }, [tournament]);
 
     const handleSubmit = async (e) => {
-        console.log(e);
         e.preventDefault();
         onSubmit({
             title,
@@ -37,67 +36,20 @@ const TournamentForm = ({ tournament, onSubmit }) => {
     };
 
     return (
-        <><form onSubmit={handleSubmit}>
-            <div className="form-group">
-                <label>Title:</label>
-                <input
-                    type="text"
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    autoComplete="off"
-                    required />
-            </div>
-
-            <div className="form-group">
-                <label>Min Elo:</label>
-                <input
-                    type="number"
-                    id="minElo"
-                    value={minElo}
-                    onChange={(e) => setMinElo(e.target.value)}
-                    required />
-            </div>
-
-            <div className="form-group">
-                <label>Max Elo:</label>
-                <input
-                    type="number"
-                    id="maxElo"
-                    value={maxElo}
-                    onChange={(e) => setMaxElo(e.target.value)}
-                    required />
-            </div>
-
-            <div className="form-group">
-                <label>Date:</label>
+        <>
+            <form onSubmit={handleSubmit}>
+                <FormField label="Title" type="text" value={title} setValue={setTitle} />
+                <FormField label="Min Elo" type="number" value={minElo} setValue={setMinElo} />
+                <FormField label="Max Elo" type="number" value={maxElo} setValue={setMaxElo} />
                 <DatePicker value={date} onChange={(e) => setDate(e.target.value)} />
-            </div>
-
-            <div className="form-group">
-                <label>Size:</label>
-                <input
-                    type="number"
-                    id="size"
-                    value={size}
-                    onChange={(e) => setSize(e.target.value - 2)}
-                    required />
-            </div>
-
-            <div className="form-group">
-                <label>Total Rounds:</label>
-                <input
-                    type="number"
-                    id="totalRounds"
-                    value={totalRounds}
-                    onChange={(e) => setTotalRounds(e.target.value)}
-                    required />
-            </div>
-
-            <input className="submit-button" type="submit" value="Submit" />
-        </form><p>
+                <FormField label="Size" type="number" value={size} setValue={setSize} />
+                <FormField label="Total Rounds" type="number" value={totalRounds} setValue={setTotalRounds} />
+                <input className="submit-button" type="submit" value="Submit" />
+            </form>
+            <p>
                 <Link to="/tournaments">Cancel</Link>
-            </p></>
+            </p>
+        </>
     );
 };
 

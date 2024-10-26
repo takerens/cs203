@@ -2,25 +2,21 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TournamentForm from '../components/TournamentForm';
 import ErrorMessage from '../components/ErrorMessage';
-
 import { handleAddTournament } from '../utils/tournamentUtils';
-
 
 const AddTournament = () => {
     const [errorMessage, setErrorMessage] = useState('');
-    const navigate = useNavigate();    
+    const navigate = useNavigate();
 
     const handleSubmit = async (tournamentData) => {
-        handleAddTournament(tournamentData, setErrorMessage, navigate);
+        await handleAddTournament(tournamentData, setErrorMessage, navigate);
     };
 
     return (
         <div className="container">
             <h1>Add Tournament</h1>
             <ErrorMessage message={errorMessage} />
-            <TournamentForm
-                onSubmit={handleSubmit}
-            />
+            <TournamentForm onSubmit={handleSubmit} />
         </div>
     );
 };

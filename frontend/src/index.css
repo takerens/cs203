@@ -6,7 +6,7 @@ body {
   background-color: #f4f4f4;
 }
 .container {
-  width: 300px;
+  width: 325px;
   margin: 50px auto;
   padding: 20px;
   background: white;
@@ -14,6 +14,8 @@ body {
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 input[type="text"],
+input[type="date"],
+input[type="number"],
 input[type="password"] {
     width: 300px;
     padding: 10px;
@@ -22,30 +24,17 @@ input[type="password"] {
     border-radius: 5px;
 }
 /* LOGIN BUTTON */
-input[type="submit"].login-button {
+input[type="submit"].blue-button {
     background: #007bff;
     color: white;
     border: none;
     padding: 10px;
     cursor: pointer;
     border-radius: 5px;
-    width: 300px;
+    width: 325px;
 }
-input[type="submit"].login-button:hover {
+input[type="submit"].blue-button:hover {
     background: #0056b3;
-}
-/* REGISTER BUTTON */
-input[type="submit"].register-button {
-  background: #5cb85c;
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 5px;
-  width: 100%;
-}
-input[type="submit"].register-button:hover {
-  background: #4cae4c;
 }
 
 /* NAVIGATION */
@@ -200,6 +189,5 @@ h1, h2, p {
 }
 
 .admin-buttons button {
-    margin-bottom: 10px; /* Add spacing between buttons */
     display: block; /* Ensure buttons are displayed in block format */
 }

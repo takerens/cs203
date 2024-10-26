@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import csd.grp3.usertournament.UserTournament;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -21,12 +20,15 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import csd.grp3.usertournament.UserTournament;
 
 @Entity
 @Getter
@@ -36,31 +38,31 @@ import lombok.ToString;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Table(name = "AppUsers")
+public class User implements UserDetails {
 
-public class User implements UserDetails{
-    private Integer ELO = 100;
+    private static final int DEFAULT_ELO = 100;
 
-    @Id @NotNull(message = "Username should not be null")
+    @Id
+    @NotNull(message = "Username should not be null")
     private String username;
 
-    @NotNull (message = "Password should not be null")
+    @NotNull(message = "Password should not be null")
     @Size(min = 8, message = "Password should be at least 8 characters long")
-    // @JsonIgnore
     private String password;
 
     @NotNull(message = "Authorities should not be null")
-    // @JsonIgnore
     private String authorities;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
     private List<UserTournament> userTournaments = new ArrayList<>();
+
+    private Integer ELO = DEFAULT_ELO;
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
         this.authorities = "ROLE_USER";
-        this.ELO = 100; // Default
     }
 
     public User(String username, String password, String authorities, int ELO) {
@@ -70,17 +72,15 @@ public class User implements UserDetails{
         this.ELO = ELO;
     }
 
-    // @JsonIgnore
     public String getUserRole() {
         return authorities;
     }
-  
-    // Return a collection of authorities (roles) granted to the user.
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Arrays.asList(new SimpleGrantedAuthority(authorities));
     }
-    
+
     @Override
     @JsonIgnore
     public boolean isAccountNonExpired() {
@@ -104,6 +104,4 @@ public class User implements UserDetails{
     public boolean isEnabled() {
         return true; // Implement as needed
     }
-
-    
 }

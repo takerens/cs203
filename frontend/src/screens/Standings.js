@@ -28,7 +28,7 @@ const TournamentStandings = () => {
 
     return (
         <><Navbar userRole={user.userRole} />
-            <SecondaryNavbar userRole={user.userRole} tournament={tournament} />
+            <SecondaryNavbar tournament={tournament} />
             <main>
                 <h3>Standings</h3>
                 <ErrorMessage message={errorMessage} />

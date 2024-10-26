@@ -1,7 +1,6 @@
 package csd.grp3.user;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,29 +8,20 @@ import jakarta.validation.Valid;
 
 @RestController
 public class UserController {
+
     private UserService userService;
-
     //TEMPORARY
-    private User user;
-
-    private void setUser(User user) {
-        this.user = user;
-    }
-
-    private User getUser() {
-        return this.user;
-    }
-    // Till HERE
+    private User currentUser; // currently logged-in user
 
     public UserController(UserService userService) {
         this.userService = userService;
-        this.user = null; //TEMP
+        this.currentUser = null; //TEMP - Initialize with no user
     }
 
     @GetMapping("/user")
     public ResponseEntity<User> getUserDetails() {
-        if (getUser() != null) {
-            return ResponseEntity.ok(getUser());    
+        if (currentUser != null) {
+            return ResponseEntity.ok(currentUser);    
         }
         return ResponseEntity.notFound().build();
     }
@@ -39,31 +29,30 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
         User createdUser = userService.createNewUser(user.getUsername(), user.getPassword());
-        return new ResponseEntity<User>(createdUser, HttpStatus.CREATED);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<HttpStatus> loginUser(@RequestBody User user) {
-        User loggedIn = userService.login(user.getUsername(), user.getPassword());
-        setUser(loggedIn);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        currentUser  = userService.login(user.getUsername(), user.getPassword());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/user/{username}")
     public ResponseEntity<User> viewProfile(@PathVariable String username) {
-        User user = userService.findByUsername(username);
-        return new ResponseEntity<User>(user, HttpStatus.OK);
+        User foundUser = userService.findByUsername(username);
+        return ResponseEntity.ok(foundUser);
     }
 
     @PutMapping("/user")
     public ResponseEntity<User> changePassword(@Valid @RequestBody User user) {
         User updatedUser = userService.changePassword(user.getUsername(), user.getPassword());
-        return new ResponseEntity<User>(updatedUser, HttpStatus.OK);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/user")
     public ResponseEntity<HttpStatus> deleteUser(@Valid @RequestBody User user) {
         userService.deleteUser(user);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

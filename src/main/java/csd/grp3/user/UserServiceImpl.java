@@ -1,30 +1,24 @@
 package csd.grp3.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
     private final BCryptPasswordEncoder encoder;
-
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder ) {
-        this.userRepository = userRepository;
-        this.encoder = encoder;
-    }
 
     @Override
     public User findByUsername(String username) throws UserNotFoundException{
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(UserNotFoundException::new);
     }
 
     @Override
@@ -33,46 +27,42 @@ public class UserServiceImpl implements UserService {
 
         //Check if the username already exists, if it does throw exception
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new BadCredentialsException("Username already exists");
+            throw new BadCredentialsException("Username already taken. Try a different username.");
         }
 
         // Encode password given by user to store
         String encodedPassword = encoder.encode(password);
-
         return userRepository.save(new User(username, encodedPassword));
     }
 
     @Override
     public User login(String username, String password) throws UsernameNotFoundException{
-        //Get the password associated with the searched username
         User user = findByUsername(username);
-        String encodedPassword = user.getPassword();
 
         //Return the user if the password matches
-        if (encoder.matches(password, encodedPassword)) {
+        if (encoder.matches(password, user.getPassword())) {
             return user;
         }
-        //Else throw exception
         throw new BadCredentialsException("Password does not match");
     }
 
     @Override
-    public User changePassword(String username, String password) {
+    public User changePassword(String username, String newPassword) {
         User user = findByUsername(username);
-        user.setPassword(encoder.encode(password));
+        user.setPassword(encoder.encode(newPassword));
         return userRepository.save(user);
     }
 
     @Override
-    public void updateELO(User tempUser, int ELO) {
+    public void updateELO(User tempUser, int newELO) {
         User user = findByUsername(tempUser.getUsername());
-        user.setELO(ELO);
+        user.setELO(newELO);
         userRepository.save(user);
     }
 
     @Override
     public void deleteUser(User user) {
-        User toDelete = login(user.getUsername(), user.getPassword());
-        userRepository.delete(toDelete);
+        login(user.getUsername(), user.getPassword());
+        userRepository.delete(user);
     }
 }

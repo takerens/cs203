@@ -1,13 +1,11 @@
-// src/components/SecondaryNavbar.js
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const SecondaryNavbar = ({ tournament, userRole }) => {
-    const navigate = useNavigate(); // For programmatic navigation
+const SecondaryNavbar = ({ tournament }) => {
+    const navigate = useNavigate();
 
-    const handleBack = async (e) => {
+    const handleBack = (e) => {
         e.preventDefault();
-
         navigate('/tournaments'); // Navigate back to tournaments
     };
 
@@ -16,17 +14,23 @@ const SecondaryNavbar = ({ tournament, userRole }) => {
             <div className="nav-container">
                 <h1 className="navbar-brand">{tournament.title}</h1>
                 <ul className="navbar-nav">
-                    <li className="nav-item">
-                        <Link className="nav-link" to={`/tournaments/${tournament.id}/rounds/1`}>Rounds</Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link className="nav-link" to={`/tournaments/${tournament.id}/standings`}>Standings</Link>
-                    </li>
+                    {renderNavLinks(tournament.id)}
                 </ul>
-                <button onClick={handleBack}>Back</button>
+                <button onClick={handleBack} className="back-button">Back</button>
             </div>
         </nav>
     );
 };
+
+const renderNavLinks = (tournamentId) => (
+    <>
+        <li className="nav-item">
+            <Link className="nav-link" to={`/tournaments/${tournamentId}/rounds/1`}>Rounds</Link>
+        </li>
+        <li className="nav-item">
+            <Link className="nav-link" to={`/tournaments/${tournamentId}/standings`}>Standings</Link>
+        </li>
+    </>
+);
 
 export default SecondaryNavbar;

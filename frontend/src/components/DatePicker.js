@@ -3,27 +3,28 @@ import React, { useState, useEffect } from 'react';
 const DatePicker = ({ value, onChange }) => {
   const [minDate, setMinDate] = useState('');
 
-  // Function to get tomorrow's date in YYYY-MM-DD format
+  useEffect(() => {
+    const tomorrowDate = getTomorrowDate();
+    setMinDate(tomorrowDate);
+  }, []);
+
   const getTomorrowDate = () => {
-    const today = new Date()
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);  // Add 1 day to today's date
-    return tomorrow.toISOString().split("T")[0];  // Format the date as YYYY-MM-DD
+    const tomorrow = new Date(Date.now() + 86400000); // Add 1 day in milliseconds
+    return tomorrow.toISOString().split("T")[0]; // Format as YYYY-MM-DD
   };
 
-  // Set the minimum date when page load
-  useEffect(() => {
-    setMinDate(getTomorrowDate());
-  }, []);  // Runs once
-
   return (
-    <input
-      type="date"
-      value={value} // Controlled input value
-      onChange={onChange} // Event handler passed down as a prop
-      min={minDate} // Restrict date selection to tomorrow onwards
-      required
-    />
+    <div className="form-group">
+      <label>Date</label>
+      <input
+        id="Date"
+        type="date"
+        value={value}
+        onChange={onChange}
+        min={minDate} // Restrict to tomorrow
+        required
+      />
+    </div>
   );
 };
 

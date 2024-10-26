@@ -49,11 +49,11 @@ public class Tournament {
     private String title;
 
     @NotNull(message = "minElo: put a valid Elo")
-    @Min(value = 0, message = "Minimum value of 0")
+    @Min(value = 0, message = "minElo: Minimum value of 0")
     private int minElo;
 
     @NotNull(message = "maxElo: put a valid Elo")
-    @Min(value = 0, message = "Minimum value of 0")
+    @Min(value = 0, message = "maxElo: Minimum value of 0")
     private int maxElo;
 
     @NotNull(message = "Date: put a valid Date")

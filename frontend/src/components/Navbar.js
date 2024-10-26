@@ -3,12 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = ({ userRole }) => {
     const navigate = useNavigate();
-    
-    const handleLogout = async (e) => {
-        e.preventDefault(); // Stop default form submission
 
-        // Redirect to the login page
-        navigate("/login");
+    const handleLogout = (e) => {
+        e.preventDefault(); // Stop default form submission
+        navigate("/login"); // Redirect to the login page
     };
 
     return (
@@ -17,7 +15,7 @@ const Navbar = ({ userRole }) => {
                 <Link className="navbar-brand" to="/tournaments">
                     Chess Tournament Manager
                 </Link>
-                
+
                 <ul className="navbar-nav">
                     <li className="nav-item">
                         <Link className="nav-link" to="/tournaments">Tournaments</Link>
@@ -28,7 +26,7 @@ const Navbar = ({ userRole }) => {
                         </li>
                     )}
                 </ul>
-                
+
                 <form onSubmit={handleLogout} className="logout-form">
                     <button type="submit" className="logout-button">Log Out</button>
                 </form>

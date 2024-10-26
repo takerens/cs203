@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ErrorMessage from '../components/ErrorMessage';
 import Navbar from '../components/Navbar';
+import FormField from '../components/FormField';
 import { fetchUserData, handlePassword } from '../utils/userUtils';
 
 const Profile = () => {
@@ -43,14 +44,8 @@ const Profile = () => {
 
     const renderPasswordChangeForm = () => (
         <form onSubmit={handleSubmit}>
-            <input 
-                type="password" // Use "password" type for security
-                placeholder="Enter New Password" 
-                value={newPassword} 
-                onChange={(e) => setNewPassword(e.target.value)} 
-                required 
-            />
-            <button type="submit">Change Password</button>
+            <FormField label="New Password: " type="password" value={newPassword} setValue={setNewPassword} />
+            <button type="submit">Change</button>
         </form>
     );
 

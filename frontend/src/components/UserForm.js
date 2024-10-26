@@ -1,54 +1,34 @@
-// components/UserForm.js
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import ErrorMessage from './ErrorMessage';
+import FormField from './FormField';
 
-const UserForm = ({
-  title,
-  errorMessage,
-  onSubmit,
-  username,
-  password,
-  setUsername,
-  setPassword,
-  submitButtonText,
-  linkPath,
-  linkText
-}) => {
+const UserForm = ({ onSubmit, linkPath }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const isLogin = linkPath === "/signup";
+  const buttonText = isLogin ? "Login Here" : "Signup Here";
+  const linkText = isLogin ? "Signup Here" : "Login Here";
+  const authorities = isLogin ? undefined : "ROLE_USER"; // autorities only for signup 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    onSubmit({
+      username,
+      password,
+      authorities
+    });
+  };
+
   return (
-    <div className="container">
-      <ErrorMessage message={errorMessage} />
-      <h1>{title}</h1>
-      <form onSubmit={onSubmit}>
-        <div className="form-group">
-          <label htmlFor="username">Username:</label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            autoComplete="off"
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        <input className="submit-button" type="submit" value={submitButtonText} />
-      </form>
+    <><form onSubmit={handleSubmit}>
+      <FormField label="Username: " type="text" value={username} setValue={setUsername} />
+      <FormField label="Password: " type="password" value={password} setValue={setPassword} />
+      <input className="blue-button" type="submit" value={buttonText} />
+    </form>
       <p>
-        {linkText} <Link to={linkPath}>{linkPath === "/signup" ? "Signup Here" : "Login Here"}</Link>
-      </p>
-    </div>
+        {isLogin ? "Don't have an account? " : "Already have an account? "}
+        <Link to={linkPath}>{linkText}</Link>
+      </p></>
   );
 };
 

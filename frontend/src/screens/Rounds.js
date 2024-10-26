@@ -28,15 +28,12 @@ const TournamentRounds = () => {
     }, [roundNumber]);
 
     const handleResultChange = async () => {
-        const updatedMatches = matches.map(match => {
-            const result = newResults[match.id] !== undefined ? parseFloat(newResults[match.id]) : match.result;
-            return {
-                id: match.id,
-                bye: match.bye,
-                result: result
-            };
-        });
-        handleUpdateMatchResults(updatedMatches, setErrorMessage, setEditing, tournamentId, setRounds, setMatches, roundNumber);
+        const updatedMatches = matches.map(match => ({
+            id: match.id,
+            bye: match.bye,
+            result: newResults[match.id] !== undefined ? parseFloat(newResults[match.id]) : match.result,
+        }));
+        await handleUpdateMatchResults(updatedMatches, setErrorMessage, setEditing, tournamentId, setRounds, setMatches, roundNumber);
     };
 
     const handleDropdownChange = (matchId, value) => {
@@ -47,18 +44,23 @@ const TournamentRounds = () => {
     };
 
     const displayResult = (result) => {
-        return result === 1 ? '1:0' : result === -1 ? '0:1' : result === 0.5 ? '0.5:0.5' : 'N/A'
-    }
+        switch (result) {
+            case 1: return '1:0';
+            case -1: return '0:1';
+            case 0.5: return '0.5:0.5';
+            default: return 'N/A';
+        }
+    };
 
     return (
         <><Navbar userRole={user.userRole} />
-            <SecondaryNavbar userRole={user.userRole} tournament={tournament} />
+            <SecondaryNavbar tournament={tournament} />
             
             <main>
                 <h3>Round</h3>
-
-                <Pagination tournamentId={tournamentId} inProgressRounds={rounds.length} currentRound={roundNumber} editing={editing}/>
+                <Pagination tournamentId={tournamentId} inProgressRounds={rounds.length} currentRound={roundNumber} editing={editing} />
                 <ErrorMessage message={errorMessage} />
+
                 <div>
                     {user.userRole === 'ROLE_ADMIN' && !editing && !rounds[roundNumber - 1]?.over &&(
                         <button onClick={() => setEditing(true)}>Edit Match Details</button>
@@ -80,11 +82,9 @@ const TournamentRounds = () => {
                         </tr>
                     </thead>
                     <tbody>
-                    
-                        {matches && matches.length > 0 ? (
-                            
+                        {matches.length > 0 ? (
                             matches.map((match, index) => (
-                                <tr key={index}>
+                                <tr key={match.id}>
                                     <td>{index + 1}</td>
                                     <td>{match.white.username}</td>
                                     <td>{match.white.elo}</td>
@@ -100,9 +100,7 @@ const TournamentRounds = () => {
                                                 <option value="0.5">0.5:0.5</option>
                                             </select>
                                         ) : (
-                                            <span>
-                                                {displayResult(match.result)}
-                                            </span>
+                                            <span>{displayResult(match.result)}</span>
                                         )}
                                     </td>
                                     <td>{match.black.username}</td>
@@ -116,8 +114,9 @@ const TournamentRounds = () => {
                         )}
                     </tbody>
                 </table>
-            </main></>
-    )
+            </main>
+        </>
+    );
 };
 
 export default TournamentRounds;
