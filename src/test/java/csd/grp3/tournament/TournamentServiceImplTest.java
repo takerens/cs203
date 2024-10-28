@@ -1,5 +1,19 @@
 package csd.grp3.tournament;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyChar;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
@@ -7,51 +21,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyChar;
-import static org.mockito.ArgumentMatchers.anyLong;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import csd.grp3.tournament.InvalidTournamentStatus;
-import csd.grp3.tournament.Tournament;
-import csd.grp3.tournament.TournamentNotFoundException;
-import csd.grp3.tournament.TournamentRepository;
-import csd.grp3.tournament.TournamentServiceImpl;
-import csd.grp3.user.User;
-import csd.grp3.user.UserServiceImpl;
 import csd.grp3.match.Match;
 import csd.grp3.match.MatchRepository;
 import csd.grp3.match.MatchServiceImpl;
 import csd.grp3.round.Round;
 import csd.grp3.round.RoundServiceImpl;
-import csd.grp3.tournament.PlayerAlreadyRegisteredException;
-import csd.grp3.usertournament.UserTournamentServiceImpl;
+import csd.grp3.user.User;
+import csd.grp3.user.UserServiceImpl;
 import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentId;
 import csd.grp3.usertournament.UserTournamentRepository;
-import csd.grp3.usertournament.UserTournamentService;
+import csd.grp3.usertournament.UserTournamentServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class TournamentServiceImplTest {
@@ -233,7 +222,7 @@ public class TournamentServiceImplTest {
         // Assert
         assertNotNull(updatedTournament);
         assertEquals("Updated Tournament", updatedTournament.getTitle());
-        verify(tournamentRepository).findById(1L);
+        verify(tournamentRepository, times(2)).findById(1L);
     }
 
     @Test

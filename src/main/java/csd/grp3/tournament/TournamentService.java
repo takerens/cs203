@@ -18,14 +18,13 @@ public interface TournamentService {
     void withdrawUser(User user, Long id);
     void addRound(Long id);
     void updateMatchResults(Round round);
-    void updateResults(Round round);
+    void updateTournamentResults(Round round);
     void endTournament(Long id);
     List<Tournament> getTournamentAboveMin(int ELO);
     List<Tournament> getTournamentBelowMax(int ELO);
     List<Tournament> getTournamentAboveMinBelowMax(int minELO, int maxELO);
     List<Tournament> getUserEligibleTournament(int ELO);
     double calculateBuchholzInTournament(User user, Tournament tournament);
-    double calculateBuchholzCut1InTournament(User user, Tournament tournament);
     void createPairings(Tournament tournament);
     List<User> getSortedUsers(Long id);
     

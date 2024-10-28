@@ -65,7 +65,8 @@ public class Match {
      *  1 (white wins),
      *  0.5 (draw),
      *  0 (unplayed/ongoing)
-     * @return Integer value
+     * 
+     * @return Double value
      */
     public double getResult() {
         return result;
