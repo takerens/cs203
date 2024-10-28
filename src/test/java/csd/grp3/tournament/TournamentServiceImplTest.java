@@ -434,13 +434,13 @@ public class TournamentServiceImplTest {
         when(matchService.getUserMatches(Mockito.any(User.class))).thenReturn(Collections.emptyList());
         when(matchService.getMatchesBetweenTwoUsers(Mockito.any(User.class), Mockito.any(User.class))).thenReturn(Collections.emptyList());
         Round mockRound = new Round(tournament);
-        when(roundService.createRound(tournament)).thenReturn(mockRound);
+        tournament.getRounds().add(mockRound);
         Match match1 = new Match(user1, user2, mockRound);
         Match match2 = new Match(user3, user4, mockRound);
         when(matchService.createMatch(user1, user2, mockRound)).thenReturn(match1);
         when(matchService.createMatch(user3, user4, mockRound)).thenReturn(match2);
 
-        tournamentService.createPairings(tournament);
+        tournamentService.createPairings(tournament, mockRound);
         Round returnedRound = tournament.getRounds().get(0);
 
         assertNotNull(returnedRound);
@@ -486,13 +486,13 @@ public class TournamentServiceImplTest {
         when(matchService.getMatchesBetweenTwoUsers(user2, user4)).thenReturn(Collections.emptyList());
 
         Round secondRound = new Round(tournament);
-        when(roundService.createRound(tournament)).thenReturn(secondRound);
+        tournament.getRounds().add(secondRound);
         Match match3 = new Match(user3, user1, secondRound);
         Match match4 = new Match(user2, user4, secondRound);
         when(matchService.createMatch(user3, user1, secondRound)).thenReturn(match3);
         when(matchService.createMatch(user2, user4, secondRound)).thenReturn(match4);
 
-        tournamentService.createPairings(tournament);
+        tournamentService.createPairings(tournament,secondRound);
         Round returnedRound = tournament.getRounds().get(0);
 
         assertNotNull(returnedRound);

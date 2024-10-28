@@ -17,9 +17,9 @@ public class MatchServiceImpl implements MatchService{
     /**
      * Creates a match object for the Round
      * 
-     * @param white 
-     * @param black
-     * @param round
+     * @param white User object
+     * @param black User object
+     * @param round Round object
      * @return Match object
     */
     @Override
@@ -42,7 +42,7 @@ public class MatchServiceImpl implements MatchService{
     /**
      *  Saves a match object to database
      * 
-     * @param match
+     * @param match Match object to be added
      * @return Match object added
      */
     @Override
@@ -54,13 +54,13 @@ public class MatchServiceImpl implements MatchService{
     /**
      * Update match object referenced by id
      * 
-     * @param id target match to update
+     * @param matchID target match to update
      * @param newMatch updated match details
      * @return Updated Match object
      */
     @Override 
-    public Match updateMatch(Long id, Match newMatch) {
-        Match match = getMatch(id);
+    public Match updateMatch(Long matchID, Match newMatch) {
+        Match match = getMatch(matchID);
         match.setResult(newMatch.getResult());
         match.setBYE(newMatch.isBYE());
         return matches.save(match);
@@ -69,17 +69,17 @@ public class MatchServiceImpl implements MatchService{
     /**
      * Deletes a match by id from repository 
      * 
-     * @param id 
+     * @param matchID Long 
      */
     @Override 
-    public void deleteMatch(Long id) {
-        matches.deleteById(id);
+    public void deleteMatch(Long matchID) {
+        matches.deleteById(matchID);
     }
 
     /**
      * Get all matches in round
      * 
-     * @param round 
+     * @param round Round object
      */
     @Override
     public List<Match> getRoundMatches(Round round) {
@@ -90,8 +90,8 @@ public class MatchServiceImpl implements MatchService{
      * Get all matches played by user.
      * Across all tournaments and rounds
      * 
-     * @param user
-     * @return List<Match>
+     * @param user User object
+     * @return List of Match objects
      */
     @Override
     public List<Match> getUserMatches(User user) {
@@ -102,9 +102,9 @@ public class MatchServiceImpl implements MatchService{
      * Get all matches played between 2 users.
      * Across all tournaments and rounds
      * 
-     * @param user1
-     * @param user2
-     * @return List<Match>
+     * @param user1 User1 object
+     * @param user2 User2 object
+     * @return List of Match objects
      */
     @Override
     public List<Match> getMatchesBetweenTwoUsers(User user1, User user2) {

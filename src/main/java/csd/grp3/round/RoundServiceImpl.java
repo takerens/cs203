@@ -14,7 +14,7 @@ public class RoundServiceImpl implements RoundService {
     /**
      * Creates a new round object for tournament
      * 
-     * @param tournament
+     * @param tournament Tournament object
      * @return Round object added
      */
     @Override
@@ -23,14 +23,14 @@ public class RoundServiceImpl implements RoundService {
     }
 
     /**
-     * Get round object specified by id
+     * Get round object specified by roundID
      * 
-     * @param id
+     * @param roundID Long
      * @return Round object in repository
      */
     @Override
-    public Round getRound(Long id) {
-        return rounds.findById(id)
+    public Round getRound(Long roundID) {
+        return rounds.findById(roundID)
             .orElseThrow(() -> new RoundNotFoundException());
     }
 }

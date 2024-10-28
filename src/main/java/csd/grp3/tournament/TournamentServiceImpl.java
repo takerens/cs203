@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +52,7 @@ public class TournamentServiceImpl implements TournamentService {
     /**
      * Adds a new tournmaent object to repository
      * 
-     * @param newTournamentInfo Long
+     * @param newTournamentInfo Tournament object to be added
      * @return Tournament object added
      */
     @Override
@@ -122,10 +123,6 @@ public class TournamentServiceImpl implements TournamentService {
 
         // modify list of players based on new Elo limits and new Size limits
         for (User user : users) {
-            if (user.getUsername().equals("DEFAULT_BOT")) {
-                continue;
-            }
-
             if (isUserEloEligible(tournament, user.getELO()) == false) {
                 initialSize--;
                 UTService.delete(tournament, user);
@@ -153,20 +150,12 @@ public class TournamentServiceImpl implements TournamentService {
      */
     private void addFromWaiting(Long tournamentID, int numToAdd) {
         // invite players from waiting list
-        List<User> waitingUsers = UTService.getWaitingList(tournamentID);
+        Iterator<User> waitingUsers = UTService.getWaitingList(tournamentID).iterator();
 
-        if (waitingUsers.isEmpty())
-            return;
-
-        if (waitingUsers.size() <= numToAdd) {
-            for (User user : waitingUsers) {
-                UTService.updatePlayerStatus(tournamentID, user.getUsername(), 'r');
-            }
-            return;
-        }
-
-        for (int i = 0; i < numToAdd; i++) {
-            UTService.updatePlayerStatus(tournamentID, waitingUsers.get(i).getUsername(), 'r');
+        while (numToAdd > 0 && waitingUsers.hasNext()) {
+            User user = waitingUsers.next();
+            UTService.updatePlayerStatus(tournamentID, user.getUsername(), 'r');
+            numToAdd--;
         }
     }
 
@@ -180,21 +169,13 @@ public class TournamentServiceImpl implements TournamentService {
      */
     private void addToWaiting(Long tournamentID, int numToRemove) {
         // invite players from waiting list
-        List<User> players = UTService.getPlayers(tournamentID);
-        int countPlayers = players.size();
 
-        if (players.isEmpty())
-            return;
+        Iterator<User> players = UTService.getPlayers(tournamentID).iterator();
 
-        if (countPlayers <= numToRemove) {
-            for (User user : players) {
-                UTService.updatePlayerStatus(tournamentID, user.getUsername(), 'w');
-            }
-            return;
-        }
-
-        for (int i = 0; i < numToRemove; i++) {
-            UTService.updatePlayerStatus(tournamentID, players.get(i).getUsername(), 'w');
+        while (numToRemove > 0 && players.hasNext()) {
+            User user = players.next();
+            UTService.updatePlayerStatus(tournamentID, user.getUsername(), 'w');
+            numToRemove--;
         }
     }
 
@@ -239,25 +220,26 @@ public class TournamentServiceImpl implements TournamentService {
      * Else add user to either player list or waiting list
      * 
      * @param user User object to be registered
+     * @param tournamentID Long 
      */
     @Override
     @Transactional
     public void registerUser(User user, Long tournamentID) throws TournamentNotFoundException {
         Tournament tournament = getTournament(tournamentID);
-        List<User> userList = UTService.getPlayers(tournamentID);
+        List<User> playerList = UTService.getPlayers(tournamentID);
         List<User> waitingList = UTService.getWaitingList(tournamentID);
 
         // check if user exists in database
         userService.findByUsername(user.getUsername());
 
         // check if tournament already has that user data
-        if (userList.contains(user) || waitingList.contains(user)) {
+        if (playerList.contains(user) || waitingList.contains(user)) {
             throw new PlayerAlreadyRegisteredException();
         } else { // if user isn't inside tournament
-            // if tournament is full, we add to waitingList instead
-            if (userList.size() == tournament.getSize()) {
+            // if tournament is full, we add to waiting list instead
+            if (playerList.size() == tournament.getSize()) {
                 UTService.add(tournament, user, 'w');
-                // else, we want to add to normal userList
+                // else, we want to add to player list 
             } else {
                 UTService.add(tournament, user, 'r');
             }
@@ -268,26 +250,27 @@ public class TournamentServiceImpl implements TournamentService {
      * Removes user from tournament player list or waiting list
      * 
      * @param tempUser User object to be withdrawn
-     * @param id       Long ID of tournament
+     * @param tournamentID Long 
      */
     @Override
     @Transactional
-    public void withdrawUser(User tempUser, Long id) throws UserNotRegisteredException {
-        Tournament tournament = getTournament(id);
-        List<User> userList = UTService.getPlayers(id);
-        List<User> waitingList = UTService.getWaitingList(id);
+    // TODO : Check necessity of throwing error since frontend blocks it
+    public void withdrawUser(User tempUser, Long tournamentID) throws UserNotRegisteredException {
+        Tournament tournament = getTournament(tournamentID);
+        List<User> playerList = UTService.getPlayers(tournamentID);
+        List<User> waitingList = UTService.getWaitingList(tournamentID);
         User user = userService.findByUsername(tempUser.getUsername());
 
-        if (!userList.contains(user) && !waitingList.contains(user)) {
+        if (!playerList.contains(user) && !waitingList.contains(user)) {
             throw new UserNotRegisteredException("User has not registered for tournament");
         }
 
-        if (tournament.getRounds().size() != 0 && userList.contains(user)) {
-            UTService.updatePlayerStatus(id, user.getUsername(), 'b');
+        if (tournament.getRounds().size() != 0 && playerList.contains(user)) {
+            UTService.updatePlayerStatus(tournamentID, user.getUsername(), 'b');
             List<Round> rounds = tournament.getRounds();
             handleBYE(rounds.get(rounds.size() - 1), user); // give opp win for current round
-            if (UTService.getPlayers(id).size() < 3) {
-                endTournament(id);
+            if (UTService.getPlayers(tournamentID).size() < 3) {
+                endTournament(tournamentID);
             }
             return;
         }
@@ -295,10 +278,9 @@ public class TournamentServiceImpl implements TournamentService {
         UTService.delete(tournament, user); // Remove player
 
         // handling for before tournament start
-        if (tournament.getStartDateTime().isAfter(LocalDateTime.now()) && userList.contains(user)
+        if (tournament.getStartDateTime().isAfter(LocalDateTime.now()) && playerList.contains(user)
                 && !waitingList.isEmpty()) { // Before and in player list
-            User moveUser = waitingList.remove(0);
-            UTService.updatePlayerStatus(id, moveUser.getUsername(), 'r');
+            addFromWaiting(tournamentID, 1);
         }
     }
 
@@ -311,10 +293,10 @@ public class TournamentServiceImpl implements TournamentService {
     @Transactional
     public void addRound(Long tournamentID) throws TournamentNotFoundException, InvalidTournamentStatus {
         Tournament tournament = getTournament(tournamentID);
-        int currentRounds = tournament.getRounds().size();
+        List<Round> rounds = tournament.getRounds();
 
-        if (currentRounds > 0) {
-            Round lastRound = tournament.getRounds().get(currentRounds - 1);
+        if (rounds.size() > 0) {
+            Round lastRound = rounds.get(rounds.size() - 1);
             updateMatchResults(lastRound); // results for this round only
             if (!lastRound.isOver()) {
                 return; // return tournament data as is
@@ -323,7 +305,10 @@ public class TournamentServiceImpl implements TournamentService {
         }
 
         if (tournament.hasStarted()) {
-            createPairings(tournament);
+            Round newRound = roundService.createRound(tournament);
+            createPairings(tournament, newRound);
+            rounds.add(newRound);
+            tournament.setRounds(rounds);
         } else {
             throw new InvalidTournamentStatus("Tournament has not started or less than 2 players");
         }
@@ -351,6 +336,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param match Match object to update player points
      */
     private void updatePlayerPoints(Long tournamentId, Match match) {
+        // Map of results to arrays. First index is white points, second is black points
         Map<Double, double[]> resultPoints = Map.of(
              1.0, new double[]{1.0, 0.0},  // White wins
             -1.0, new double[]{0.0, 1.0},  // Black wins
@@ -489,7 +475,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     /**
-     * Buchholz score is the sum of game points obtained by the opponents throughtout the tournament.
+     * Buchholz score is the sum of game points obtained by the opponents throughout the tournament.
      * Iterate through user's matches in the tournament and sum up the game points of all opponents faced.
      * 
      * @param user User to calculate Buchholz score for
@@ -533,15 +519,9 @@ public class TournamentServiceImpl implements TournamentService {
      * @param tournament Tournament object
      */
     @Transactional
-    public void createPairings(Tournament tournament) {
+    public void createPairings(Tournament tournament, Round round) {
         Set<User> pairedUsers = new HashSet<>();
-
-        // create new round
-        Round nextRound = roundService.createRound(tournament);
-        nextRound.setTournament(tournament);
-        tournament.getRounds().add(nextRound);
-        List<Match> matches = nextRound.getMatches();
-
+        List<Match> matches = round.getMatches();
         List<User> users = getSortedUsers(tournament.getId());
 
         for (int i = 0; i < users.size(); i++) {
@@ -568,16 +548,13 @@ public class TournamentServiceImpl implements TournamentService {
                 if (!isColourSuitable(user2, tournament, isUser1White ? "black" : "white"))
                     continue;
 
-                Match newPair = createMatchWithUserColour(user1, isUser1White ? "white" : "black", user2, nextRound);
+                Match newPair = createMatchWithUserColour(user1, isUser1White ? "white" : "black", user2, round);
                 matches.add(newPair);
                 pairedUsers.add(user1);
                 pairedUsers.add(user2);
                 break;
             }
         }
-        // after all users are paired, assign the list to round and return it
-        // nextRound.setMatches(pairings);
-        // return nextRound;
     }
 
     /**
@@ -673,26 +650,14 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = getTournament(tournamentID);
         tournament.setCalculated(true);
         tournaments.save(tournament); // set Calculated
-        Map<User, Integer> newELOMap = new HashMap<>();
 
         for (User user : UTService.getPlayers(tournamentID)) {
-            List<Match> userMatches = new ArrayList<>();
+            List<Match> userMatches = matchService.getUserMatches(user).stream()
+                .filter(match -> match.getTournament().equals(tournament))
+                .collect(Collectors.toList());
 
-            for (Round round : tournament.getRounds()) {
-                for (Match match : round.getMatches()) {
-                    if (user.equals(match.getWhite()) || user.equals(match.getBlack())) {
-                        userMatches.add(match);
-                    }
-                }
-            }
-            newELOMap.put(user, calculateELO(userMatches, user));
-        }
-
-        for (Map.Entry<User, Integer> entry : newELOMap.entrySet()) {
-            User user = entry.getKey();
-            int newELO = entry.getValue();
-            user.setELO(newELO);
-            userService.updateELO(user, newELO);
+            user.setELO(calculateELO(userMatches, user));
+            userService.updateELO(user, user.getELO());
         }
     }
 
@@ -765,18 +730,26 @@ public class TournamentServiceImpl implements TournamentService {
 
     /**
      * Get development coefficient based on user's matches played since inception
+     * THRESHOLD_ELO = 2400 to moderate pro players
+     * THRESHOLD_MATCHES = 30 to moderate new players
      * 
      * @param user User object
      * @return development coefficient for ELO calculation
      */
     private Integer getDevelopmentCoefficient(User user) {
         List<Match> userMatches = matchService.getUserMatches(user);
-        if (user.getELO() > 2400) {
-            return 5;
+        final int THRESHOLD_ELO = 2400;
+        final int THRESHOLD_MATCHES = 30;
+        final int PRO_COEFFICIENT = 5;
+        final int NEWBIE_COEFFICIENT = 15;
+        final int DEFAULT_COEFFICIENT = 10;
+
+        if (user.getELO() > THRESHOLD_ELO) {
+            return PRO_COEFFICIENT;
         }
-        if (userMatches.size() < 30) {
-            return 15;
+        if (userMatches.size() < THRESHOLD_MATCHES) {
+            return NEWBIE_COEFFICIENT;
         }
-        return 10;
+        return DEFAULT_COEFFICIENT;
     }
 }

@@ -20,8 +20,8 @@ public class MatchController {
     /**
      * Updates match details of matches in list, saves updates to repository
      * 
-     * @param matches
-     * @return List<Match> matches updated
+     * @param matches List of match object to be updated
+     * @return List of matches updated
      */
     @PutMapping("/match/list")
     public List<Match> updateMatches(@Valid @RequestBody List<Match> matches) {

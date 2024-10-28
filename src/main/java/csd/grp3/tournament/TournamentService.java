@@ -25,7 +25,7 @@ public interface TournamentService {
     List<Tournament> getTournamentAboveMinBelowMax(int minELO, int maxELO);
     List<Tournament> getUserEligibleTournament(int ELO);
     double calculateBuchholzInTournament(User user, Tournament tournament);
-    void createPairings(Tournament tournament);
+    void createPairings(Tournament tournament, Round round);
     List<User> getSortedUsers(Long id);
     
     // public static void update(List<Match> matches, User user);
