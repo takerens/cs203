@@ -1,13 +1,21 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import NavLink from './NavLink';
 
 const Navbar = ({ userRole }) => {
     const navigate = useNavigate();
 
     const handleLogout = (e) => {
-        e.preventDefault(); // Stop default form submission
-        navigate("/login"); // Redirect to the login page
+        e.preventDefault(); // Prevent default form submission
+        navigate("/login"); // Navigate to the login page
     };
+
+    const renderNavItems = () => (
+        <>
+            <NavLink to="/tournaments" label="Tournaments" />
+            {userRole === 'ROLE_USER' && <NavLink to="/profile" label="Profile" />}
+        </>
+    );
 
     return (
         <nav className="navbar">
@@ -17,22 +25,22 @@ const Navbar = ({ userRole }) => {
                 </Link>
 
                 <ul className="navbar-nav">
-                    <li className="nav-item">
-                        <Link className="nav-link" to="/tournaments">Tournaments</Link>
-                    </li>
-                    {userRole === 'ROLE_USER' && (
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/profile">Profile</Link>
-                        </li>
-                    )}
+                    {renderNavItems()}
                 </ul>
 
-                <form onSubmit={handleLogout} className="logout-form">
-                    <button type="submit" className="logout-button">Log Out</button>
-                </form>
+                <LogoutButton onLogout={handleLogout} />
             </div>
         </nav>
     );
 };
+
+const LogoutButton = ({ onLogout }) => {
+    return (
+        <form onSubmit={onLogout} className="logout-form">
+            <button type="submit" className="logout-button">Log Out</button>
+        </form>
+    );
+};
+
 
 export default Navbar;

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
-import UserForm from '../components/UserForm';
-import { handleLogin } from '../utils/userUtils';
+import UserForm from '../components/user/UserForm';
+import { handleLogin } from '../utils/UserUtils';
 
 const Login = () => {
-
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
@@ -14,14 +13,13 @@ const Login = () => {
   };
 
   return (
-    <div className='container'>
-      <h1>Login</h1>
-      <ErrorMessage message={errorMessage} />
-      <UserForm
-        onSubmit={handleSubmit}
-        linkPath="/signup"
-      />
-    </div>
+    <main>
+      <div className='view'>
+        <h1>Login</h1>
+        <ErrorMessage message={errorMessage} />
+        <UserForm onSubmit={handleSubmit} linkPath="/signup" />
+      </div>
+    </main>
   );
 };
 

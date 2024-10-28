@@ -1,40 +1,22 @@
-import { apiRequest } from './apiUtils';
-
-const getTournamentTitleById = (tournaments, id) => {
-    const tournament = tournaments.find(t => t.id === id);
-    return tournament ? tournament.title : null; // Return title or null if not found
-};
-
-const createSuccessCallback = (message, navigate) => () => {
-    alert(message);
-    navigate('/tournaments'); // Return to Home Page
-};
-
-const createFetchCallback = (setFunction) => (data) => {
-    console.log(`${setFunction.name} Data:`, data);
-    setFunction(data);
-};
+import { apiRequest } from './ApiUtils';
+import { fetchCallback, getHomePage, successCallback } from './SuccessCallback';
 
 export const handleAddTournament = async (tournamentData, setErrorMessage, navigate) => {
-    const onSuccess = createSuccessCallback(`You have successfully created ${tournamentData.title}.`, navigate);
-
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/tournaments`,
         method: 'POST',
         body: tournamentData,
-        successCallback: onSuccess,
+        callback: getHomePage(`You have successfully created ${tournamentData.title}.`, navigate),
         setErrorMessage,
     });
 };
 
 export const handleUpdateTournament = async (tournamentData, tournamentId, setErrorMessage, navigate) => {
-    const onSuccess = createSuccessCallback(`You have successfully updated ${tournamentData.title}.`, navigate);
-
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/tournaments/${tournamentId}`,
         method: 'PUT',
         body: tournamentData,
-        successCallback: onSuccess,
+        callback: getHomePage(`You have successfully updated ${tournamentData.title}.`, navigate),
         setErrorMessage,
     });
 };
@@ -49,7 +31,7 @@ export const handleUpdateMatchResults = async (updatedMatches, setErrorMessage, 
         url: `${process.env.REACT_APP_API_URL}/match/updateList`,
         method: 'PUT',
         body: updatedMatches,
-        successCallback: onSuccess,
+        callback: onSuccess,
         setErrorMessage,
     });
 };
@@ -58,7 +40,7 @@ export const fetchTournamentData = async (tournamentId, setErrorMessage, setTour
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/tournaments/${tournamentId}`,
         method: 'GET',
-        successCallback: createFetchCallback(setTournament),
+        callback: fetchCallback(setTournament),
         setErrorMessage,
     });
 };
@@ -73,7 +55,7 @@ export const fetchRoundsAndMatches = async (tournamentId, setErrorMessage, setRo
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/tournaments/${tournamentId}/rounds`,
         method: 'GET',
-        successCallback: onSuccess,
+        callback: onSuccess,
         setErrorMessage,
     });
 };
@@ -82,7 +64,7 @@ export const fetchStandings = async (tournamentId, setErrorMessage, setStandings
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/tournaments/${tournamentId}/standings`,
         method: 'GET',
-        successCallback: createFetchCallback(setStandings),
+        callback: fetchCallback(setStandings),
         setErrorMessage,
     });
 };
@@ -91,7 +73,7 @@ export const fetchEligibleTournaments = async (elo, setErrorMessage, setTourname
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/tournaments/byElo/${elo}`,
         method: 'GET',
-        successCallback: createFetchCallback(setTournaments),
+        callback: fetchCallback(setTournaments),
         setErrorMessage,
     });
 };
@@ -100,7 +82,7 @@ export const fetchHistory = async (username, setErrorMessage, setHistory) => {
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/tournaments/byUser/${username}`,
         method: 'GET',
-        successCallback: createFetchCallback(setHistory),
+        callback: fetchCallback(setHistory),
         setErrorMessage,
     });
 };
@@ -109,50 +91,45 @@ export const fetchAllTournaments = async (setErrorMessage, setTournaments) => {
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/tournaments`,
         method: 'GET',
-        successCallback: createFetchCallback(setTournaments),
+        callback: fetchCallback(setTournaments),
         setErrorMessage,
     });
 };
 
-const createRegistrationCallback = (message, tournaments, tournamentId, userData, setErrorMessage, setTournaments) => () => {
+const registrationCallback = (message, userData, setErrorMessage, setTournaments) => () => {
     alert(message);
     fetchEligibleTournaments(userData.elo, setErrorMessage, setTournaments); // Refresh Page
 };
 
-export const handleRegister = async (tournaments, tournamentId, userData, setErrorMessage, setTournaments) => {
-    const onSuccess = createRegistrationCallback(`${userData.username} has registered for ${getTournamentTitleById(tournaments, tournamentId)}.`, tournaments, tournamentId, userData, setErrorMessage, setTournaments);
+export const handleRegister = async (title, tournamentId, userData, setErrorMessage, setTournaments) => {
+    const onSuccess = registrationCallback(`${userData.username} has registered for ${title}.`, userData, setErrorMessage, setTournaments);
 
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/tournaments/${tournamentId}/register`,
         method: 'POST',
         body: userData,
-        successCallback: onSuccess,
+        callback: onSuccess,
         setErrorMessage,
     });
 };
 
-export const handleWithdraw = async (tournaments, tournamentId, userData, setErrorMessage, setTournaments) => {
-    const onSuccess = createRegistrationCallback(`${userData.username} has withdrawn from ${getTournamentTitleById(tournaments, tournamentId)}.`, tournaments, tournamentId, userData, setErrorMessage, setTournaments);
+export const handleWithdraw = async (title, tournamentId, userData, setErrorMessage, setTournaments) => {
+    const onSuccess = registrationCallback(`${userData.username} has withdrawn from ${title}.`, userData, setErrorMessage, setTournaments);
 
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/tournaments/${tournamentId}/withdraw`,
         method: 'DELETE',
         body: userData,
-        successCallback: onSuccess,
+        callback: onSuccess,
         setErrorMessage,
     });
 };
 
-export const handleDeleteTournament = async (tournaments, tournamentId, setErrorMessage, setTournaments) => {
-    const onSuccess = () => {
-        alert(`${getTournamentTitleById(tournaments, tournamentId)} has been deleted.`); // Success message
-        fetchAllTournaments(setErrorMessage, setTournaments); // Refresh Page
-    };
-
+export const handleDeleteTournament = async (title, tournamentId, setErrorMessage, setTournaments) => {
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/tournaments/${tournamentId}`,
         method: 'DELETE',
-        successCallback: onSuccess,
+        callback: successCallback(`${title} has been deleted.`, () => fetchAllTournaments(setErrorMessage, setTournaments)),
         setErrorMessage,
     });
 };

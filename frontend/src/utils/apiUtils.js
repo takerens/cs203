@@ -1,4 +1,4 @@
-export const apiRequest = async ({ url, method, body, successCallback, setErrorMessage }) => {
+export const apiRequest = async ({ url, method, body, callback, setErrorMessage }) => {
     setErrorMessage(''); // Clear previous error message
 
     try {
@@ -18,7 +18,7 @@ export const apiRequest = async ({ url, method, body, successCallback, setErrorM
 
         // Check if the response has a body before parsing
         const responseData = response.status !== 204 ? await response.json() : null;
-        successCallback?.(responseData); // Call success callback if provided
+        callback?.(responseData); // Call success callback if provided
     } catch (error) {
         setErrorMessage(error.message); // Handle error
     }

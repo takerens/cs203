@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import ErrorMessage from '../components/ErrorMessage';
 import Navbar from '../components/Navbar';
 import FormField from '../components/FormField';
-import { fetchUserData, handlePassword } from '../utils/userUtils';
+import TableComponent from '../components/TableComponent';
+import { fetchUserData, handlePassword } from '../utils/UserUtils';
 
 const Profile = () => {
     const [errorMessage, setErrorMessage] = useState('');
@@ -23,24 +24,14 @@ const Profile = () => {
         await handlePassword(userData, setErrorMessage, setNewPassword);
     };
 
-    const renderUserInfo = () => (
-        <table>
-            <tbody>
-                <tr>
-                    <td><strong>Username:</strong></td>
-                    <td>{user.username}</td>
-                </tr>
-                <tr>
-                    <td><strong>Change Password:</strong></td>
-                    <td>{renderPasswordChangeForm()}</td>
-                </tr>
-                <tr>
-                    <td><strong>Rating:</strong></td>
-                    <td>{user.elo}</td>
-                </tr>
-            </tbody>
-        </table>
-    );
+    const renderUserInfo = () => {
+        const rows = [
+            ["Username:", user.username],
+            ["Change Password:", renderPasswordChangeForm()],
+            ["Rating:", user.elo]
+        ];
+        return <TableComponent rows={rows} />;
+    };
 
     const renderPasswordChangeForm = () => (
         <form onSubmit={handleSubmit}>

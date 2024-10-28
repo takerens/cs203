@@ -1,18 +1,10 @@
-/* LOGIN & REGISTRATION */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f4f4f4;
 }
-.container {
-  width: 325px;
-  margin: 50px auto;
-  padding: 20px;
-  background: white;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
+/* FORM FIELDS */
 input[type="text"],
 input[type="date"],
 input[type="number"],
@@ -23,7 +15,8 @@ input[type="password"] {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
-/* LOGIN BUTTON */
+
+/* LOGIN/SIGNUP BUTTON */
 input[type="submit"].blue-button {
     background: #007bff;
     color: white;
@@ -31,18 +24,13 @@ input[type="submit"].blue-button {
     padding: 10px;
     cursor: pointer;
     border-radius: 5px;
-    width: 325px;
+    width: 400px;
 }
 input[type="submit"].blue-button:hover {
     background: #0056b3;
 }
 
 /* NAVIGATION */
-.nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 .navbar {
   background-color: #A3C1DA; /* Blue background */
   padding: 15px; /* Padding for the navbar */
@@ -50,6 +38,11 @@ input[type="submit"].blue-button:hover {
 .secondary-navbar {
   background-color: lightgray; /* Gray background */
   padding: 15px; /* Padding for the navbar */
+}
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .navbar-brand {
   color: black;
@@ -91,6 +84,21 @@ input[type="submit"].blue-button:hover {
 }
 
 /* MAIN */
+main {
+  width: 100%; /* Full width */
+  max-width: 800px; /* Optional: limit max width */
+  margin: 20px auto; /* Center horizontally */
+  padding: 20px; /* Padding around the content */
+  background-color: white; /* White background */
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  text-align: center; /* Center text */
+}
+.view {
+  display: block; /* Ensure these sections are block elements */
+  width: 100%; /* Take the full width */
+  margin-top: 20px;
+}
 h1 {
   color: #333; /* Dark gray for headings */
   text-align: center;
@@ -99,23 +107,28 @@ h2 {
   color: #4CAF50; /* Green for subheadings */
   text-align: center;
 }
-.button {
-  display: inline-block;
-  background-color: #4CAF50; /* Green button */
-  color: white;
-  padding: 10px 20px;
-  text-decoration: none; /* No underline */
-  border-radius: 5px; /* Rounded corners */
-  margin: 10px 0; /* Margin for spacing */
+
+/* PAGINATION */
+.pagination {
+  margin-bottom: 20px;
 }
-.button:hover {
-  background-color: #45a049; /* Darker green on hover */
+.pagination a {
+  margin: 0 5px;
+  text-decoration: underline;
+  color: lightblue (63, 63, 190);
 }
-button:disabled {
-  background-color: #CCCCCC; /* Gray out the button */
-  cursor: not-allowed;       /* Show not-allowed cursor */
-  color: #666666;            /* Gray out text */
+.pagination a.current {
+  text-decoration: none;
+  font-weight: bold;
+  color: red;
 }
+.pagination a.unclickable {
+  pointer-events: none; /* Disable click events */
+  color: gray; /* Change text color to indicate it's unclickable */
+  cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+}
+
+/* TABLE */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -129,65 +142,15 @@ th, td {
 th {
   background-color: #f2f2f2;
 }
-.centered {
-  text-align: center; /* Center text horizontally */
+.table-link {
+  text-decoration: none; /* Remove underline */
 }
-.button.centered {
-  display: block; /* Make the button take up the full width */
-  margin: 10px auto; /* Center the button with auto margins */
-  width: fit-content; /* Adjust width to fit content */
+.table-button {
+  display: block; /* Ensure buttons are displayed in block format */
 }
-main {
-  width: 100%; /* Full width */
-  max-width: 800px; /* Optional: limit max width */
-  margin: 20px auto; /* Center horizontally */
-  padding: 20px; /* Padding around the content */
-  background-color: white; /* White background */
-  border-radius: 5px; /* Rounded corners */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  text-align: center; /* Center text */
-}
-h1, h2, p {
-  margin: 10px 0; /* Margin for spacing */
-}
-.view {
-  display: block; /* Ensure these sections are block elements */
-  width: 100%; /* Take the full width */
-  margin-top: 20px;
+button:disabled {
+  background-color: #CCCCCC; /* Gray out the button */
+  cursor: not-allowed;       /* Show not-allowed cursor */
+  color: #666666;            /* Gray out text */
 }
 
-/* PAGINATION */
-.pagination {
-  margin-bottom: 20px;
-}
-.pagination a {
-  margin: 0 5px;
-  text-decoration: underline;
-  color: lightblue
-  (63, 63, 190);
-
-}
-.pagination a.current {
-  text-decoration: none;
-  font-weight: bold;
-  color: red;
-}
-.pagination a.unclickable {
-  pointer-events: none; /* Disable click events */
-  color: gray; /* Change text color to indicate it's unclickable */
-  cursor: not-allowed; /* Change cursor to indicate it's not clickable */
-}
-
-
-.admin-link {
-    text-decoration: none; /* Remove underline */
-}
-
-.admin-link button {
-    padding: 100; /* Optional: Adjust padding if needed */
-    cursor: pointer; /* Optional: Change cursor to pointer */
-}
-
-.admin-buttons button {
-    display: block; /* Ensure buttons are displayed in block format */
-}

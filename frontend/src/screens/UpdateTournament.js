@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
-import TournamentForm from '../components/TournamentForm';
-import { fetchTournamentData, handleUpdateTournament } from '../utils/tournamentUtils';
+import TournamentForm from '../components/tournament/TournamentForm';
+import { fetchTournamentData, handleUpdateTournament } from '../utils/TournamentUtils';
 
 const UpdateTournament = () => {
     const { tournamentId } = useParams();
@@ -19,14 +19,13 @@ const UpdateTournament = () => {
     };
 
     return (
-        <div className="container">
-            <h1>Update Tournament</h1>
-            <ErrorMessage message={errorMessage} />
-            <TournamentForm
-                tournament={tournament}
-                onSubmit={handleSubmit}
-            />
-        </div>
+        <main>
+            <div className="view">
+                <h1>Update Tournament</h1>
+                <ErrorMessage message={errorMessage} />
+                <TournamentForm tournament={tournament} onSubmit={handleSubmit} />
+            </div>
+        </main>
     );
 };
 

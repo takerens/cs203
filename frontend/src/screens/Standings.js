@@ -3,8 +3,9 @@ import { useParams } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
 import Navbar from '../components/Navbar';
 import SecondaryNavbar from '../components/SecondaryNavbar';
-import { fetchUserData } from '../utils/userUtils';
-import { fetchTournamentData, fetchStandings } from '../utils/tournamentUtils';
+import StandingsTable from '../components/tournament/StandingsTable';
+import { fetchUserData } from '../utils/UserUtils';
+import { fetchTournamentData, fetchStandings } from '../utils/TournamentUtils';
 
 const TournamentStandings = () => {
     const { tournamentId } = useParams();
@@ -19,43 +20,16 @@ const TournamentStandings = () => {
         fetchStandings(tournamentId, setErrorMessage, setStandings);
     }, [tournamentId]);
 
-    const getUserTournament = (userTournaments, tournamentId, username) => {
-        return (userTournaments.find(tournament =>
-            tournament.id.tournamentId === tournamentId &&
-            tournament.id.username === username
-        ));
-    };
-
     return (
-        <><Navbar userRole={user.userRole} />
+        <>
+            <Navbar userRole={user.userRole} />
             <SecondaryNavbar tournament={tournament} />
             <main>
                 <h3>Standings</h3>
                 <ErrorMessage message={errorMessage} />
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Player</th>
-                            <th>Rating</th>
-                            <th>Points</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {standings.map((player, index) => {
-                            const ut = getUserTournament(player.userTournaments, tournament.id, player.username); // Get user tournament
-                            return ( // Return the JSX
-                                <tr key={player.username}>
-                                    <td>{index + 1}</td>
-                                    <td>{player.username}</td>
-                                    <td>{player.elo}</td>
-                                    <td>{ut.gamePoints}</td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </main></>
+                <StandingsTable standings={standings} tournament={tournament} />
+            </main>
+        </>
     );
 };
 

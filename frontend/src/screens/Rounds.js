@@ -4,8 +4,9 @@ import Pagination from '../components/Pagination';
 import ErrorMessage from '../components/ErrorMessage';
 import Navbar from '../components/Navbar';
 import SecondaryNavbar from '../components/SecondaryNavbar';
-import { fetchUserData } from '../utils/userUtils';
-import { fetchTournamentData, fetchRoundsAndMatches, handleUpdateMatchResults } from '../utils/tournamentUtils';
+import MatchesTable from '../components/tournament/MatchTable';
+import { fetchUserData } from '../utils/UserUtils';
+import { fetchTournamentData, fetchRoundsAndMatches, handleUpdateMatchResults } from '../utils/TournamentUtils';
 
 const TournamentRounds = () => {
     const { tournamentId, roundNumber } = useParams();
@@ -17,13 +18,12 @@ const TournamentRounds = () => {
     const [newResults, setNewResults] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
 
-    // When page loaded, fetch user data
-    useEffect(() => {
+    useEffect(() => { // Fetch user and tournament data when page loads
         fetchUserData(setErrorMessage, setUser);
         fetchTournamentData(tournamentId, setErrorMessage, setTournament);
     }, []);
 
-    useEffect(() => {
+    useEffect(() => { // Fetch rounds and matches whenever roundNumber changes
         fetchRoundsAndMatches(tournamentId, setErrorMessage, setRounds, setMatches, roundNumber);
     }, [roundNumber]);
 
@@ -43,15 +43,6 @@ const TournamentRounds = () => {
         }));
     };
 
-    const displayResult = (result) => {
-        switch (result) {
-            case 1: return '1:0';
-            case -1: return '0:1';
-            case 0.5: return '0.5:0.5';
-            default: return 'N/A';
-        }
-    };
-
     return (
         <><Navbar userRole={user.userRole} />
             <SecondaryNavbar tournament={tournament} />
@@ -62,7 +53,7 @@ const TournamentRounds = () => {
                 <ErrorMessage message={errorMessage} />
 
                 <div>
-                    {user.userRole === 'ROLE_ADMIN' && !editing && !rounds[roundNumber - 1]?.over &&(
+                    {user.userRole === 'ROLE_ADMIN' && !editing && !rounds[roundNumber - 1]?.over && (
                         <button onClick={() => setEditing(true)}>Edit Match Details</button>
                     )}
                     {editing && (
@@ -70,50 +61,7 @@ const TournamentRounds = () => {
                     )}
                 </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>White Player</th>
-                            <th>Rating</th>
-                            <th>Results</th>
-                            <th>Black Player</th>
-                            <th>Rating</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {matches.length > 0 ? (
-                            matches.map((match, index) => (
-                                <tr key={match.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{match.white.username}</td>
-                                    <td>{match.white.elo}</td>
-                                    <td>
-                                        {editing && !match.bye ? (
-                                            <select
-                                            value={newResults[match.id] !== undefined ? newResults[match.id] : match.result}
-                                                onChange={(e) => handleDropdownChange(match.id, e.target.value)}
-                                            >
-                                                <option value="0.0">N/A</option>
-                                                <option value="1">1:0</option>
-                                                <option value="-1">0:1</option>
-                                                <option value="0.5">0.5:0.5</option>
-                                            </select>
-                                        ) : (
-                                            <span>{displayResult(match.result)}</span>
-                                        )}
-                                    </td>
-                                    <td>{match.black.username}</td>
-                                    <td>{match.black.elo}</td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="8">No matches available.</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                <MatchesTable matches={matches} editing={editing} newResults={newResults} handleChange={handleDropdownChange} />
             </main>
         </>
     );
