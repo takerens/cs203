@@ -9,9 +9,4 @@ public class RoundNotFoundException extends RuntimeException {
     public RoundNotFoundException() {
         super("round not found");
     }
-
-    public RoundNotFoundException(String message) {
-        super(message);
-    }
-
 }

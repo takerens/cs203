@@ -46,6 +46,12 @@ public class UserTournament {
 
     private double matchPoints = 0;
 
+    public UserTournament(Tournament tournament, User user, Character status) {
+        this.tournament = tournament;
+        this.user = user;
+        this.status = status;
+    }
+
     public void setStatus(Character status) {
         if (status != null && !status.equals('r') && !status.equals('w') && !status.equals('b')) {
             throw new IllegalArgumentException("Status must be r : registered or w : waiting list or b: bye list");

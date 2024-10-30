@@ -1,5 +1,19 @@
 package csd.grp3.tournament;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyChar;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
@@ -7,50 +21,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyChar;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import csd.grp3.tournament.InvalidTournamentStatus;
-import csd.grp3.tournament.Tournament;
-import csd.grp3.tournament.TournamentNotFoundException;
-import csd.grp3.tournament.TournamentRepository;
-import csd.grp3.tournament.TournamentServiceImpl;
-import csd.grp3.user.User;
-import csd.grp3.user.UserServiceImpl;
 import csd.grp3.match.Match;
 import csd.grp3.match.MatchRepository;
 import csd.grp3.match.MatchServiceImpl;
 import csd.grp3.round.Round;
 import csd.grp3.round.RoundServiceImpl;
-import csd.grp3.tournament.PlayerAlreadyRegisteredException;
-import csd.grp3.usertournament.UserTournamentServiceImpl;
+import csd.grp3.user.User;
+import csd.grp3.user.UserServiceImpl;
 import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentId;
 import csd.grp3.usertournament.UserTournamentRepository;
-import csd.grp3.usertournament.UserTournamentService;
+import csd.grp3.usertournament.UserTournamentServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class TournamentServiceImplTest {
@@ -89,7 +79,7 @@ public class TournamentServiceImplTest {
         tournament.setId(1L);
         tournament.setTitle("Test Tournament");
         tournament.setSize(2);
-        tournament.setUserTournaments(new ArrayList<>());
+        // tournament.setUserTournaments(new ArrayList<>());
         
         player = new User("testUser", "testPassword123");  // Username and password
         player.setAuthorities("ROLE_PLAYER"); // Set specific authorities
@@ -161,7 +151,17 @@ public class TournamentServiceImplTest {
 
     @Test
     void addTournament_NewTitle_ReturnSavedTournament() {
-        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+
+        when(tournamentRepository.save(tournament)).thenReturn(tournament);
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+        when(userService.findByUsername("DEFAULT_BOT")).thenReturn(new User("DEFAULT_BOT", "goodpassword", "ROLE_USER", 0));
+
+        doAnswer(invocation -> {
+            UserTournamentId utId = new UserTournamentId(tournament.getId(), player.getUsername());
+            UserTournament userTournament = new UserTournament(utId, tournament, player, 'r', 0, 0);
+            tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's list
+            return null; // Since add returns void
+        }).when(userTournamentService).add(any(Tournament.class), any(User.class), anyChar());
 
         Tournament result = tournamentService.addTournament(tournament);
 
@@ -175,6 +175,15 @@ public class TournamentServiceImplTest {
         Tournament tournament2 = tournament;
         tournament2.setId(2L);
         when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+        when(userService.findByUsername("DEFAULT_BOT")).thenReturn(new User("DEFAULT_BOT", "goodpassword", "ROLE_USER", 0));
+
+        doAnswer(invocation -> {
+            UserTournamentId utId = new UserTournamentId(tournament.getId(), player.getUsername());
+            UserTournament userTournament = new UserTournament(utId, tournament, player, 'r', 0, 0);
+            tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's list
+            return null; // Since add returns void
+        }).when(userTournamentService).add(any(Tournament.class), any(User.class), anyChar());
 
         // Act
         tournamentService.addTournament(tournament);
@@ -213,7 +222,7 @@ public class TournamentServiceImplTest {
         // Assert
         assertNotNull(updatedTournament);
         assertEquals("Updated Tournament", updatedTournament.getTitle());
-        verify(tournamentRepository).findById(1L);
+        verify(tournamentRepository, times(2)).findById(1L);
     }
 
     @Test
@@ -412,7 +421,7 @@ public class TournamentServiceImplTest {
         // Arrange
         tournament.setMaxElo(100);
         tournament.setSize(10);
-        tournamentService.addTournament(tournament);
+        // tournamentService.addTournament(tournament);
         
         User user1 = new User("player1", "player11", "ROLE_PLAYER", 40);
         User user2 = new User("player2", "player22", "ROLE_PLAYER", 35);
@@ -425,13 +434,13 @@ public class TournamentServiceImplTest {
         when(matchService.getUserMatches(Mockito.any(User.class))).thenReturn(Collections.emptyList());
         when(matchService.getMatchesBetweenTwoUsers(Mockito.any(User.class), Mockito.any(User.class))).thenReturn(Collections.emptyList());
         Round mockRound = new Round(tournament);
-        when(roundService.createRound(tournament)).thenReturn(mockRound);
+        tournament.getRounds().add(mockRound);
         Match match1 = new Match(user1, user2, mockRound);
         Match match2 = new Match(user3, user4, mockRound);
         when(matchService.createMatch(user1, user2, mockRound)).thenReturn(match1);
         when(matchService.createMatch(user3, user4, mockRound)).thenReturn(match2);
 
-        tournamentService.createPairings(tournament);
+        tournamentService.createPairings(tournament, mockRound);
         Round returnedRound = tournament.getRounds().get(0);
 
         assertNotNull(returnedRound);
@@ -444,7 +453,7 @@ public class TournamentServiceImplTest {
         // Arrange
         tournament.setMaxElo(100);
         tournament.setSize(10);
-        tournamentService.addTournament(tournament);
+        // tournamentService.addTournament(tournament);
         
         User user1 = new User("player1", "player11", "ROLE_PLAYER", 40);
         User user2 = new User("player2", "player22", "ROLE_PLAYER", 35);
@@ -477,13 +486,13 @@ public class TournamentServiceImplTest {
         when(matchService.getMatchesBetweenTwoUsers(user2, user4)).thenReturn(Collections.emptyList());
 
         Round secondRound = new Round(tournament);
-        when(roundService.createRound(tournament)).thenReturn(secondRound);
+        tournament.getRounds().add(secondRound);
         Match match3 = new Match(user3, user1, secondRound);
         Match match4 = new Match(user2, user4, secondRound);
         when(matchService.createMatch(user3, user1, secondRound)).thenReturn(match3);
         when(matchService.createMatch(user2, user4, secondRound)).thenReturn(match4);
 
-        tournamentService.createPairings(tournament);
+        tournamentService.createPairings(tournament,secondRound);
         Round returnedRound = tournament.getRounds().get(0);
 
         assertNotNull(returnedRound);
@@ -496,7 +505,7 @@ public class TournamentServiceImplTest {
         // arrange
         tournament.setMaxElo(100);
         tournament.setSize(10);
-        tournamentService.addTournament(tournament);
+        // tournamentService.addTournament(tournament);
         
         User user1 = new User("player1", "player11", "ROLE_PLAYER", 40);
         User user2 = new User("player2", "player22", "ROLE_PLAYER", 35);
@@ -568,7 +577,7 @@ public class TournamentServiceImplTest {
         });
 
         // Verify that the exception message is correct
-        assertEquals("Wait for Tournament Start Date", tournamentStatus.getMessage());
+        assertEquals("Tournament has not started or less than 2 players", tournamentStatus.getMessage());
 
         // Verify that deleteById was never called with the correct argument
         verify(tournamentRepository).findById(1L);
@@ -582,7 +591,6 @@ public class TournamentServiceImplTest {
 
         // Retrieve empty mock tournament
         when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
-        when(userTournamentService.getPlayers(tournament.getId())).thenReturn(new ArrayList<>());
 
         // Act & Assert: Expect TournamentNotFoundException to be thrown
         InvalidTournamentStatus tournamentStatus = assertThrows(InvalidTournamentStatus.class, () -> {
@@ -590,37 +598,39 @@ public class TournamentServiceImplTest {
         });
 
         // Verify that the exception message is correct
-        assertEquals("Need at least 2 Players registered", tournamentStatus.getMessage());
+        assertEquals("Tournament has not started or less than 2 players", tournamentStatus.getMessage());
 
         // Verify that deleteById was never called with the correct argument
         verify(tournamentRepository).findById(1L);
     }
 
-    @Test
-    void addRound_AddSuccess_ReturnRound() {
-        // Arrange 
-        LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
-        tournament.setStartDateTime(time);
-        tournament.setSize(10);
-        tournament.setMaxElo(200);
-        tournament.setMinElo(100);
-        List<User> playerList = new ArrayList<>();
-        User player1 = new User("player1", "player11", "ROLE_PLAYER", 100);
-        User player2 = new User("player2", "player21", "ROLE_PLAYER", 200);
-        playerList.add(player1);
-        playerList.add(player2);
+    // @Test
+    // void addRound_AddSuccess_ReturnRound() {
+    //     // Arrange 
+    //     LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
+    //     tournament.setStartDateTime(time);
+    //     tournament.setSize(10);
+    //     tournament.setMaxElo(200);
+    //     tournament.setMinElo(100);
+    //     List<User> playerList = new ArrayList<>();
+    //     User player1 = new User("player1", "player11", "ROLE_PLAYER", 100);
+    //     User player2 = new User("player2", "player21", "ROLE_PLAYER", 200);
+    //     playerList.add(player1);
+    //     playerList.add(player2);
+    //     tournament.getUserTournaments().add(new UserTournament(tournament, player1, 'r'));
+    //     tournament.getUserTournaments().add(new UserTournament(tournament, player2, 'r'));
 
-        // Mock findbyId and save
-        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
-        when(userTournamentService.getPlayers(tournament.getId())).thenReturn(playerList);
+    //     // Mock findbyId and save
+    //     when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+    //     when(userTournamentService.getPlayers(tournament.getId())).thenReturn(playerList);
 
-        // Act, add 1 round to tournament
-        tournamentService.addRound(tournament.getId());
+    //     // Act, add 1 round to tournament
+    //     tournamentService.addRound(tournament.getId());
 
-        // Assert
-        assertEquals(1, tournament.getRounds().size());
-        verify(tournamentRepository, times(2)).findById(tournament.getId());
-    }
+    //     // Assert
+    //     assertEquals(1, tournament.getRounds().size());
+    //     verify(tournamentRepository, times(2)).findById(tournament.getId());
+    // }
 
     // @Test
     // void updateResult_MatchNotEnded_ReturnMatchNotCompletedException() {

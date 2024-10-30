@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import csd.grp3.tournament.Tournament;
 import csd.grp3.user.User;
+import csd.grp3.user.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -18,14 +19,26 @@ public class UserTournamentServiceImpl implements UserTournamentService {
     @Autowired
     private UserTournamentRepository userTournamentRepo;
 
+    @Autowired
+    private UserService userService;
+
     public UserTournament findRecord(Long tourneyID, String username) throws UserTournamentNotFoundException {
         return userTournamentRepo.findById_TournamentIdAndId_Username(tourneyID, username)
                 .orElseThrow(() -> new UserTournamentNotFoundException());
     }
 
+    /**
+     * Retrieves a list of players registered for a given tournament, excluding the default bot user.
+     *
+     * @param tourneyID the ID of the tournament for which to retrieve the players
+     * @return a list of users registered for the specified tournament, excluding the default bot user
+     */
     @Override
     public List<User> getPlayers(Long tourneyID) {
-        return userTournamentRepo.findRegisteredUsersByTournamentId(tourneyID);
+        List<User> players = userTournamentRepo.findRegisteredUsersByTournamentId(tourneyID);
+        User user = userService.findByUsername("DEFAULT_BOT");
+        players.remove(user);
+        return players;
     }
 
     @Override
