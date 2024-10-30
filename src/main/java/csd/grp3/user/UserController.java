@@ -1,8 +1,9 @@
 package csd.grp3.user;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -11,42 +12,47 @@ import jakarta.validation.Valid;
 public class UserController {
     private UserService userService;
 
-    //TEMPORARY
-    private User user;
+    // //TEMPORARY
+    // private User user;
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+    // public void setUser(User user) {
+    //     this.user = user;
+    // }
 
-    User getUser() {
-        return this.user;
-    }
-    // Till HERE
+    // User getUser() {
+    //     return this.user;
+    // }
+    // // Till HERE
 
     public UserController(UserService userService) {
         this.userService = userService;
-        this.user = null; //TEMP
+        // this.user = null; //TEMP
     }
 
+    // @GetMapping("/user")
+    // public ResponseEntity<User> getUserDetails() {
+    //     if (getUser() != null) {
+    //         return ResponseEntity.ok(getUser());
+    //     }
+    //     return ResponseEntity.notFound().build();
+    // }
     @GetMapping("/user")
-    public ResponseEntity<User> getUserDetails() {
-        if (getUser() != null) {
-            return ResponseEntity.ok(getUser());
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> userList = userService.listUsers();
+        return ResponseEntity.status(HttpStatus.OK).body(userList);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> registerUser(@Valid @RequestBody User user) throws MethodArgumentNotValidException {
+    public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
         User createdUser = userService.createNewUser(user.getUsername(), user.getPassword());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody User user) {
-        User loggedIn = userService.login(user.getUsername(), user.getPassword());
-        setUser(loggedIn);
-        return ResponseEntity.status(HttpStatus.OK).body(loggedIn);
+    public ResponseEntity<String> loginUser(@RequestBody User user) {
+        String token = userService.login(user.getUsername(), user.getPassword());
+        // setUser(loggedIn);
+        return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 
     @GetMapping("/profile/{username}")

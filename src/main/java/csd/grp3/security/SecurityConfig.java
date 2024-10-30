@@ -1,29 +1,41 @@
 package csd.grp3.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import csd.grp3.jwt.JwtFilter;
+import csd.grp3.user.CustomUserDetailsService;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
 
-    private UserDetailsService userDetailsService;
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
 
-    public SecurityConfig(UserDetailsService userSvc) {
-        this.userDetailsService = userSvc;
+    @Autowired
+    private JwtFilter jwtFilter;
+
+    public SecurityConfig(CustomUserDetailsService userDetailsSvc) {
+        this.userDetailsService = userDetailsSvc;
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
         authProvider.setUserDetailsService(userDetailsService);
@@ -33,21 +45,22 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests((authz) -> authz
-                    .requestMatchers(HttpMethod.POST,"/register").permitAll()
-                    .anyRequest().permitAll())
-            // ensure that the application won’t create any session in our stateless REST APIs
-            .sessionManagement(configurer ->
-            configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .httpBasic(Customizer.withDefaults())
-            .csrf(csrf -> csrf.disable()) // CSRF protection is needed only for browser based attacks
-            .formLogin(form -> form.disable())
-            .headers(header -> header.disable()) // disable the security headers, as we do not return HTML in our
-                                                    // APIs
-            .authenticationProvider(authenticationProvider());
-        return http.build();
+        return http.csrf(customizer -> customizer.disable()).
+                authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.POST, "/signup").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user").hasAnyRole("ADMIN")
+                        .anyRequest().authenticated()).
+                httpBasic(Customizer.withDefaults()).
+                sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean

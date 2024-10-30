@@ -40,26 +40,26 @@ public class UserControllerTest {
         validator = factory.getValidator();
     }
 
-    @Test
-    public void getUserDetails_Success() {
-        //Arrange
-        UserController uc = new UserController(userService);
-        User user = new User("username", "password");
-        uc.setUser(user);
+    // @Test
+    // public void getUserDetails_Success() {
+    //     //Arrange
+    //     UserController uc = new UserController(userService);
+    //     User user = new User("username", "password");
+    //     uc.setUser(user);
 
-        ResponseEntity<User> response = uc.getUserDetails();
+    //     ResponseEntity<User> response = uc.getUserDetails();
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(user, response.getBody());
-    }
+    //     assertEquals(HttpStatus.OK, response.getStatusCode());
+    //     assertEquals(user, response.getBody());
+    // }
 
-    @Test
-    public void getUserDetails_Fail_ReturnNotFound() {
-        ResponseEntity<User> response = userController.getUserDetails();
+    // @Test
+    // public void getUserDetails_Fail_ReturnNotFound() {
+    //     ResponseEntity<User> response = userController.getUserDetails();
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals(null, response.getBody());
-    }
+    //     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    //     assertEquals(null, response.getBody());
+    // }
 
     @Test
     public void registerUser_Success() throws MethodArgumentNotValidException {
