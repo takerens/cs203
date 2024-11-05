@@ -5,10 +5,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -23,7 +21,6 @@ public class UserServiceImpl implements UserService {
     public User findByUsername(String username) throws UserNotFoundException{
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-
     }
 
     @Override
@@ -32,25 +29,26 @@ public class UserServiceImpl implements UserService {
 
         //Check if the username already exists, if it does throw exception
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new BadCredentialsException("Username already taken. Try a different username.");
+            throw new BadCredentialsException("Username already exists");
         }
 
         // Encode password given by user to store
         String encodedPassword = encoder.encode(password);
+
         return userRepository.save(new User(username, encodedPassword));
     }
 
     @Override
-
     public User login(String username, String password) throws UserNotFoundException, BadCredentialsException{
         //Get the password associated with the searched username
-
         User user = findByUsername(username);
+        String encodedPassword = user.getPassword();
 
         //Return the user if the password matches
-        if (encoder.matches(password, user.getPassword())) {
+        if (encoder.matches(password, encodedPassword)) {
             return user;
         }
+        //Else throw exception
         throw new BadCredentialsException("Password does not match");
     }
 
@@ -70,19 +68,12 @@ public class UserServiceImpl implements UserService {
         User user = findByUsername(username);
         userRepository.delete(user);
         return username;
-
     }
 
     @Override
-    public void updateELO(User tempUser, int newELO) {
+    public void updateELO(User tempUser, int ELO) {
         User user = findByUsername(tempUser.getUsername());
-        user.setELO(newELO);
+        user.setELO(ELO);
         userRepository.save(user);
-    }
-
-    @Override
-    public void deleteUser(User user) {
-        login(user.getUsername(), user.getPassword());
-        userRepository.delete(user);
     }
 }

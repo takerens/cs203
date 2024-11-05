@@ -3,7 +3,6 @@ package csd.grp3.tournament;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -22,8 +21,6 @@ import csd.grp3.user.User;
 import csd.grp3.user.UserService;
 import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -60,6 +57,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     @Transactional
     public Tournament addTournament(Tournament newTournamentInfo) {
+        newTournamentInfo.setSize(newTournamentInfo.getSize() + 1);
         tournaments.save(newTournamentInfo);
         registerUser(userService.findByUsername("DEFAULT_BOT"), newTournamentInfo.getId());
         return newTournamentInfo;
@@ -197,7 +195,6 @@ public class TournamentServiceImpl implements TournamentService {
      * 
      * @param tournamentID Long
      */
-
     @Override
     @Transactional
     public void deleteTournament(Long tournamentID) {
@@ -369,7 +366,6 @@ public class TournamentServiceImpl implements TournamentService {
         }
     }
 
-
     /**
      * Get list of tournaments above minELO
      * 
@@ -377,7 +373,6 @@ public class TournamentServiceImpl implements TournamentService {
      * @return List of tournaments
      */
     public List<Tournament> getTournamentAboveMin(int minELO) {
-
         List<Tournament> tournamentList = listTournaments();
         List<Tournament> tournamentListAboveMin = new ArrayList<>();
 
@@ -439,7 +434,6 @@ public class TournamentServiceImpl implements TournamentService {
 
         for (Tournament tournament : tournamentList) {
             if (isUserEloEligible(tournament, userELO)) {
-
                 eligibleTournamentList.add(tournament);
             }
         }
@@ -528,18 +522,6 @@ public class TournamentServiceImpl implements TournamentService {
         Set<User> pairedUsers = new HashSet<>();
         List<Match> matches = round.getMatches();
         List<User> users = getSortedUsers(tournament.getId());
-
-        if (users.size() % 2 == 0) {
-            User bot = users.get(users.size() - 1);
-            User worst = users.get(users.size() - 2); // avoid bot
-            String color = "white";
-            Match match = createMatchWithUserColour(worst, color, bot, nextRound);
-            match.setBYE(true);
-            match.setResult(color.equals("white") ? 1 : -1);
-            match.setRound(nextRound);
-            matches.add(match);
-            pairedUsers.add(users.get(users.size() - 1));
-        }
 
         for (int i = 0; i < users.size(); i++) {
             User user1 = users.get(i);
@@ -768,17 +750,5 @@ public class TournamentServiceImpl implements TournamentService {
             return NEWBIE_COEFFICIENT;
         }
         return DEFAULT_COEFFICIENT;
-    }
-
-    @Override
-    public List<Tournament> getHistoryByUser(String username) {
-        List<Tournament> list = new ArrayList<>();
-        User user = userService.findByUsername(username);
-        for (UserTournament ut : user.getUserTournaments()) {
-            if (ut.getTournament().isOver()) {
-                list.add(ut.getTournament());
-            }
-        }
-        return list;
     }
 }

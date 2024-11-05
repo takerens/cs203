@@ -9,8 +9,8 @@ import jakarta.validation.Valid;
 
 @RestController
 public class UserController {
-
     private UserService userService;
+
     //TEMPORARY
     private User user;
 
@@ -25,13 +25,13 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
-        this.currentUser = null; //TEMP - Initialize with no user
+        this.user = null; //TEMP
     }
 
     @GetMapping("/user")
     public ResponseEntity<User> getUserDetails() {
-        if (currentUser != null) {
-            return ResponseEntity.ok(currentUser);    
+        if (getUser() != null) {
+            return ResponseEntity.ok(getUser());
         }
         return ResponseEntity.notFound().build();
     }
@@ -39,31 +39,25 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<User> registerUser(@Valid @RequestBody User user) throws MethodArgumentNotValidException {
         User createdUser = userService.createNewUser(user.getUsername(), user.getPassword());
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<HttpStatus> loginUser(@RequestBody User user) {
-        currentUser  = userService.login(user.getUsername(), user.getPassword());
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    public ResponseEntity<User> loginUser(@RequestBody User user) {
+        User loggedIn = userService.login(user.getUsername(), user.getPassword());
+        setUser(loggedIn);
+        return ResponseEntity.status(HttpStatus.OK).body(loggedIn);
     }
 
-    @GetMapping("/user/{username}")
+    @GetMapping("/profile/{username}")
     public ResponseEntity<User> viewProfile(@PathVariable String username) {
-        User foundUser = userService.findByUsername(username);
-        return ResponseEntity.ok(foundUser);
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findByUsername(username));
     }
 
-    @PutMapping("/user")
+    @PutMapping("/user/changePassword")
     public ResponseEntity<User> changePassword(@Valid @RequestBody User user) {
         User updatedUser = userService.changePassword(user.getUsername(), user.getPassword());
-        return ResponseEntity.ok(updatedUser);
-    }
-
-    @DeleteMapping("/user")
-    public ResponseEntity<HttpStatus> deleteUser(@Valid @RequestBody User user) {
-        userService.deleteUser(user);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
     @DeleteMapping("/profile/{username}")
