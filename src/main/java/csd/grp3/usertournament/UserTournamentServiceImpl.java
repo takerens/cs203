@@ -19,16 +19,12 @@ public class UserTournamentServiceImpl implements UserTournamentService {
     @Autowired
     private UserTournamentRepository userTournamentRepo;
 
-<<<<<<< HEAD
     @Autowired
     private UserService userService;
 
     public UserTournament findRecord(Long tourneyID, String username) throws UserTournamentNotFoundException {
         return userTournamentRepo.findById_TournamentIdAndId_Username(tourneyID, username)
-=======
-    public UserTournament findRecord(Long tournamentID, String username) throws UserTournamentNotFoundException {
-        return userTournamentRepo.findById_TournamentIdAndId_Username(tournamentID, username)
->>>>>>> frontendcopyformerging
+
                 .orElseThrow(() -> new UserTournamentNotFoundException());
     }
 
@@ -39,16 +35,11 @@ public class UserTournamentServiceImpl implements UserTournamentService {
      * @return a list of users registered for the specified tournament, excluding the default bot user
      */
     @Override
-<<<<<<< HEAD
     public List<User> getPlayers(Long tourneyID) {
         List<User> players = userTournamentRepo.findRegisteredUsersByTournamentId(tourneyID);
         User user = userService.findByUsername("DEFAULT_BOT");
         players.remove(user);
         return players;
-=======
-    public List<User> getPlayers(Long tournamentID) {
-        return userTournamentRepo.findRegisteredUsersByTournamentId(tournamentID);
->>>>>>> frontendcopyformerging
     }
 
     @Override

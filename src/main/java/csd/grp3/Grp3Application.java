@@ -38,20 +38,11 @@ public class Grp3Application {
 		t.setTitle("Tournament A");
 		t.setSize(4);
 		t.setTotalRounds(2);
-<<<<<<< HEAD
 		t.setStartDateTime(LocalDateTime.of(2024, 9, 30, 15, 45));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t).getTitle());
 		Tournament t1 = new Tournament();
 		t1.setTitle("Tournament B");
 		t1.setSize(5);
-=======
-		t.setMaxElo(200);
-		t.setDate(LocalDateTime.of(2024, 9, 30, 15, 45));
-		System.out.println("[Add Tournament]: " + Ts.addTournament(t).getTitle());
-		Tournament t1 = new Tournament();
-		t1.setTitle("Tournament B");
-		t1.setSize(2);
->>>>>>> frontendcopyformerging
 		t1.setMaxElo(200);
 		t1.setTotalRounds(1);
 		t1.setStartDateTime(LocalDateTime.of(2024, 12, 20, 15, 0));

@@ -112,7 +112,6 @@ public class TournamentServiceImpl implements TournamentService {
         return tournament;
     }
 
-<<<<<<< HEAD
     /**
      * Removes users from tournament players and waiting list to fit min max ELO range
      * 
@@ -198,25 +197,7 @@ public class TournamentServiceImpl implements TournamentService {
      * 
      * @param tournamentID Long
      */
-=======
-    @Override
-    @Transactional
-    public void deleteTournament(Long id) {
-        Tournament tournament = getTournament(id);
 
-        // Collect the UserTournament IDs to be deleted
-        List<UserTournament> userTournamentsToDelete = new ArrayList<>(tournament.getUserTournaments());
-        
-        // Now iterate over the collected UserTournament list
-        for (UserTournament userTournament : userTournamentsToDelete) {
-            UTService.delete(tournament, userTournament.getUser());
-        }
-
-        // Now delete the tournament
-        tournaments.delete(tournament);
-    }
-    
->>>>>>> frontendcopyformerging
     @Override
     @Transactional
     public void deleteTournament(Long tournamentID) {
@@ -388,7 +369,7 @@ public class TournamentServiceImpl implements TournamentService {
         }
     }
 
-<<<<<<< HEAD
+
     /**
      * Get list of tournaments above minELO
      * 
@@ -396,9 +377,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @return List of tournaments
      */
     public List<Tournament> getTournamentAboveMin(int minELO) {
-=======
-    public List<Tournament> getTournamentAboveMin(int ELO) {
->>>>>>> frontendcopyformerging
+
         List<Tournament> tournamentList = listTournaments();
         List<Tournament> tournamentListAboveMin = new ArrayList<>();
 
@@ -459,11 +438,8 @@ public class TournamentServiceImpl implements TournamentService {
         List<Tournament> eligibleTournamentList = new ArrayList<>();
 
         for (Tournament tournament : tournamentList) {
-<<<<<<< HEAD
             if (isUserEloEligible(tournament, userELO)) {
-=======
-            if (!tournament.isOver() && tournament.getMaxElo() >= userELO && tournament.getMinElo() <= userELO) {
->>>>>>> frontendcopyformerging
+
                 eligibleTournamentList.add(tournament);
             }
         }
@@ -747,38 +723,10 @@ public class TournamentServiceImpl implements TournamentService {
             if (match.isBYE())
                 continue;
 
-<<<<<<< HEAD
             User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
             Double expectedScore = 1.0 / (1 + Math.pow(10, (opponent.getELO() - userELO) / classInterval));
             Double actualScore = getActualScore(match.getResult(), match.getWhite().equals(user) ? "white" : "black");
             changeInRating += developmentCoefficient * (actualScore - expectedScore);
-=======
-            if (match.getWhite().equals(user)) {
-                Integer oppELO = match.getBlack().getELO();
-                Double expected = 1.0 / (1 + Math.pow(10, (oppELO - userELO) / classInterval));
-                if (match.getResult() == 1) {
-                    changeInRating += developmentCoefficient * (1 - expected);
-                }
-                else if (match.getResult() == -1) {
-                    changeInRating += developmentCoefficient * (0 - expected);
-                } 
-                else {
-                    changeInRating += developmentCoefficient * (0.5 - expected);
-                }
-            } else {
-                Integer oppELO = match.getWhite().getELO();
-                Double expected = 1.0 / (1 + Math.pow(10, (oppELO - userELO) / classInterval));
-                if (match.getResult() == 1) {
-                    changeInRating += developmentCoefficient * (0 - expected);
-                }
-                else if (match.getResult() == -1) {
-                    changeInRating += developmentCoefficient * (1 - expected);
-                } 
-                else {
-                    changeInRating += developmentCoefficient * (0.5 - expected);
-                }
-            }
->>>>>>> frontendcopyformerging
         }
 
         return (int) (changeInRating + 0.5) + userELO;

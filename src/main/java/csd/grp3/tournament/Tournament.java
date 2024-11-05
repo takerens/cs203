@@ -56,13 +56,7 @@ public class Tournament {
     @Min(value = 0, message = "maxElo: Minimum value of 0")
     private int maxElo;
 
-<<<<<<< HEAD
     private LocalDateTime startDateTime;
-=======
-    @NotNull(message = "Date: put a valid Date")
-    private LocalDateTime date;
->>>>>>> frontendcopyformerging
-
     @NotNull(message = "size: put a valid tournament size")
     @Min(value = 2, message = "needs at least 2 players")
     private int size;

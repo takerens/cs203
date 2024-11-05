@@ -13,23 +13,17 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
-<<<<<<< HEAD
     
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder) {
         this.userRepository = userRepository;
         this.encoder = encoder;
     }
-=======
->>>>>>> frontendcopyformerging
 
     @Override
     public User findByUsername(String username) throws UserNotFoundException{
         return userRepository.findByUsername(username)
-<<<<<<< HEAD
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-=======
-                .orElseThrow(UserNotFoundException::new);
->>>>>>> frontendcopyformerging
+
     }
 
     @Override
@@ -47,12 +41,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-<<<<<<< HEAD
+
     public User login(String username, String password) throws UserNotFoundException, BadCredentialsException{
         //Get the password associated with the searched username
-=======
-    public User login(String username, String password) throws UsernameNotFoundException{
->>>>>>> frontendcopyformerging
+
         User user = findByUsername(username);
 
         //Return the user if the password matches
@@ -63,7 +55,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-<<<<<<< HEAD
     public User changePassword(String username, String newPassword) throws UserNotFoundException, BadCredentialsException{
         User user = findByUsername(username);
         //Only change the password if it is different
@@ -79,12 +70,7 @@ public class UserServiceImpl implements UserService {
         User user = findByUsername(username);
         userRepository.delete(user);
         return username;
-=======
-    public User changePassword(String username, String newPassword) {
-        User user = findByUsername(username);
-        user.setPassword(encoder.encode(newPassword));
-        return userRepository.save(user);
->>>>>>> frontendcopyformerging
+
     }
 
     @Override

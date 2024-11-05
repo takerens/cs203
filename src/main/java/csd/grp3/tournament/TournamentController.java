@@ -16,14 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
-<<<<<<< HEAD
-=======
-import csd.grp3.usertournament.UserTournament;
-import jakarta.validation.Valid;
-
-import org.springframework.web.bind.annotation.RequestParam;
->>>>>>> frontendcopyformerging
-
 
 
 @RestController

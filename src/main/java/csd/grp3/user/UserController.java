@@ -12,7 +12,6 @@ public class UserController {
 
     private UserService userService;
     //TEMPORARY
-<<<<<<< HEAD
     private User user;
 
     public void setUser(User user) {
@@ -23,9 +22,6 @@ public class UserController {
         return this.user;
     }
     // Till HERE
-=======
-    private User currentUser; // currently logged-in user
->>>>>>> frontendcopyformerging
 
     public UserController(UserService userService) {
         this.userService = userService;
