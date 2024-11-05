@@ -3,6 +3,7 @@ package csd.grp3.match;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
