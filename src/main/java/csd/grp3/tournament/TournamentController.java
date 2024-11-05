@@ -89,7 +89,6 @@ public class TournamentController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    // TODO
     @GetMapping("/{id}/standings")
     public ResponseEntity<List<User>> getStandings(@PathVariable Long id) {
         List<User> users = tournamentService.getSortedUsers(id);

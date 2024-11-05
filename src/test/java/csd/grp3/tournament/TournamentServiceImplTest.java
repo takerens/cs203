@@ -1,4 +1,3 @@
-<<<<<<< HEAD:src/test/java/csd/grp3/tournament/TournamentServiceImplTest.java
 package csd.grp3.tournament;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -14,9 +13,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-=======
-// // package csd.grp3.Testing;
->>>>>>> frontendcopyformerging:src/test/java/csd/grp3/Testing/TournamentServiceImplTest.java
 
 // import java.time.LocalDateTime;
 // import java.time.Month;
@@ -25,7 +21,6 @@ import static org.mockito.Mockito.when;
 // import java.util.List;
 // import java.util.Optional;
 
-<<<<<<< HEAD:src/test/java/csd/grp3/tournament/TournamentServiceImplTest.java
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,52 +41,6 @@ import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentId;
 import csd.grp3.usertournament.UserTournamentRepository;
 import csd.grp3.usertournament.UserTournamentServiceImpl;
-=======
-// import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-// import static org.junit.jupiter.api.Assertions.assertEquals;
-// import static org.junit.jupiter.api.Assertions.assertNotNull;
-// import static org.junit.jupiter.api.Assertions.assertThrows;
-// import static org.junit.jupiter.api.Assertions.assertTrue;
-
-// import org.assertj.core.util.Arrays;
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Test;
-// import org.junit.jupiter.api.extension.ExtendWith;
-// import static org.mockito.ArgumentMatchers.any;
-// import static org.mockito.ArgumentMatchers.anyChar;
-
-// import org.mockito.InjectMocks;
-// import org.mockito.Mock;
-// import org.mockito.Mockito;
-
-// import static org.mockito.Mockito.doAnswer;
-// import static org.mockito.Mockito.doNothing;
-// import static org.mockito.Mockito.never;
-// import static org.mockito.Mockito.times;
-// import static org.mockito.Mockito.verify;
-// import static org.mockito.Mockito.when;
-// import org.mockito.MockitoAnnotations;
-// import org.mockito.junit.jupiter.MockitoExtension;
-
-// import csd.grp3.tournament.InvalidTournamentStatus;
-// import csd.grp3.tournament.Tournament;
-// import csd.grp3.tournament.TournamentNotFoundException;
-// import csd.grp3.tournament.TournamentRepository;
-// import csd.grp3.tournament.TournamentServiceImpl;
-// import csd.grp3.user.User;
-// import csd.grp3.user.UserServiceImpl;
-// import csd.grp3.match.Match;
-// import csd.grp3.match.MatchRepository;
-// import csd.grp3.match.MatchServiceImpl;
-// import csd.grp3.round.Round;
-// import csd.grp3.round.RoundServiceImpl;
-// import csd.grp3.tournament.PlayerAlreadyRegisteredException;
-// import csd.grp3.usertournament.UserTournamentServiceImpl;
-// import csd.grp3.usertournament.UserTournament;
-// import csd.grp3.usertournament.UserTournamentId;
-// import csd.grp3.usertournament.UserTournamentRepository;
-// import csd.grp3.usertournament.UserTournamentService;
->>>>>>> frontendcopyformerging:src/test/java/csd/grp3/Testing/TournamentServiceImplTest.java
 
 // // @ExtendWith(MockitoExtension.class)
 // // public class TournamentServiceImplTest {
@@ -200,7 +149,6 @@ import csd.grp3.usertournament.UserTournamentServiceImpl;
 // //         verify(tournamentRepository).findById(1L);
 // //     }
 
-<<<<<<< HEAD:src/test/java/csd/grp3/tournament/TournamentServiceImplTest.java
     @Test
     void addTournament_NewTitle_ReturnSavedTournament() {
 
@@ -214,15 +162,9 @@ import csd.grp3.usertournament.UserTournamentServiceImpl;
             tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's list
             return null; // Since add returns void
         }).when(userTournamentService).add(any(Tournament.class), any(User.class), anyChar());
-=======
-// //     // @Test
-// //     // void addTournament_NewTitle_ReturnSavedTournament() {
-// //     //     when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
->>>>>>> frontendcopyformerging:src/test/java/csd/grp3/Testing/TournamentServiceImplTest.java
 
 
 
-<<<<<<< HEAD:src/test/java/csd/grp3/tournament/TournamentServiceImplTest.java
     @Test
     void addTournament_SameTitle_ReturnSavedTournamentWithDifferentID() {
         // Arrange
@@ -238,11 +180,6 @@ import csd.grp3.usertournament.UserTournamentServiceImpl;
             tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's list
             return null; // Since add returns void
         }).when(userTournamentService).add(any(Tournament.class), any(User.class), anyChar());
-=======
-// //     //     assertEquals(tournament, result);
-// //     //     verify(tournamentRepository).save(tournament);
-// //     // }
->>>>>>> frontendcopyformerging:src/test/java/csd/grp3/Testing/TournamentServiceImplTest.java
 
 // //     @Test
 // //     void addTournament_SameTitle_ReturnSavedTournamentWithDifferentID() {
@@ -266,7 +203,6 @@ import csd.grp3.usertournament.UserTournamentServiceImpl;
 // //         // Arrange
 // //         when(tournamentRepository.findById(1L)).thenReturn(Optional.empty());
         
-<<<<<<< HEAD:src/test/java/csd/grp3/tournament/TournamentServiceImplTest.java
         // Act
         TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
             tournamentService.updateTournament(1L, tournament);
@@ -993,17 +929,6 @@ import csd.grp3.usertournament.UserTournamentServiceImpl;
         assertEquals(0, result.size());
         verify(tournamentRepository).findAll();
     }
-=======
-// //         // Act
-// //         TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
-// //             tournamentService.updateTournament(1L, tournament);
-// //         });
-
-// //         // Assert
-// //         assertEquals("Could not find tournament 1", exception.getMessage());
-// //         verify(tournamentRepository).findById(1L);
-// //     }
->>>>>>> frontendcopyformerging:src/test/java/csd/grp3/Testing/TournamentServiceImplTest.java
 
 //     @Test
 //     void updateTournament_UpdatedTournament_ReturnUpdatedTournament() {

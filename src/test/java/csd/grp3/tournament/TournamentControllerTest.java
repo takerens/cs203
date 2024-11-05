@@ -1,8 +1,5 @@
-<<<<<<< HEAD:src/test/java/csd/grp3/tournament/TournamentControllerTest.java
 package csd.grp3.tournament;
-=======
-// package csd.grp3.Testing;
->>>>>>> frontendcopyformerging:src/test/java/csd/grp3/Testing/TournamentControllerTest.java
+
 
 // import csd.grp3.user.User;
 // import csd.grp3.tournament.*;
