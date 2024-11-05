@@ -115,6 +115,12 @@ public class TournamentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // @DeleteMapping("/tournaments/{title}")
+    // @PreAuthorize("hasRole('ADMIN')")
+    // public ResponseEntity<HttpStatus> deleteTournamentByTitle(@PathVariable String title) {
+    //     tournamentRepo.deleteByTitle(title);
+    //     return new ResponseEntity<>(HttpStatus.OK);
+    // }
 
     @DeleteMapping("/{id}/withdraw")
     public ResponseEntity<Void> withdraw(@RequestBody User user, @PathVariable Long id) {
@@ -128,6 +134,7 @@ public class TournamentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // TODO
     @GetMapping("/{id}/standings")
     public ResponseEntity<List<User>> getStandings(@PathVariable Long id) {
         List<User> users = tournamentService.getSortedUsers(id);

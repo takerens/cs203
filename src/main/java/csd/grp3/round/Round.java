@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import csd.grp3.match.Match;
@@ -27,6 +28,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+
 public class Round {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
