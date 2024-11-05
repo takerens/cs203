@@ -124,8 +124,43 @@ Content-Type: application/json
     "authorities": "ROLE_USER"
 }
 
+<<<<<<< HEAD
 ### Delete User
 DELETE http://localhost:8080/profile/User1
+=======
+### Change Password - password too short
+PUT http://localhost:8080/user/changePassword
+Content-Type: application/json
+
+{
+    "username": "Usernotexist",
+    "password": "short",
+    "authorities": "ROLE_USER"
+}
+
+### Delete User - user not exist
+DELETE http://localhost:8080/user/delete
+Content-Type: application/json
+
+{
+    "username": "usernotexist",
+    "password": "newpassw",
+    "authorities": "ROLE_USER"
+}
+
+### Delete User - bad password
+DELETE http://localhost:8080/user/delete
+Content-Type: application/json
+
+{
+    "username": "User1",
+    "password": "badpassword",
+    "authorities": "ROLE_USER"
+}
+
+### Delete User 
+DELETE http://localhost:8080/user/delete
+>>>>>>> frontendcopyformerging
 Content-Type: application/json
 
 {
@@ -133,4 +168,9 @@ Content-Type: application/json
     "password": "newpassw",
     "authorities": "ROLE_USER"
 
+<<<<<<< HEAD
 }
+=======
+}
+
+>>>>>>> frontendcopyformerging

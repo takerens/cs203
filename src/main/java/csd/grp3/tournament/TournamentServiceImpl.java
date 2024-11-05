@@ -22,6 +22,8 @@ import csd.grp3.user.User;
 import csd.grp3.user.UserService;
 import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -58,7 +60,6 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     @Transactional
     public Tournament addTournament(Tournament newTournamentInfo) {
-        newTournamentInfo.setSize(newTournamentInfo.getSize() + 1);
         tournaments.save(newTournamentInfo);
         registerUser(userService.findByUsername("DEFAULT_BOT"), newTournamentInfo.getId());
         return newTournamentInfo;
@@ -111,6 +112,7 @@ public class TournamentServiceImpl implements TournamentService {
         return tournament;
     }
 
+<<<<<<< HEAD
     /**
      * Removes users from tournament players and waiting list to fit min max ELO range
      * 
@@ -196,6 +198,25 @@ public class TournamentServiceImpl implements TournamentService {
      * 
      * @param tournamentID Long
      */
+=======
+    @Override
+    @Transactional
+    public void deleteTournament(Long id) {
+        Tournament tournament = getTournament(id);
+
+        // Collect the UserTournament IDs to be deleted
+        List<UserTournament> userTournamentsToDelete = new ArrayList<>(tournament.getUserTournaments());
+        
+        // Now iterate over the collected UserTournament list
+        for (UserTournament userTournament : userTournamentsToDelete) {
+            UTService.delete(tournament, userTournament.getUser());
+        }
+
+        // Now delete the tournament
+        tournaments.delete(tournament);
+    }
+    
+>>>>>>> frontendcopyformerging
     @Override
     @Transactional
     public void deleteTournament(Long tournamentID) {
@@ -367,6 +388,7 @@ public class TournamentServiceImpl implements TournamentService {
         }
     }
 
+<<<<<<< HEAD
     /**
      * Get list of tournaments above minELO
      * 
@@ -374,6 +396,9 @@ public class TournamentServiceImpl implements TournamentService {
      * @return List of tournaments
      */
     public List<Tournament> getTournamentAboveMin(int minELO) {
+=======
+    public List<Tournament> getTournamentAboveMin(int ELO) {
+>>>>>>> frontendcopyformerging
         List<Tournament> tournamentList = listTournaments();
         List<Tournament> tournamentListAboveMin = new ArrayList<>();
 
@@ -434,7 +459,11 @@ public class TournamentServiceImpl implements TournamentService {
         List<Tournament> eligibleTournamentList = new ArrayList<>();
 
         for (Tournament tournament : tournamentList) {
+<<<<<<< HEAD
             if (isUserEloEligible(tournament, userELO)) {
+=======
+            if (!tournament.isOver() && tournament.getMaxElo() >= userELO && tournament.getMinElo() <= userELO) {
+>>>>>>> frontendcopyformerging
                 eligibleTournamentList.add(tournament);
             }
         }
@@ -523,6 +552,18 @@ public class TournamentServiceImpl implements TournamentService {
         Set<User> pairedUsers = new HashSet<>();
         List<Match> matches = round.getMatches();
         List<User> users = getSortedUsers(tournament.getId());
+
+        if (users.size() % 2 == 0) {
+            User bot = users.get(users.size() - 1);
+            User worst = users.get(users.size() - 2); // avoid bot
+            String color = "white";
+            Match match = createMatchWithUserColour(worst, color, bot, nextRound);
+            match.setBYE(true);
+            match.setResult(color.equals("white") ? 1 : -1);
+            match.setRound(nextRound);
+            matches.add(match);
+            pairedUsers.add(users.get(users.size() - 1));
+        }
 
         for (int i = 0; i < users.size(); i++) {
             User user1 = users.get(i);
@@ -706,10 +747,38 @@ public class TournamentServiceImpl implements TournamentService {
             if (match.isBYE())
                 continue;
 
+<<<<<<< HEAD
             User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
             Double expectedScore = 1.0 / (1 + Math.pow(10, (opponent.getELO() - userELO) / classInterval));
             Double actualScore = getActualScore(match.getResult(), match.getWhite().equals(user) ? "white" : "black");
             changeInRating += developmentCoefficient * (actualScore - expectedScore);
+=======
+            if (match.getWhite().equals(user)) {
+                Integer oppELO = match.getBlack().getELO();
+                Double expected = 1.0 / (1 + Math.pow(10, (oppELO - userELO) / classInterval));
+                if (match.getResult() == 1) {
+                    changeInRating += developmentCoefficient * (1 - expected);
+                }
+                else if (match.getResult() == -1) {
+                    changeInRating += developmentCoefficient * (0 - expected);
+                } 
+                else {
+                    changeInRating += developmentCoefficient * (0.5 - expected);
+                }
+            } else {
+                Integer oppELO = match.getWhite().getELO();
+                Double expected = 1.0 / (1 + Math.pow(10, (oppELO - userELO) / classInterval));
+                if (match.getResult() == 1) {
+                    changeInRating += developmentCoefficient * (0 - expected);
+                }
+                else if (match.getResult() == -1) {
+                    changeInRating += developmentCoefficient * (1 - expected);
+                } 
+                else {
+                    changeInRating += developmentCoefficient * (0.5 - expected);
+                }
+            }
+>>>>>>> frontendcopyformerging
         }
 
         return (int) (changeInRating + 0.5) + userELO;
@@ -751,5 +820,17 @@ public class TournamentServiceImpl implements TournamentService {
             return NEWBIE_COEFFICIENT;
         }
         return DEFAULT_COEFFICIENT;
+    }
+
+    @Override
+    public List<Tournament> getHistoryByUser(String username) {
+        List<Tournament> list = new ArrayList<>();
+        User user = userService.findByUsername(username);
+        for (UserTournament ut : user.getUserTournaments()) {
+            if (ut.getTournament().isOver()) {
+                list.add(ut.getTournament());
+            }
+        }
+        return list;
     }
 }

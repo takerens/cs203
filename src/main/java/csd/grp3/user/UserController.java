@@ -9,9 +9,10 @@ import jakarta.validation.Valid;
 
 @RestController
 public class UserController {
-    private UserService userService;
 
+    private UserService userService;
     //TEMPORARY
+<<<<<<< HEAD
     private User user;
 
     public void setUser(User user) {
@@ -22,16 +23,19 @@ public class UserController {
         return this.user;
     }
     // Till HERE
+=======
+    private User currentUser; // currently logged-in user
+>>>>>>> frontendcopyformerging
 
     public UserController(UserService userService) {
         this.userService = userService;
-        this.user = null; //TEMP
+        this.currentUser = null; //TEMP - Initialize with no user
     }
 
     @GetMapping("/user")
     public ResponseEntity<User> getUserDetails() {
-        if (getUser() != null) {
-            return ResponseEntity.ok(getUser());
+        if (currentUser != null) {
+            return ResponseEntity.ok(currentUser);    
         }
         return ResponseEntity.notFound().build();
     }
@@ -39,25 +43,31 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<User> registerUser(@Valid @RequestBody User user) throws MethodArgumentNotValidException {
         User createdUser = userService.createNewUser(user.getUsername(), user.getPassword());
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody User user) {
-        User loggedIn = userService.login(user.getUsername(), user.getPassword());
-        setUser(loggedIn);
-        return ResponseEntity.status(HttpStatus.OK).body(loggedIn);
+    public ResponseEntity<HttpStatus> loginUser(@RequestBody User user) {
+        currentUser  = userService.login(user.getUsername(), user.getPassword());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/profile/{username}")
+    @GetMapping("/user/{username}")
     public ResponseEntity<User> viewProfile(@PathVariable String username) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findByUsername(username));
+        User foundUser = userService.findByUsername(username);
+        return ResponseEntity.ok(foundUser);
     }
 
-    @PutMapping("/user/changePassword")
+    @PutMapping("/user")
     public ResponseEntity<User> changePassword(@Valid @RequestBody User user) {
         User updatedUser = userService.changePassword(user.getUsername(), user.getPassword());
-        return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @DeleteMapping("/user")
+    public ResponseEntity<HttpStatus> deleteUser(@Valid @RequestBody User user) {
+        userService.deleteUser(user);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/profile/{username}")

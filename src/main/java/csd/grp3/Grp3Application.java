@@ -21,13 +21,16 @@ public class Grp3Application {
 
 		// JPA User Repository init
 		UserRepository users = ctx.getBean(UserRepository.class);
+		User user110 = new User("User110", encoder.encode("user1234"), "ROLE_USER", 110);
+		User user150 = new User("User150", encoder.encode("user1234"), "ROLE_USER", 150);
+		User user100 = new User("User100", encoder.encode("user1234"), "ROLE_USER", 100);
 		System.out.println("[Add Admin]: " + users.save(new User("Admin", encoder.encode("password123"), "ROLE_ADMIN", 0)).getUsername());
-		System.out.println("[Add User]: " + users.save(new User("User100", encoder.encode("user1234"), "ROLE_USER", 100)).getUsername());
 		System.out.println("[Add User]: " + users.save(new User("User0", encoder.encode("user1234"), "ROLE_USER", 0)).getUsername());
-		System.out.println("[Add User]: " + users.save(new User("User110", encoder.encode("user1234"), "ROLE_USER", 110)).getUsername());
-		System.out.println("[Add User]: " + users.save(new User("User150", encoder.encode("user1234"), "ROLE_USER", 150)).getUsername());
+		System.out.println("[Add User]: " + users.save(user110).getUsername());
+		System.out.println("[Add User]: " + users.save(user150).getUsername());
+		System.out.println("[Add User]: " + users.save(user100).getUsername());
 		System.out.println("[Add User]: " + users.save(new User("User120", encoder.encode("user1234"), "ROLE_USER", 120)).getUsername());
-		System.out.println("[Add Bot]: " + users.save(new User("DEFAULT_BOT", encoder.encode("goodpassword"), "ROLE_USER", 0)).getUsername());
+		System.out.println("[Add Bot]: " + users.save(new User("DEFAULT_BOT", encoder.encode("goodpassword"), "ROLE_USER", -1)).getUsername());
 
 		// JPA User Repository init
 		TournamentService Ts = ctx.getBean(TournamentService.class);
@@ -35,14 +38,30 @@ public class Grp3Application {
 		t.setTitle("Tournament A");
 		t.setSize(4);
 		t.setTotalRounds(2);
+<<<<<<< HEAD
 		t.setStartDateTime(LocalDateTime.of(2024, 9, 30, 15, 45));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t).getTitle());
 		Tournament t1 = new Tournament();
 		t1.setTitle("Tournament B");
 		t1.setSize(5);
+=======
+		t.setMaxElo(200);
+		t.setDate(LocalDateTime.of(2024, 9, 30, 15, 45));
+		System.out.println("[Add Tournament]: " + Ts.addTournament(t).getTitle());
+		Tournament t1 = new Tournament();
+		t1.setTitle("Tournament B");
+		t1.setSize(2);
+>>>>>>> frontendcopyformerging
 		t1.setMaxElo(200);
 		t1.setTotalRounds(1);
 		t1.setStartDateTime(LocalDateTime.of(2024, 12, 20, 15, 0));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t1).getTitle());
+		Tournament t2 = new Tournament();
+		t2.setTitle("Tournament C");
+		t2.setSize(2);
+		t2.setMaxElo(200);
+		t2.setTotalRounds(3);
+		t2.setDate(LocalDateTime.of(2024, 12, 31, 15, 0));
+		Ts.addTournament(t2);
 	}
 }

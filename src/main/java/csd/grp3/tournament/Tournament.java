@@ -16,6 +16,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -47,17 +49,26 @@ public class Tournament {
     private String title;
 
     @NotNull(message = "minElo: put a valid Elo")
+    @Min(value = 0, message = "minElo: Minimum value of 0")
     private int minElo;
 
     @NotNull(message = "maxElo: put a valid Elo")
+    @Min(value = 0, message = "maxElo: Minimum value of 0")
     private int maxElo;
 
+<<<<<<< HEAD
     private LocalDateTime startDateTime;
+=======
+    @NotNull(message = "Date: put a valid Date")
+    private LocalDateTime date;
+>>>>>>> frontendcopyformerging
 
     @NotNull(message = "size: put a valid tournament size")
+    @Min(value = 2, message = "needs at least 2 players")
     private int size;
 
     @NotNull(message = "totalRounds: put a valid number of rounds")
+    @Min(value = 1, message = "tournament should have at least 1 round")
     private int totalRounds;
 
     private boolean isCalculated = false;
@@ -89,8 +100,13 @@ public class Tournament {
         return rounds.size() == totalRounds && rounds.get(rounds.size() - 1).isOver();
     }
 
-
     public boolean hasStarted() {
         return !(LocalDateTime.now().isBefore(startDateTime) || userTournaments.size() < 2); // bot has no UT 
+    }
+
+    // Custom validation method
+    @AssertTrue(message = "minElo must be less than maxElo")
+    public boolean isMinEloLessThanMaxElo() {
+        return minElo < maxElo;
     }
 }
