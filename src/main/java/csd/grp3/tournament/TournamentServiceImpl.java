@@ -57,7 +57,6 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     @Transactional
     public Tournament addTournament(Tournament newTournamentInfo) {
-        newTournamentInfo.setSize(newTournamentInfo.getSize() + 1);
         tournaments.save(newTournamentInfo);
         registerUser(userService.findByUsername("DEFAULT_BOT"), newTournamentInfo.getId());
         return newTournamentInfo;
@@ -218,18 +217,18 @@ public class TournamentServiceImpl implements TournamentService {
      * Checks if user is in tournament already.
      * Else add user to either player list or waiting list
      * 
-     * @param user User object to be registered
+     * @param tempUser User object to be registered
      * @param tournamentID Long 
      */
     @Override
     @Transactional
-    public void registerUser(User user, Long tournamentID) throws TournamentNotFoundException {
+    public void registerUser(User tempUser, Long tournamentID) throws TournamentNotFoundException {
         Tournament tournament = getTournament(tournamentID);
         List<User> playerList = UTService.getPlayers(tournamentID);
         List<User> waitingList = UTService.getWaitingList(tournamentID);
 
         // check if user exists in database
-        userService.findByUsername(user.getUsername());
+        User user = userService.findByUsername(tempUser.getUsername());
 
         // check if tournament already has that user data
         if (playerList.contains(user) || waitingList.contains(user)) {
@@ -244,7 +243,7 @@ public class TournamentServiceImpl implements TournamentService {
             }
         }
     }
-
+    
     /**
      * Removes user from tournament player list or waiting list
      * 
