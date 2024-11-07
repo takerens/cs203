@@ -80,7 +80,7 @@ public class TournamentControllerTest {
 
         ResponseEntity<HttpStatus> response = tournamentController.addTournament(tournament);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
@@ -90,7 +90,7 @@ public class TournamentControllerTest {
 
         ResponseEntity<HttpStatus> response = tournamentController.updateTournamentById(1L, tournament);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class TournamentControllerTest {
 
         ResponseEntity<HttpStatus> response = tournamentController.deleteTournamentById(1L);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
