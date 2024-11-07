@@ -37,7 +37,7 @@ public class UserTournament {
     @JsonBackReference(value = "userUserTournament") // Prevents infinite recursion
     private User user;
     
-    // w = waitlist, r = registered
+    // w = waitlist, r = registered, b = bye
     private Character status;
 
     private double gamePoints = 0;

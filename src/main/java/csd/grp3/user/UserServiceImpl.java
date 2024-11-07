@@ -1,7 +1,6 @@
 package csd.grp3.user;
 
 import org.springframework.security.authentication.BadCredentialsException;
-import csd.grp3.user.UserNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
