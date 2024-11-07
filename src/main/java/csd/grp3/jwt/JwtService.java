@@ -21,7 +21,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    private String secretKey;
+    private String secretKey = "tempsecretkey";
 
     public JwtService() {
 

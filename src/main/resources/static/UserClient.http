@@ -89,6 +89,7 @@ Content-Type: application/json
 
 ### Get User Profile
 GET http://localhost:8080/profile/User1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJVc2VyMSIsImlhdCI6MTczMDk0NjcwNCwiZXhwIjo2MjMxNDA4MTM3OTQ2MDAwfQ.akHHCG_9PsQKTIg03ST17xn91bRXvvHLwEU7NOAnupQ
 
 ### Get User Profile - not exist
 GET http://localhost:8080/profile/Usernotexist
