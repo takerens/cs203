@@ -1,5 +1,5 @@
 # Register for tournament - wait list - check get
-POST http://localhost:8080/tournaments/1/register
+POST http://localhost:8080/tournaments/1/user
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### Register for tournament - wait list - check get
-POST  http://localhost:8080/tournaments/1/register
+POST  http://localhost:8080/tournaments/1/user
 Content-Type: application/json
 
 {
@@ -19,7 +19,7 @@ Content-Type: application/json
 }
 
 ### Register for tournament - wait list - check get
-POST http://localhost:8080/tournaments/1/register
+POST http://localhost:8080/tournaments/1/user
 Content-Type: application/json
 
 {
@@ -29,7 +29,7 @@ Content-Type: application/json
 }
 
 ### Register for tournament - wait list - check get
-POST http://localhost:8080/tournaments/1/register
+POST http://localhost:8080/tournaments/1/user
 Content-Type: application/json
 
 {

@@ -50,16 +50,16 @@ public class Tournament {
 
     @NotNull(message = "minElo: put a valid Elo")
     @Min(value = 0, message = "minElo: Minimum value of 0")
-    private int minElo;
+    private int minElo = 0;
 
     @NotNull(message = "maxElo: put a valid Elo")
     @Min(value = 0, message = "maxElo: Minimum value of 0")
-    private int maxElo;
+    private int maxElo = 1;
 
     private LocalDateTime startDateTime;
 
     @NotNull(message = "size: put a valid tournament size")
-    @Min(value = 2, message = "needs at least 2 players")
+    @Min(value = 3, message = "needs at least 2 players") // managing size in frontend for bot
     private int size;
 
     @NotNull(message = "totalRounds: put a valid number of rounds")

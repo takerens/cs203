@@ -11,7 +11,7 @@ const Tournaments = ({ tournaments, user, handleSubmit }) => {
     };
 
     const rows = tournaments.map((tournament) => {
-        const hasTournamentStarted = new Date() > new Date(tournament.date);
+        const hasTournamentStarted = new Date() > new Date(tournament.startDateTime);
         const overloaded = tournament.size - tournament.userTournaments.length;
         const vacancies = overloaded < 0 ? 0 : overloaded;
 
@@ -19,7 +19,7 @@ const Tournaments = ({ tournaments, user, handleSubmit }) => {
             tournament.title,
             tournament.minElo,
             tournament.maxElo,
-            formatDate(tournament.date),
+            formatDate(tournament.startDateTime),
             vacancies,
             user.userRole === 'ROLE_USER' ? (
                 <>

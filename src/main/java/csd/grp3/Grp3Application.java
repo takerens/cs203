@@ -38,6 +38,7 @@ public class Grp3Application {
 		t.setTitle("Tournament A");
 		t.setSize(4);
 		t.setTotalRounds(2);
+		t.setMaxElo(200);
 		t.setStartDateTime(LocalDateTime.of(2024, 9, 30, 15, 45));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t).getTitle());
 		Tournament t1 = new Tournament();
@@ -49,10 +50,10 @@ public class Grp3Application {
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t1).getTitle());
 		Tournament t2 = new Tournament();
 		t2.setTitle("Tournament C");
-		t2.setSize(2);
+		t2.setSize(3);
 		t2.setMaxElo(200);
 		t2.setTotalRounds(3);
-		t2.setDate(LocalDateTime.of(2024, 12, 31, 15, 0));
+		t2.setStartDateTime(LocalDateTime.of(2024, 12, 31, 15, 0));
 		Ts.addTournament(t2);
 	}
 }
