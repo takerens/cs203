@@ -1,21 +1,24 @@
 package csd.grp3.user;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import org.springframework.security.authentication.BadCredentialsException;
 
-
-public class UserServicetest {
+public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -90,7 +93,7 @@ public class UserServicetest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> {
+        assertThrows(UsernameNotFoundException.class, () -> {
             userService.findByUsername(username);
         });
     }
@@ -116,7 +119,7 @@ public class UserServicetest {
         String username = "username";
         String newPassword = "newpassword";
 
-        assertThrows(UserNotFoundException.class, ()-> {
+        assertThrows(UsernameNotFoundException.class, ()-> {
             userService.changePassword(username, newPassword);
         });
     }

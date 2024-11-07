@@ -1,26 +1,27 @@
 package csd.grp3.match;
 
-import csd.grp3.round.Round;
-import csd.grp3.user.User;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Collections;
+import csd.grp3.round.Round;
+import csd.grp3.tournament.Tournament;
+import csd.grp3.user.User;
 
 @ExtendWith(MockitoExtension.class)
 public class MatchServiceTest {
@@ -32,9 +33,29 @@ public class MatchServiceTest {
     private MatchServiceImpl matchService;
 
     @Test
+    void createMatch() {
+        // arrange
+        Tournament tournament = new Tournament("test", 0, 10, LocalDateTime.now(), 0, 0);
+        User white = new User("white", "white", "ROLE_PLAYER", 0);
+        User black = new User("black", "black", "ROLE_PLAYER", 0);
+        Round round = new Round(tournament);
+        Match match = new Match(white, black, round);
+
+        // act
+        // mock the save operation
+        when(matches.save(any(Match.class))).thenReturn(match);
+
+        Match returnedMatch = matchService.createMatch(white, black, round);
+
+        // assert
+        assertEquals(match,returnedMatch);
+        verify(matches).save(match);
+    }
+
+    @Test
     void addMatch() {
         // arrange
-        Match match = new Match();
+        Match match = new Match(null, null, null, null, false, 0);
 
         // act
         // mock the save operation

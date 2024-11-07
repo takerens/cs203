@@ -12,21 +12,16 @@ import org.springframework.stereotype.Service;
 
 import csd.grp3.jwt.JwtService;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
-    
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder, AuthenticationManager authManager, JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.encoder = encoder;
-        this.authManager = authManager;
-        this.jwtService = jwtService;
-    }
 
     /*
      * This method is used to find a user by their username
@@ -67,12 +62,11 @@ public class UserServiceImpl implements UserService {
 
         //Check if the username already exists, if it does throw exception
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new BadCredentialsException("Username already exists");
+            throw new BadCredentialsException("Username already taken. Try a different username.");
         }
 
         // Encode password given by user to store
         String encodedPassword = encoder.encode(password);
-
         return userRepository.save(new User(username, encodedPassword));
     }
 
@@ -108,7 +102,7 @@ public class UserServiceImpl implements UserService {
      * @return The user with the new password
      */
     @Override
-    public User changePassword(String username, String newPassword) throws UserNotFoundException, BadCredentialsException{
+    public User changePassword(String username, String newPassword) {
         User user = findByUsername(username);
         //Only change the password if it is different
         if (!encoder.matches(newPassword, user.getPassword())) {
