@@ -1,16 +1,14 @@
 package csd.grp3.match;
 
-import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
 
 @RestController
 public class MatchController {
@@ -23,7 +21,7 @@ public class MatchController {
      * @param matches List of match object to be updated
      * @return List of matches updated
      */
-    @PutMapping("/match/list")
+    @PutMapping("/matches")
     public List<Match> updateMatches(@Valid @RequestBody List<Match> matches) {
         List<Match> updatedList = new ArrayList<>();
         for (Match match : matches) {

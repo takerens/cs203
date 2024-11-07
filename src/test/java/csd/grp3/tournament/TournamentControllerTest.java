@@ -1,7 +1,14 @@
 package csd.grp3.tournament;
 
-import csd.grp3.user.User;
-import csd.grp3.tournament.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -11,11 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import csd.grp3.user.User;
 
 public class TournamentControllerTest {
 
@@ -128,9 +131,9 @@ public class TournamentControllerTest {
     public void testWithdrawUser_Success() {
         doNothing().when(tournamentService).withdrawUser(user, 1L);
 
-        ResponseEntity<Void> response = tournamentController.withdraw(user, 1L);
+        ResponseEntity<HttpStatus> response = tournamentController.withdraw(user, 1L);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
@@ -148,9 +151,9 @@ public class TournamentControllerTest {
     public void testRegisterUser_Success() {
         doNothing().when(tournamentService).registerUser(user, 1L);
 
-        ResponseEntity<Void> response = tournamentController.registerUser(user, 1L);
+        ResponseEntity<HttpStatus> response = tournamentController.registerUser(user, 1L);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test

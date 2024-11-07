@@ -361,8 +361,6 @@ public class TournamentServiceImplTest {
         // Arrange
         List<User> userList = new ArrayList<>();
         List<User> waitingList = new ArrayList<>();
-        UserTournamentId UTId = new UserTournamentId(tournament.getId(), player.getUsername());
-        UserTournament userTournament = new UserTournament(UTId, tournament, player, null, 0, 0);
         LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
         userList.add(player);
         tournament.setStartDateTime(time);
@@ -530,6 +528,14 @@ public class TournamentServiceImplTest {
         tournament.getRounds().addAll(List.of(firstRound, secondRound));
         // mock the get players in UT service
         when(userTournamentService.getPlayers(tournament.getId())).thenReturn(userList);
+
+        // mock the get matches in match service
+        when(matchService.getUserMatches(user1)).thenReturn(List.of(match1, match3));
+        when(matchService.getUserMatches(user2)).thenReturn(List.of(match1, match4));
+        when(matchService.getUserMatches(user3)).thenReturn(List.of(match2, match3));
+        when(matchService.getUserMatches(user4)).thenReturn(List.of(match2, match4));
+
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
 
         // mock the find tournament
         when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
