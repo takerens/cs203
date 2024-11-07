@@ -163,9 +163,6 @@ public class UserControllerTest {
         assertThrows(UserNotFoundException.class,()-> {
             userController.viewProfile(username);
         });
-        // Assert
-        // assertEquals(HttpStatus.NOT_FOUND, userController.viewProfile(username).getStatusCode());
-        // assertEquals("user not found", userController.viewProfile(username).getBody());
 
         // Verify that the service method was called
         verify(userService, times(1)).findByUsername(username);

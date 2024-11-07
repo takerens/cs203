@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 public class UserController {
     private UserService userService;
 
-    //TEMPORARY
     private User user;
 
     public void setUser(User user) {
@@ -21,11 +20,10 @@ public class UserController {
     User getUser() {
         return this.user;
     }
-    // Till HERE
 
     public UserController(UserService userService) {
         this.userService = userService;
-        this.user = null; //TEMP
+        this.user = null; // TODO TEMP
     }
 
     @GetMapping("/user")

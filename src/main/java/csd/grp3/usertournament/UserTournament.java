@@ -24,8 +24,6 @@ import lombok.Setter;
 public class UserTournament {
     @EmbeddedId
     private UserTournamentId id;
-    // Long tournamentId
-    // String username
 
     @ManyToOne
     @MapsId("tournamentId")

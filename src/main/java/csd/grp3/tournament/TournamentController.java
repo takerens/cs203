@@ -23,9 +23,6 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/tournaments")
 public class TournamentController {
-    // @Autowired
-    // private TournamentRepository tournamentRepo;
-
     @Autowired
     private TournamentService tournamentService;
 
@@ -59,33 +56,30 @@ public class TournamentController {
     }
 
     @PostMapping
-    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> addTournament(@Valid @RequestBody Tournament tournament) {
         tournamentService.addTournament(tournament);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
-    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> updateTournamentById(@PathVariable Long id, @Valid @RequestBody Tournament newTournamentData) {
         tournamentService.updateTournament(id, newTournamentData);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
-    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteTournamentById(@PathVariable Long id) {
         tournamentService.deleteTournament(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{id}/withdraw")
+    @DeleteMapping("/{id}/user")
     public ResponseEntity<HttpStatus> withdraw(@RequestBody User user, @PathVariable Long id) {
         tournamentService.withdrawUser(user, id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/{id}/register")
+    @PostMapping("/{id}/user")
     public ResponseEntity<HttpStatus> registerUser(@RequestBody User user, @PathVariable Long id) {
         tournamentService.registerUser(user, id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

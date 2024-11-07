@@ -27,13 +27,4 @@ public interface TournamentService {
     double calculateBuchholzInTournament(User user, Tournament tournament);
     void createPairings(Tournament tournament, Round round);
     List<User> getSortedUsers(Long id);
-    
-    // public static void update(List<Match> matches, User user);
-    // private --
-    // boolean isNextColourWhite(User user, Tournament tournament)
-    // boolean hasPlayedBefore(User user1, User user2, Tournament tournament)
-    // boolean isColourSuitable(User user, Tournament tournament, String nextColour)
-    // Match createMatchWithUserColour(User user1, String user1Colour, User user2, Round round)
-    // Match handleBYE(User worst, String color, Round round);
-
 }

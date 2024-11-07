@@ -79,7 +79,6 @@ public class TournamentServiceImplTest {
         tournament.setId(1L);
         tournament.setTitle("Test Tournament");
         tournament.setSize(2);
-        // tournament.setUserTournaments(new ArrayList<>());
         
         player = new User("testUser", "testPassword123");  // Username and password
         player.setAuthorities("ROLE_PLAYER"); // Set specific authorities
@@ -113,8 +112,6 @@ public class TournamentServiceImplTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         verify(tournamentRepository).findAll();
-        // assertEquals("Test Tournament", result.get(0).getTitle());
-        // verify(tournamentRepository, times(1)).findAll();
     }
 
     @Test
@@ -276,9 +273,6 @@ public class TournamentServiceImplTest {
             tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's list
             return null; // Since add returns void
         }).when(userTournamentService).add(any(Tournament.class), any(User.class), anyChar());
-        // mock UTService
-        // when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(userList);
-        // when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(userList);
 
         // act
         tournamentService.registerUser(player, 1L);
@@ -377,10 +371,6 @@ public class TournamentServiceImplTest {
             return null; // Since add returns void
         }).when(userTournamentService).delete(tournament, player);
 
-        // mock UTService
-        // when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(userList);
-        // when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(userList);
-
         // act
         tournamentService.withdrawUser(player, tournament.getId());
 
@@ -408,11 +398,6 @@ public class TournamentServiceImplTest {
         // Verify that deleteById was never called with the correct argument
         verify(tournamentRepository).findById(1L);
     }
-
-    // @Test
-    // void withdrawPlayer_PlayerNotFound_ReturnUserTournamentNotFoundException() {
-        
-    // }
 
     @Test
     void createPairings_FirstRound() {
@@ -479,7 +464,6 @@ public class TournamentServiceImplTest {
         when(userTournamentService.getGamePoints(tournament.getId(),user4.getUsername())).thenReturn(0.0);
         when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
 
-        // when(matchService.getMatchesBetweenTwoUsers(user1, user2)).thenReturn(match1List);
         when(matchService.getMatchesBetweenTwoUsers(user1, user3)).thenReturn(Collections.emptyList());
         when(matchService.getMatchesBetweenTwoUsers(user2, user4)).thenReturn(Collections.emptyList());
 
@@ -609,44 +593,6 @@ public class TournamentServiceImplTest {
         // Verify that deleteById was never called with the correct argument
         verify(tournamentRepository).findById(1L);
     }
-
-    // @Test
-    // void addRound_AddSuccess_ReturnRound() {
-    //     // Arrange 
-    //     LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
-    //     tournament.setStartDateTime(time);
-    //     tournament.setSize(10);
-    //     tournament.setMaxElo(200);
-    //     tournament.setMinElo(100);
-    //     List<User> playerList = new ArrayList<>();
-    //     User player1 = new User("player1", "player11", "ROLE_PLAYER", 100);
-    //     User player2 = new User("player2", "player21", "ROLE_PLAYER", 200);
-    //     playerList.add(player1);
-    //     playerList.add(player2);
-    //     tournament.getUserTournaments().add(new UserTournament(tournament, player1, 'r'));
-    //     tournament.getUserTournaments().add(new UserTournament(tournament, player2, 'r'));
-
-    //     // Mock findbyId and save
-    //     when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
-    //     when(userTournamentService.getPlayers(tournament.getId())).thenReturn(playerList);
-
-    //     // Act, add 1 round to tournament
-    //     tournamentService.addRound(tournament.getId());
-
-    //     // Assert
-    //     assertEquals(1, tournament.getRounds().size());
-    //     verify(tournamentRepository, times(2)).findById(tournament.getId());
-    // }
-
-    // @Test
-    // void updateResult_MatchNotEnded_ReturnMatchNotCompletedException() {
-
-    // }
-    
-    // @Test
-    // void updateResult_UpdatedResult_ReturnNothing() {
-
-    // }
 
     @Test
     void getTournamentAboveMin_TournamentAboveMin_ReturnListOfTournamentAboveMin() {
@@ -932,14 +878,4 @@ public class TournamentServiceImplTest {
         assertEquals(0, result.size());
         verify(tournamentRepository).findAll();
     }
-
-//     @Test
-//     void testTournamentExists() {
-//         // when(tournamentRepository.existsById(1L)).thenReturn(true);
-
-//         // boolean exists = tournamentService.tournamentExists(1L);
-
-//         // assertTrue(exists);
-//         // verify(tournamentRepository, times(1)).existsById(1L);
-//     }
 }
