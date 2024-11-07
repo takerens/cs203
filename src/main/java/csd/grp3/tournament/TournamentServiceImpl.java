@@ -593,7 +593,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param nextColour - either "white" or "black" only
      * @return - true if not same colour for 3 times consecutively
      */
-    private boolean isColourSuitable(User user, Tournament tournament, String nextColour) {
+    public boolean isColourSuitable(User user, Tournament tournament, String nextColour) {
         List<Match> matchList = matchService.getUserMatches(user).stream()
                 .filter(match -> match.getTournament().equals(tournament))
                 .collect(Collectors.toList());
@@ -667,7 +667,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @param user User object
      */
     @Transactional
-    private void handleBYE(Round round, User user) { // color is color of worst player
+    public void handleBYE(Round round, User user) { // color is color of worst player
         List<Match> matches = round.getMatches();
         for (Match match : matches) {
             if (match.getBlack().equals(user) || match.getWhite().equals(user)) {
@@ -750,5 +750,22 @@ public class TournamentServiceImpl implements TournamentService {
             return NEWBIE_COEFFICIENT;
         }
         return DEFAULT_COEFFICIENT;
+    }
+    /**
+     * Get tournament history of user
+     * 
+     * @param username String
+     * @return List of Tournament Objects
+     */
+    @Override
+    public List<Tournament> getHistoryByUser(String username) {
+        List<Tournament> list = new ArrayList<>();
+        User user = userService.findByUsername(username);
+        for (UserTournament ut : user.getUserTournaments()) {
+            if (ut.getTournament().isOver()) {
+                list.add(ut.getTournament());
+            }
+        }
+        return list;
     }
 }

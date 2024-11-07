@@ -27,4 +27,5 @@ public interface TournamentService {
     double calculateBuchholzInTournament(User user, Tournament tournament);
     void createPairings(Tournament tournament, Round round);
     List<User> getSortedUsers(Long id);
+    List<Tournament> getHistoryByUser(String username);
 }

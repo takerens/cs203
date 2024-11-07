@@ -18,8 +18,6 @@ import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import jakarta.validation.Valid;
 
-
-
 @RestController
 @RequestMapping("/tournaments")
 public class TournamentController {
@@ -84,4 +82,24 @@ public class TournamentController {
         tournamentService.registerUser(user, id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    // TODO
+    @GetMapping("/{id}/standings")
+    public ResponseEntity<List<User>> getStandings(@PathVariable Long id) {
+        List<User> users = tournamentService.getSortedUsers(id);
+        return new ResponseEntity<List<User>>(users.subList(0, users.size() - 1), HttpStatus.OK); // excl bot
+    }
+
+    @GetMapping("/byElo/{elo}")
+    public ResponseEntity<List<Tournament>> getTournamentByElo(@PathVariable int elo) {
+        List<Tournament> t = tournamentService.getUserEligibleTournament(elo);
+        return new ResponseEntity<List<Tournament>>(t, HttpStatus.OK);
+    }
+
+    @GetMapping("/byUser/{username}")
+    public ResponseEntity<List<Tournament>> getHistoryByUser(@PathVariable String username) {
+        List<Tournament> t = tournamentService.getHistoryByUser(username);
+        return new ResponseEntity<List<Tournament>>(t, HttpStatus.OK);
+    }
+    
 }
