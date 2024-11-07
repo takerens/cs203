@@ -93,49 +93,47 @@ public class TournamentServiceImpl implements TournamentService {
         // update player and waiting list based on new Elo range
         tournament.setMaxElo(newTournamentInfo.getMaxElo());
         tournament.setMinElo(newTournamentInfo.getMinElo());
-        updateTournamentEloRange(tournamentID);
+        updateTournamentEloRange(tournament);
 
         // update player and waiting list based on new size
-        int currentSize = tournament.getSize();
         tournament.setSize(newTournamentInfo.getSize());
-        int newSize = tournament.getSize();
-        if (currentSize < newSize) {
-            addFromWaiting(tournamentID, newSize - currentSize);
-        } else if (currentSize > newSize) {
-            addToWaiting(tournamentID, currentSize - newSize);
-        }
+        updateTournamentSize(tournament);
 
-        tournaments.save(tournament);
-
-        return tournament;
+        return tournaments.save(tournament);
     }
 
     /**
      * Removes users from tournament players and waiting list to fit min max ELO range
      * 
-     * @param tournamentID Long
+     * @param tournament Tournament object 
      */
-    private void updateTournamentEloRange(Long tournamentID) {
-        Tournament tournament = getTournament(tournamentID);
-        int initialSize = tournament.getSize();
-        List<User> users = UTService.getPlayers(tournamentID);
+    private void updateTournamentEloRange(Tournament tournament) {
+        List<User> users = UTService.getPlayers(tournament.getId());
+        // combine waiting list with player list
+        users.addAll(UTService.getWaitingList(tournament.getId()));
 
-        // modify list of players based on new Elo limits and new Size limits
+        // modify combined list based on new Elo limits
         for (User user : users) {
             if (isUserEloEligible(tournament, user.getELO()) == false) {
-                initialSize--;
                 UTService.delete(tournament, user);
             }
         }
-        tournament.setSize(initialSize);
+    }
 
-        List<User> waitingList = UTService.getWaitingList(tournamentID);
-
-        // modify list of players based on new Elo limits and new Size limits
-        for (User user : waitingList) {
-            if (isUserEloEligible(tournament, user.getELO()) == false) {
-                UTService.delete(tournament, user);
-            }
+    /**
+     * Updates player and waiting list based on new tournament size.
+     * If new size is larger, add players from waiting list.
+     * If new size is smaller, add players to waiting list.
+     * 
+     * @param tournament Tournament object
+     */
+    private void updateTournamentSize(Tournament tournament) {
+        int currentSize = UTService.getPlayers(tournament.getId()).size();
+        int newSize = tournament.getSize();
+        if (currentSize < newSize) {
+            addFromWaiting(tournament.getId(), newSize - currentSize);
+        } else if (currentSize > newSize) {
+            addToWaiting(tournament.getId(), currentSize - newSize);
         }
     }
 
