@@ -16,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -92,5 +93,11 @@ public class Tournament {
 
     public boolean hasStarted() {
         return !(LocalDateTime.now().isBefore(startDateTime) || userTournaments.size() < 2); // bot has no UT 
+    }
+
+    // Custom validation method
+    @AssertTrue(message = "minElo must be less than maxElo")
+    public boolean isMinEloLessThanMaxElo() {
+        return minElo < maxElo;
     }
 }
