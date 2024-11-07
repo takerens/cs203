@@ -51,6 +51,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User changePassword(String username, String newPassword) {
         User user = findByUsername(username);
+
+        // If the new password is the same as the old one, throw an error
+        if (encoder.matches(newPassword, user.getPassword())) {
+            throw new BadCredentialsException("New password should not be the same as the old one");
+        }
+        
         user.setPassword(encoder.encode(newPassword));
         return userRepository.save(user);
     }
