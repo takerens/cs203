@@ -35,19 +35,39 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests((authz) -> authz
-                    .requestMatchers(HttpMethod.GET, "/tournaments").permitAll()
-                    .anyRequest().permitAll())
-            // ensure that the application won’t create any session in our stateless REST
-            // APIs
-            .sessionManagement(configurer ->
-            configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .httpBasic(Customizer.withDefaults())
-            .csrf(csrf -> csrf.disable()) // CSRF protection is needed only for browser based attacks
-            .formLogin(form -> form.disable())
-            .headers(header -> header.disable()) // disable the security headers, as we do not return HTML in our
-                                                    // APIs
-            .authenticationProvider(authenticationProvider());
+
+                .authorizeHttpRequests((authz) -> authz
+                        // Open Access for all
+                        .requestMatchers(HttpMethod.POST, "/signup", "/login").permitAll()
+
+                        // Admin-only access
+                        .requestMatchers(HttpMethod.GET, "/tournament").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/tournaments").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/tournaments/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/matches").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/tournaments/*").hasRole("ADMIN")
+
+                        // User-only access
+                        .requestMatchers(HttpMethod.PUT, "/user").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/tournaments/byElo", "/tournament/byUser").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/tournaments/*/user").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/tournaments/*/user").hasRole("USER")
+
+                        // Access for both User and Admin
+                        .requestMatchers(HttpMethod.GET, "/user").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/tournaments/*", "/tournaments/*/rounds", "/tournaments/*/standings")
+                        .hasAnyRole("USER", "ADMIN")
+
+                        // Deny all other requests
+                        .anyRequest().denyAll())
+
+                .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .httpBasic(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable()) // CSRF protection is needed only for browser based attacks
+                .formLogin(form -> form.disable())
+                .headers(header -> header.disable()) // disable the security headers, as we do not return HTML in our
+                                                     // APIs
+                .authenticationProvider(authenticationProvider());
         return http.build();
     }
 
