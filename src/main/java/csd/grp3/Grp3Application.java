@@ -18,6 +18,7 @@ public class Grp3Application {
 	public static void main(String[] args) {
 		ApplicationContext ctx = SpringApplication.run(Grp3Application.class, args);
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
 		// JPA User Repository init
 		UserRepository users = ctx.getBean(UserRepository.class);
 		User user110 = new User("User110", encoder.encode("user1234"), "ROLE_USER", 110);
@@ -37,15 +38,14 @@ public class Grp3Application {
 		t.setTitle("Tournament A");
 		t.setSize(4);
 		t.setTotalRounds(2);
-		t.setMaxElo(200);
-		t.setDate(LocalDateTime.of(2024, 9, 30, 15, 45));
+		t.setStartDateTime(LocalDateTime.of(2024, 9, 30, 15, 45));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t).getTitle());
 		Tournament t1 = new Tournament();
 		t1.setTitle("Tournament B");
-		t1.setSize(2);
+		t1.setSize(5);
 		t1.setMaxElo(200);
 		t1.setTotalRounds(1);
-		t1.setDate(LocalDateTime.of(2024, 12, 20, 15, 0));
+		t1.setStartDateTime(LocalDateTime.of(2024, 12, 20, 15, 0));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t1).getTitle());
 		Tournament t2 = new Tournament();
 		t2.setTitle("Tournament C");
@@ -55,5 +55,4 @@ public class Grp3Application {
 		t2.setDate(LocalDateTime.of(2024, 12, 31, 15, 0));
 		Ts.addTournament(t2);
 	}
-
 }

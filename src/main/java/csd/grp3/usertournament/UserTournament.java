@@ -24,8 +24,6 @@ import lombok.Setter;
 public class UserTournament {
     @EmbeddedId
     private UserTournamentId id;
-    // Long tournamentId
-    // String username
 
     @ManyToOne
     @MapsId("tournamentId")
@@ -45,6 +43,12 @@ public class UserTournament {
     private double gamePoints = 0;
 
     private double matchPoints = 0;
+
+    public UserTournament(Tournament tournament, User user, Character status) {
+        this.tournament = tournament;
+        this.user = user;
+        this.status = status;
+    }
 
     public void setStatus(Character status) {
         if (status != null && !status.equals('r') && !status.equals('w') && !status.equals('b')) {

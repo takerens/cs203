@@ -1,7 +1,6 @@
 package csd.grp3.user;
 
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +35,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User login(String username, String password) throws UsernameNotFoundException{
+    public User login(String username, String password) throws UserNotFoundException, BadCredentialsException{
+        //Get the password associated with the searched username
         User user = findByUsername(username);
 
         //Return the user if the password matches

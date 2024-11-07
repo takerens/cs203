@@ -1,6 +1,6 @@
 ######### Focus: Player and Waiting List
 ### Get all tournaments
-GET http://localhost:8080/tournaments
+GET http://localhost:8080/tournaments/
 
 ### Get tourn by ID
 GET http://localhost:8080/tournaments/2
@@ -116,7 +116,7 @@ Content-Type: application/json
 }
 
 ### Get Round data for tournament
-GET http://localhost:8080/tournaments/1/rounds
+GET http://localhost:8080/tournaments/2/rounds
 
 ### Get standings
 GET http://localhost:8080/tournaments/1/standings

@@ -56,8 +56,7 @@ public class Tournament {
     @Min(value = 0, message = "maxElo: Minimum value of 0")
     private int maxElo;
 
-    @NotNull(message = "Date: put a valid Date")
-    private LocalDateTime date;
+    private LocalDateTime startDateTime;
 
     @NotNull(message = "size: put a valid tournament size")
     @Min(value = 2, message = "needs at least 2 players")
@@ -68,6 +67,15 @@ public class Tournament {
     private int totalRounds;
 
     private boolean isCalculated = false;
+
+    public Tournament(String title, int minELO, int maxELO, LocalDateTime startDateTime, int size, int totalRounds) {
+        this.title = title;
+        this.minElo = minELO;
+        this.maxElo = maxELO;
+        this.startDateTime = startDateTime;
+        this.size = size;
+        this.totalRounds = totalRounds;
+    }
 
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference(value = "tournamentUserTournament") // Prevents infinite recursion
@@ -88,7 +96,7 @@ public class Tournament {
     }
 
     public boolean hasStarted() {
-        return !(LocalDateTime.now().isBefore(date) || userTournaments.size() < 3); // 1 player is bot, need 2 other players
+        return !(LocalDateTime.now().isBefore(startDateTime) || userTournaments.size() < 3); // bot has no UT 
     }
 
     // Custom validation method

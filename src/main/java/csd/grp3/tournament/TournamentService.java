@@ -18,25 +18,14 @@ public interface TournamentService {
     void withdrawUser(User user, Long id);
     void addRound(Long id);
     void updateMatchResults(Round round);
-    void updateResults(Round round);
-    String directEncounterResultInTournament(Tournament tournament, User user1, User user2);
+    void updateTournamentResults(Round round);
     void endTournament(Long id);
     List<Tournament> getTournamentAboveMin(int ELO);
     List<Tournament> getTournamentBelowMax(int ELO);
     List<Tournament> getTournamentAboveMinBelowMax(int minELO, int maxELO);
     List<Tournament> getUserEligibleTournament(int ELO);
-    List<Tournament> getHistoryByUser(String username);
     double calculateBuchholzInTournament(User user, Tournament tournament);
-    double calculateBuchholzCut1InTournament(User user, Tournament tournament);
-    void createPairings(Tournament tournament);
+    void createPairings(Tournament tournament, Round round);
     List<User> getSortedUsers(Long id);
-    
-    // public static void update(List<Match> matches, User user);
-    // private --
-    // boolean isNextColourWhite(User user, Tournament tournament)
-    // boolean hasPlayedBefore(User user1, User user2, Tournament tournament)
-    // boolean isColourSuitable(User user, Tournament tournament, String nextColour)
-    // Match createMatchWithUserColour(User user1, String user1Colour, User user2, Round round)
-    // void handleBYE(User worst, String color, Round round);
-
+    List<Tournament> getHistoryByUser(String username);
 }

@@ -1,4 +1,9 @@
 ####### Focus: Validation Aspects ##
+
+### get all tournaments
+GET http://localhost:8080/tournaments
+Content-Type: application/json
+
 ### add tourn - success
 POST http://localhost:8080/tournaments
 Content-Type: application/json

@@ -4,7 +4,7 @@ public interface UserService {
     User createNewUser(String username, String password);
     User login(String username, String password);
     User findByUsername(String username);
-    User changePassword(String username, String newPassword);
-    void updateELO(User user, int newELO);
-    void deleteUser(User user);
+    User changePassword(String username, String password);
+    String deleteByUsername(String username);
+    void updateELO(User user, int ELO);
 }

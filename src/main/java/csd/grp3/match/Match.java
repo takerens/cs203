@@ -43,7 +43,7 @@ public class Match {
     @JoinColumn(name = "black") // Foreign key referencing User
     private User black;
     
-    private boolean isBYE = false;
+    private boolean BYE = false;
 
     @Getter (AccessLevel.NONE)
     private double result = 0;
@@ -65,7 +65,8 @@ public class Match {
      *  1 (white wins),
      *  0.5 (draw),
      *  0 (unplayed/ongoing)
-     * @return Integer value
+     * 
+     * @return Double value
      */
     public double getResult() {
         return result;
