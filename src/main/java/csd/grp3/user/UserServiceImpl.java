@@ -1,6 +1,7 @@
 package csd.grp3.user;
 
 import org.springframework.security.authentication.BadCredentialsException;
+import csd.grp3.user.UserNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,26 +44,33 @@ public class UserServiceImpl implements UserService {
         if (encoder.matches(password, user.getPassword())) {
             return user;
         }
+        //Else throw exception
         throw new BadCredentialsException("Password does not match");
     }
 
     @Override
     public User changePassword(String username, String newPassword) {
         User user = findByUsername(username);
+
+        // If the new password is the same as the old one, throw an error
+        if (encoder.matches(newPassword, user.getPassword())) {
+            throw new BadCredentialsException("New password should not be the same as the old one");
+        }
+        
         user.setPassword(encoder.encode(newPassword));
         return userRepository.save(user);
     }
 
-    @Override
-    public void updateELO(User tempUser, int newELO) {
-        User user = findByUsername(tempUser.getUsername());
-        user.setELO(newELO);
-        userRepository.save(user);
+    public String deleteByUsername(String username) {
+        User user = findByUsername(username);
+        userRepository.delete(user);
+        return username;
     }
 
     @Override
-    public void deleteUser(User user) {
-        login(user.getUsername(), user.getPassword());
-        userRepository.delete(user);
+    public void updateELO(User tempUser, int ELO) {
+        User user = findByUsername(tempUser.getUsername());
+        user.setELO(ELO);
+        userRepository.save(user);
     }
 }
