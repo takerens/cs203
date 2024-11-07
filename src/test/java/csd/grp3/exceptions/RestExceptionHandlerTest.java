@@ -11,18 +11,19 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import csd.grp3.exception.RestExceptionHandler;
+import csd.grp3.jwt.JwtService;
 import csd.grp3.match.MatchService;
 import csd.grp3.tournament.InvalidTournamentStatus;
 import csd.grp3.tournament.TournamentNotFoundException;
 import csd.grp3.tournament.TournamentService;
 import csd.grp3.tournament.UserNotRegisteredException;
-import csd.grp3.user.UserNotFoundException;
 import csd.grp3.user.UserService;
 
 @WebMvcTest
@@ -35,6 +36,9 @@ public class RestExceptionHandlerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private JwtService jwtService;
 
     @InjectMocks
     private RestExceptionHandler restExceptionHandler;
@@ -113,16 +117,16 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void testHandleUserNotFoundException() {
+    public void testHandleUsernameNotFoundException() {
         // Arrange
-        UserNotFoundException ex = new UserNotFoundException();
+        UsernameNotFoundException ex = new UsernameNotFoundException("User not found");
 
         // Act
-        ResponseEntity<Object> response = restExceptionHandler.handleUserNotFoundException(ex);
+        ResponseEntity<Object> response = restExceptionHandler.handleUsernameNotFoundException(ex);
 
         // Assert
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertTrue(response.getBody().toString().contains("User not found."));
+        assertTrue(response.getBody().toString().contains("User not found"));
     }
 
     @Test
