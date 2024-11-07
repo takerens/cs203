@@ -27,7 +27,7 @@ public class Grp3Application {
 		System.out.println("[Add User]: " + users.save(new User("User110", encoder.encode("user1234"), "ROLE_USER", 110)).getUsername());
 		System.out.println("[Add User]: " + users.save(new User("User150", encoder.encode("user1234"), "ROLE_USER", 150)).getUsername());
 		System.out.println("[Add User]: " + users.save(new User("User120", encoder.encode("user1234"), "ROLE_USER", 120)).getUsername());
-		System.out.println("[Add Bot]: " + users.save(new User("DEFAULT_BOT", encoder.encode("goodpassword"), "ROLE_USER", 0)).getUsername());
+		System.out.println("[Add Bot]: " + users.save(new User("DEFAULT_BOT", encoder.encode("goodpassword"), "ROLE_USER", -1)).getUsername());
 
 		// JPA User Repository init
 		TournamentService Ts = ctx.getBean(TournamentService.class);

@@ -2,6 +2,7 @@ package csd.grp3.tournament;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -79,9 +80,8 @@ public class TournamentServiceImplTest {
         tournament.setId(1L);
         tournament.setTitle("Test Tournament");
         tournament.setSize(2);
-        // tournament.setUserTournaments(new ArrayList<>());
-        
-        player = new User("testUser", "testPassword123");  // Username and password
+
+        player = new User("testUser", "testPassword123"); // Username and password
         player.setAuthorities("ROLE_PLAYER"); // Set specific authorities
     }
 
@@ -104,7 +104,7 @@ public class TournamentServiceImplTest {
         // Arrange
         List<Tournament> tournamentsList = new ArrayList<>();
         tournamentsList.add(tournament);
-        
+
         // mock getAllTournaments()
         when(tournamentRepository.findAll()).thenReturn(tournamentsList);
 
@@ -113,8 +113,6 @@ public class TournamentServiceImplTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         verify(tournamentRepository).findAll();
-        // assertEquals("Test Tournament", result.get(0).getTitle());
-        // verify(tournamentRepository, times(1)).findAll();
     }
 
     @Test
@@ -154,12 +152,14 @@ public class TournamentServiceImplTest {
 
         when(tournamentRepository.save(tournament)).thenReturn(tournament);
         when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
-        when(userService.findByUsername("DEFAULT_BOT")).thenReturn(new User("DEFAULT_BOT", "goodpassword", "ROLE_USER", 0));
+        when(userService.findByUsername("DEFAULT_BOT"))
+                .thenReturn(new User("DEFAULT_BOT", "goodpassword", "ROLE_USER", 0));
 
         doAnswer(invocation -> {
             UserTournamentId utId = new UserTournamentId(tournament.getId(), player.getUsername());
             UserTournament userTournament = new UserTournament(utId, tournament, player, 'r', 0, 0);
-            tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's list
+            tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's
+                                                                 // list
             return null; // Since add returns void
         }).when(userTournamentService).add(any(Tournament.class), any(User.class), anyChar());
 
@@ -176,12 +176,14 @@ public class TournamentServiceImplTest {
         tournament2.setId(2L);
         when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
         when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
-        when(userService.findByUsername("DEFAULT_BOT")).thenReturn(new User("DEFAULT_BOT", "goodpassword", "ROLE_USER", 0));
+        when(userService.findByUsername("DEFAULT_BOT"))
+                .thenReturn(new User("DEFAULT_BOT", "goodpassword", "ROLE_USER", 0));
 
         doAnswer(invocation -> {
             UserTournamentId utId = new UserTournamentId(tournament.getId(), player.getUsername());
             UserTournament userTournament = new UserTournament(utId, tournament, player, 'r', 0, 0);
-            tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's list
+            tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's
+                                                                 // list
             return null; // Since add returns void
         }).when(userTournamentService).add(any(Tournament.class), any(User.class), anyChar());
 
@@ -199,7 +201,7 @@ public class TournamentServiceImplTest {
     void updateTournament_NotFound_ReturnTournamentNotFoundException() {
         // Arrange
         when(tournamentRepository.findById(1L)).thenReturn(Optional.empty());
-        
+
         // Act
         TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
             tournamentService.updateTournament(1L, tournament);
@@ -208,21 +210,6 @@ public class TournamentServiceImplTest {
         // Assert
         assertEquals("Could not find tournament 1", exception.getMessage());
         verify(tournamentRepository).findById(1L);
-    }
-
-    @Test
-    void updateTournament_UpdatedTournament_ReturnUpdatedTournament() {
-        // Arrange
-        Tournament newTournamentInfo = new Tournament(1L, null, "Updated Tournament", 0, 0, null, 0, 10, false, null);
-        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-
-        // Act
-        Tournament updatedTournament = tournamentService.updateTournament(1L, newTournamentInfo);
-
-        // Assert
-        assertNotNull(updatedTournament);
-        assertEquals("Updated Tournament", updatedTournament.getTitle());
-        verify(tournamentRepository, times(2)).findById(1L);
     }
 
     @Test
@@ -273,12 +260,10 @@ public class TournamentServiceImplTest {
         when(userService.findByUsername(player.getUsername())).thenReturn(player);
 
         doAnswer(invocation -> {
-            tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's list
+            tournament.getUserTournaments().add(userTournament); // Directly add the user tournament to the tournament's
+                                                                 // list
             return null; // Since add returns void
         }).when(userTournamentService).add(any(Tournament.class), any(User.class), anyChar());
-        // mock UTService
-        // when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(userList);
-        // when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(userList);
 
         // act
         tournamentService.registerUser(player, 1L);
@@ -361,8 +346,6 @@ public class TournamentServiceImplTest {
         // Arrange
         List<User> userList = new ArrayList<>();
         List<User> waitingList = new ArrayList<>();
-        UserTournamentId UTId = new UserTournamentId(tournament.getId(), player.getUsername());
-        UserTournament userTournament = new UserTournament(UTId, tournament, player, null, 0, 0);
         LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
         userList.add(player);
         tournament.setStartDateTime(time);
@@ -378,10 +361,6 @@ public class TournamentServiceImplTest {
             userList.remove(player); // Directly add the user tournament to the tournament's list
             return null; // Since add returns void
         }).when(userTournamentService).delete(tournament, player);
-
-        // mock UTService
-        // when(userTournamentRepository.findRegisteredUsersByTournamentId(1L)).thenReturn(userList);
-        // when(userTournamentRepository.findWaitlistUsersByTournamentId(1L)).thenReturn(userList);
 
         // act
         tournamentService.withdrawUser(player, tournament.getId());
@@ -411,18 +390,13 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findById(1L);
     }
 
-    // @Test
-    // void withdrawPlayer_PlayerNotFound_ReturnUserTournamentNotFoundException() {
-        
-    // }
-
     @Test
     void createPairings_FirstRound() {
         // Arrange
         tournament.setMaxElo(100);
         tournament.setSize(10);
         // tournamentService.addTournament(tournament);
-        
+
         User user1 = new User("player1", "player11", "ROLE_PLAYER", 40);
         User user2 = new User("player2", "player22", "ROLE_PLAYER", 35);
         User user3 = new User("player3", "player33", "ROLE_PLAYER", 15);
@@ -432,7 +406,8 @@ public class TournamentServiceImplTest {
         when(userTournamentService.getPlayers(tournament.getId())).thenReturn(userList);
         when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
         when(matchService.getUserMatches(Mockito.any(User.class))).thenReturn(Collections.emptyList());
-        when(matchService.getMatchesBetweenTwoUsers(Mockito.any(User.class), Mockito.any(User.class))).thenReturn(Collections.emptyList());
+        when(matchService.getMatchesBetweenTwoUsers(Mockito.any(User.class), Mockito.any(User.class)))
+                .thenReturn(Collections.emptyList());
         Round mockRound = new Round(tournament);
         tournament.getRounds().add(mockRound);
         Match match1 = new Match(user1, user2, mockRound);
@@ -445,7 +420,8 @@ public class TournamentServiceImplTest {
 
         assertNotNull(returnedRound);
         assertEquals(2, returnedRound.getMatches().size());
-        verify(matchService, times(2)).createMatch(Mockito.any(User.class), Mockito.any(User.class), Mockito.any(Round.class));
+        verify(matchService, times(2)).createMatch(Mockito.any(User.class), Mockito.any(User.class),
+                Mockito.any(Round.class));
     }
 
     @Test
@@ -454,7 +430,7 @@ public class TournamentServiceImplTest {
         tournament.setMaxElo(100);
         tournament.setSize(10);
         // tournamentService.addTournament(tournament);
-        
+
         User user1 = new User("player1", "player11", "ROLE_PLAYER", 40);
         User user2 = new User("player2", "player22", "ROLE_PLAYER", 35);
         User user3 = new User("player3", "player33", "ROLE_PLAYER", 15);
@@ -475,13 +451,12 @@ public class TournamentServiceImplTest {
 
         // mock the sorting of users
         when(userTournamentService.getPlayers(tournament.getId())).thenReturn(userList);
-        when(userTournamentService.getGamePoints(tournament.getId(),user1.getUsername())).thenReturn(1.0);
-        when(userTournamentService.getGamePoints(tournament.getId(),user2.getUsername())).thenReturn(0.0);
-        when(userTournamentService.getGamePoints(tournament.getId(),user3.getUsername())).thenReturn(1.0);
-        when(userTournamentService.getGamePoints(tournament.getId(),user4.getUsername())).thenReturn(0.0);
+        when(userTournamentService.getGamePoints(tournament.getId(), user1.getUsername())).thenReturn(1.0);
+        when(userTournamentService.getGamePoints(tournament.getId(), user2.getUsername())).thenReturn(0.0);
+        when(userTournamentService.getGamePoints(tournament.getId(), user3.getUsername())).thenReturn(1.0);
+        when(userTournamentService.getGamePoints(tournament.getId(), user4.getUsername())).thenReturn(0.0);
         when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
 
-        // when(matchService.getMatchesBetweenTwoUsers(user1, user2)).thenReturn(match1List);
         when(matchService.getMatchesBetweenTwoUsers(user1, user3)).thenReturn(Collections.emptyList());
         when(matchService.getMatchesBetweenTwoUsers(user2, user4)).thenReturn(Collections.emptyList());
 
@@ -492,12 +467,13 @@ public class TournamentServiceImplTest {
         when(matchService.createMatch(user3, user1, secondRound)).thenReturn(match3);
         when(matchService.createMatch(user2, user4, secondRound)).thenReturn(match4);
 
-        tournamentService.createPairings(tournament,secondRound);
+        tournamentService.createPairings(tournament, secondRound);
         Round returnedRound = tournament.getRounds().get(0);
 
         assertNotNull(returnedRound);
         assertEquals(2, returnedRound.getMatches().size());
-        verify(matchService, times(2)).createMatch(Mockito.any(User.class), Mockito.any(User.class), Mockito.any(Round.class));
+        verify(matchService, times(2)).createMatch(Mockito.any(User.class), Mockito.any(User.class),
+                Mockito.any(Round.class));
     }
 
     @Test
@@ -506,7 +482,7 @@ public class TournamentServiceImplTest {
         tournament.setMaxElo(100);
         tournament.setSize(10);
         // tournamentService.addTournament(tournament);
-        
+
         User user1 = new User("player1", "player11", "ROLE_PLAYER", 40);
         User user2 = new User("player2", "player22", "ROLE_PLAYER", 35);
         User user3 = new User("player3", "player33", "ROLE_PLAYER", 15);
@@ -531,17 +507,25 @@ public class TournamentServiceImplTest {
         // mock the get players in UT service
         when(userTournamentService.getPlayers(tournament.getId())).thenReturn(userList);
 
+        // mock the get matches in match service
+        when(matchService.getUserMatches(user1)).thenReturn(List.of(match1, match3));
+        when(matchService.getUserMatches(user2)).thenReturn(List.of(match1, match4));
+        when(matchService.getUserMatches(user3)).thenReturn(List.of(match2, match3));
+        when(matchService.getUserMatches(user4)).thenReturn(List.of(match2, match4));
+
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+
         // mock the find tournament
         when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
 
         // act
         tournamentService.endTournament(tournament.getId());
-        
+
         // assert
-        assertTrue(user1.getELO()>40);
-        assertTrue(user2.getELO()<35);
-        assertTrue(user3.getELO()>15);
-        assertTrue(user4.getELO()>10);
+        assertTrue(user1.getELO() > 40);
+        assertTrue(user2.getELO() < 35);
+        assertTrue(user3.getELO() > 15);
+        assertTrue(user4.getELO() > 10);
     }
 
     @Test
@@ -604,43 +588,69 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findById(1L);
     }
 
-    // @Test
-    // void addRound_AddSuccess_ReturnRound() {
-    //     // Arrange 
-    //     LocalDateTime time = LocalDateTime.of(2014, Month.JANUARY, 1, 10, 10, 30);
-    //     tournament.setStartDateTime(time);
-    //     tournament.setSize(10);
-    //     tournament.setMaxElo(200);
-    //     tournament.setMinElo(100);
-    //     List<User> playerList = new ArrayList<>();
-    //     User player1 = new User("player1", "player11", "ROLE_PLAYER", 100);
-    //     User player2 = new User("player2", "player21", "ROLE_PLAYER", 200);
-    //     playerList.add(player1);
-    //     playerList.add(player2);
-    //     tournament.getUserTournaments().add(new UserTournament(tournament, player1, 'r'));
-    //     tournament.getUserTournaments().add(new UserTournament(tournament, player2, 'r'));
+    @Test
+    public void testUpdateMatchResults() {
+        // Mock data setup
+        User blackPlayer = new User("blackPlayer", "black", "ROLE_PLAYER", 0);
+        User whitePlayer = new User("whitePlayer", "white", "ROLE_PLAYER", 0);
 
-    //     // Mock findbyId and save
-    //     when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
-    //     when(userTournamentService.getPlayers(tournament.getId())).thenReturn(playerList);
+        Round round = new Round(tournament);
 
-    //     // Act, add 1 round to tournament
-    //     tournamentService.addRound(tournament.getId());
+        Match match1 = new Match(blackPlayer, whitePlayer, round); // Black wins
+        Match match2 = new Match(blackPlayer, whitePlayer, round); // White wins
+        Match match3 = new Match(blackPlayer, whitePlayer, round); // Draw
+        match1.setResult(-1);
+        match2.setResult(1);
+        match3.setResult(0.5);
 
-    //     // Assert
-    //     assertEquals(1, tournament.getRounds().size());
-    //     verify(tournamentRepository, times(2)).findById(tournament.getId());
-    // }
+        List<Match> matches = List.of(match1, match2, match3);
 
-    // @Test
-    // void updateResult_MatchNotEnded_ReturnMatchNotCompletedException() {
+        round.setMatches(matches);
+        round.setTournament(tournament);
 
-    // }
-    
-    // @Test
-    // void updateResult_UpdatedResult_ReturnNothing() {
+        // Call the updateMatchResults method
+        tournamentService.updateMatchResults(round);
 
-    // }
+        // Verify that updateMatchPoints was called correctly for each match
+        verify(userTournamentService, times(1)).updateMatchPoints(tournament.getId(), blackPlayer.getUsername(), 1.0); // Black
+                                                                                                                       // wins
+        verify(userTournamentService, times(1)).updateMatchPoints(tournament.getId(), whitePlayer.getUsername(), 0.0);
+
+        verify(userTournamentService, times(1)).updateMatchPoints(tournament.getId(), whitePlayer.getUsername(), 1.0); // White
+                                                                                                                       // wins
+        verify(userTournamentService, times(1)).updateMatchPoints(tournament.getId(), blackPlayer.getUsername(), 0.0);
+
+        verify(userTournamentService, times(1)).updateMatchPoints(tournament.getId(), blackPlayer.getUsername(), 0.5); // Draw
+        verify(userTournamentService, times(1)).updateMatchPoints(tournament.getId(), whitePlayer.getUsername(), 0.5);
+    }
+
+    @Test
+    public void testUpdateResults() {
+        // Mock data setup
+        User blackPlayer = new User("blackPlayer", "black", "ROLE_PLAYER", 0);
+        User whitePlayer = new User("whitePlayer", "white", "ROLE_PLAYER", 0);
+
+        Round round = new Round(tournament);
+
+        Match match1 = new Match(blackPlayer, whitePlayer, round); // Some match
+        Match match2 = new Match(blackPlayer, whitePlayer, round); // Some match
+        match1.setResult(1);
+        match2.setResult(0.5);
+
+        List<Match> matches = new ArrayList<>();
+        matches.add(match1);
+        matches.add(match2);
+
+        round.setMatches(matches);
+        round.setTournament(tournament);
+
+        // Call the updateResults method
+        tournamentService.updateTournamentResults(round);
+
+        // Verify that updateGamePoints was called correctly for each match
+        verify(userTournamentService, times(2)).updateGamePoints(tournament.getId(), blackPlayer.getUsername());
+        verify(userTournamentService, times(2)).updateGamePoints(tournament.getId(), whitePlayer.getUsername());
+    }
 
     @Test
     void getTournamentAboveMin_TournamentAboveMin_ReturnListOfTournamentAboveMin() {
@@ -927,13 +937,204 @@ public class TournamentServiceImplTest {
         verify(tournamentRepository).findAll();
     }
 
-//     @Test
-//     void testTournamentExists() {
-//         // when(tournamentRepository.existsById(1L)).thenReturn(true);
+    @Test
+    public void testHandleBYE_WhenOpponentIsDefaultBot() {
+        // Mock data setup
+        User user = new User("player1", "password1", "ROLE_PLAYER", 0);
+        User bot = new User("DEFAULT_BOT", "password2", "ROLE_BOT", 0);
+        Round round = new Round(tournament);
 
-//         // boolean exists = tournamentService.tournamentExists(1L);
+        Match matchWithBot = new Match(user, bot, round);
+        List<Match> matches = new ArrayList<>(List.of(matchWithBot));
+        round.setMatches(matches);
 
-//         // assertTrue(exists);
-//         // verify(tournamentRepository, times(1)).existsById(1L);
-//     }
+        // Call the handleBYE method
+        tournamentService.handleBYE(round, user);
+
+        // Verify that the match with the "DEFAULT_BOT" was removed
+        assertTrue(round.getMatches().isEmpty(), "Match with DEFAULT_BOT should be removed from the round");
+    }
+
+    @Test
+    public void testHandleBYE_WhenUserHasOpponent() {
+        // Mock data setup
+        User user = new User("player1", "password1", "ROLE_PLAYER", 0);
+        User opponent = new User("player2", "password2", "ROLE_PLAYER", 0);
+        Round round = new Round(tournament);
+
+        Match matchWithOpponent = new Match(user, opponent, round);
+        List<Match> matches = new ArrayList<>(List.of(matchWithOpponent));
+        round.setMatches(matches);
+
+        // Call the handleBYE method
+        tournamentService.handleBYE(round, user);
+
+        // Verify that the match result is set correctly and marked as a BYE
+        assertEquals(-1, matchWithOpponent.getResult(),
+                "The match result should be set to -1 (black wins) since the opponent is black");
+        assertTrue(matchWithOpponent.isBYE(), "The match should be marked as a BYE");
+        assertEquals(1, round.getMatches().size(),
+                "The match should not be removed from the round when the opponent is not a bot");
+    }
+
+    @Test
+    public void testHandleBYE_WhenUserHasNoMatch() {
+        // Mock data setup
+        User user = new User("player1", "password1", "ROLE_PLAYER", 0);
+        Round round = new Round(tournament);
+
+        // No matches in the round
+        List<Match> matches = new ArrayList<>();
+        round.setMatches(matches);
+
+        // Call the handleBYE method
+        tournamentService.handleBYE(round, user);
+
+        // Verify that no changes occurred since there were no matches
+        assertTrue(round.getMatches().isEmpty(), "There should be no changes since the user was not in any match");
+    }
+
+    @Test
+    public void testIsColourSuitable_WhenLessThanTwoGamesPlayed() {
+        // Mock data setup
+        User user = new User("player1", "password1", "ROLE_PLAYER", 0);
+        Round round = new Round(tournament);
+
+        // User has played only one match
+        Match match = new Match(user, new User("opponent", "password2", "ROLE_PLAYER", 0), round);
+        match.setId(1L);
+
+        List<Match> matches = List.of(match);
+
+        // Mock the matchService to return the user's matches
+        when(matchService.getUserMatches(user)).thenReturn(matches);
+
+        // Call the isColourSuitable method
+        boolean result = tournamentService.isColourSuitable(user, tournament, "white");
+
+        // Verify that the result is true since fewer than 2 games were played
+        assertTrue(result, "The result should be true since the user has played less than two games.");
+    }
+
+    @Test
+    public void testIsColourSuitable_WhenSameColourThrice() {
+        // Mock data setup
+        User user = new User("player1", "password1", "ROLE_PLAYER", 0);
+        Round round = new Round(tournament);
+
+        // User has played two matches of the same color
+        Match match1 = new Match(user, new User("opponent1", "password2", "ROLE_PLAYER", 0), round);
+        match1.setId(1L); // Earlier match
+
+        Match match2 = new Match(user, new User("opponent2", "password3", "ROLE_PLAYER", 0), round);
+        match2.setId(2L); // More recent match
+
+        // Set both matches where the user played as "white"
+        match1.setWhite(user);
+        match2.setWhite(user);
+
+        List<Match> matches = List.of(match1, match2);
+
+        // Mock the matchService to return the user's matches
+        when(matchService.getUserMatches(user)).thenReturn(matches);
+
+        // Call the isColourSuitable method
+        boolean result = tournamentService.isColourSuitable(user, tournament, "white");
+
+        // Verify that the result is false since the user would play the same color
+        // thrice
+        assertFalse(result, "The result should be false since the user would play 'white' three times in a row.");
+    }
+
+    @Test
+    public void testIsColourSuitable_WhenDifferentColours() {
+        // Mock data setup
+        User user = new User("player1", "password1", "ROLE_PLAYER", 0);
+        Round round = new Round(tournament);
+
+        // User has played two matches with different colors
+        Match match1 = new Match(user, new User("opponent1", "password2", "ROLE_PLAYER", 0), round);
+        match1.setId(1L); // Earlier match
+
+        Match match2 = new Match(new User("opponent2", "password3", "ROLE_PLAYER", 0), user, round);
+        match2.setId(2L); // More recent match
+
+        // Set one match where the user played as "white" and the other as "black"
+        match1.setWhite(user); // Played as "white"
+        match2.setBlack(user); // Played as "black"
+
+        List<Match> matches = List.of(match1, match2);
+
+        // Mock the matchService to return the user's matches
+        when(matchService.getUserMatches(user)).thenReturn(matches);
+
+        // Call the isColourSuitable method
+        boolean result = tournamentService.isColourSuitable(user, tournament, "white");
+
+        // Verify that the result is true since the user would not play the same color
+        // thrice
+        assertTrue(result,
+                "The result should be true since the user has played different colors in the last two matches.");
+    }
+
+    @Test
+    public void testUpdateTournament() {
+        tournament.setTitle("Old Title");
+        tournament.setStartDateTime(LocalDateTime.now());
+        tournament.setMinElo(1000);
+        tournament.setMaxElo(2000);
+        tournament.setSize(5);
+        tournament.setTotalRounds(3);
+
+        Tournament newTournamentInfo = new Tournament();
+        newTournamentInfo.setId(tournament.getId());
+        newTournamentInfo.setTitle("New Title");
+        newTournamentInfo.setStartDateTime(LocalDateTime.now().plusDays(1));
+        newTournamentInfo.setMinElo(1200);
+        newTournamentInfo.setMaxElo(1800);
+        newTournamentInfo.setSize(3);
+        newTournamentInfo.setTotalRounds(4);
+
+        List<User> players = new ArrayList<>();
+        User player1 = new User("player1", "player1", "ROLE_PLAYER", 1100); // Below new Elo limit
+        User player2 = new User("player2", "player2", "ROLE_PLAYER", 1300); // Within new Elo limit
+        User player3 = new User("player3", "player3", "ROLE_PLAYER", 1900); // Above new Elo limit
+        User player4 = new User("DEFAULT_BOT", "bot", "ROLE_BOT", 1500); // Bot should be ignored
+
+        players.add(player1);
+        players.add(player2);
+        players.add(player3);
+        players.add(player4);
+
+        List<User> waitingList = new ArrayList<>();
+        User waitingUser1 = new User("waiting1", "waiting1", "ROLE_PLAYER", 1250); // Within new Elo limit
+        User waitingUser2 = new User("waiting2", "waiting2", "ROLE_PLAYER", 2000); // Outside new Elo limit
+
+        waitingList.add(waitingUser1);
+        waitingList.add(waitingUser2);
+
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+        when(userTournamentService.getPlayers(tournament.getId())).thenReturn(players);
+        when(userTournamentService.getWaitingList(tournament.getId())).thenReturn(waitingList);
+        when(tournamentRepository.save(newTournamentInfo)).thenReturn(newTournamentInfo);
+
+        // Call the updateTournament method
+        Tournament updatedTournament = tournamentService.updateTournament(tournament.getId(), newTournamentInfo);
+
+        // Verify that the tournament properties were updated
+        assertEquals("New Title", updatedTournament.getTitle());
+        assertEquals(newTournamentInfo.getStartDateTime(), updatedTournament.getStartDateTime());
+        assertEquals(1200, updatedTournament.getMinElo());
+        assertEquals(1800, updatedTournament.getMaxElo());
+        assertEquals(3, updatedTournament.getSize());
+        assertEquals(4, updatedTournament.getTotalRounds());
+
+        verify(tournamentRepository).findById(tournament.getId());
+
+        // Verify that players were processed based on the new Elo limits
+        verify(userTournamentService, times(1)).delete(tournament, player1); // Below new Elo limit
+        verify(userTournamentService, never()).delete(tournament, player2); // Within new Elo limit
+        verify(userTournamentService, times(1)).delete(tournament, player3); // Above new Elo limit
+        verify(userTournamentService, never()).delete(tournament, player4); // Bot should be ignored
+    }
 }

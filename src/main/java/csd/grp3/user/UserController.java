@@ -10,30 +10,16 @@ import jakarta.validation.Valid;
 @RestController
 public class UserController {
     private UserService userService;
-
-    //TEMPORARY
-    private User user;
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    User getUser() {
-        return this.user;
-    }
-    // Till HERE
+    private User currentUser;
 
     public UserController(UserService userService) {
         this.userService = userService;
-        this.user = null; //TEMP
+        this.currentUser = null; // TEMP
     }
 
     @GetMapping("/user")
     public ResponseEntity<User> getUserDetails() {
-        if (getUser() != null) {
-            return ResponseEntity.ok(getUser());
-        }
-        return ResponseEntity.notFound().build();
+        return currentUser == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(currentUser);
     }
 
     @PostMapping("/signup")
@@ -44,9 +30,8 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<User> loginUser(@RequestBody User user) {
-        User loggedIn = userService.login(user.getUsername(), user.getPassword());
-        setUser(loggedIn);
-        return ResponseEntity.status(HttpStatus.OK).body(loggedIn);
+        this.currentUser = userService.login(user.getUsername(), user.getPassword());
+        return ResponseEntity.status(HttpStatus.OK).body(this.currentUser);
     }
 
     @GetMapping("/profile/{username}")
@@ -54,15 +39,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findByUsername(username));
     }
 
-    @PutMapping("/user/changePassword")
+    @PutMapping("/user")
     public ResponseEntity<User> changePassword(@Valid @RequestBody User user) {
         User updatedUser = userService.changePassword(user.getUsername(), user.getPassword());
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
     @DeleteMapping("/profile/{username}")
-    public ResponseEntity<String> deleteUser(@PathVariable String username) {
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable String username) {
         userService.deleteByUsername(username);
-        return ResponseEntity.status(HttpStatus.OK).body(username + " has been deleted");
+        return ResponseEntity.noContent().build();
     }
 }

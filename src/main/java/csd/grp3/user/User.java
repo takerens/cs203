@@ -45,11 +45,9 @@ public class User implements UserDetails{
 
     @NotNull (message = "Password should not be null")
     @Size(min = 8, message = "Password should be at least 8 characters long")
-    // @JsonIgnore
     private String password;
 
     @NotNull(message = "Authorities should not be null")
-    // @JsonIgnore
     private String authorities;
 
     public User(String username, String password) {
@@ -66,7 +64,6 @@ public class User implements UserDetails{
         this.ELO = ELO;
     }
 
-    // @JsonIgnore
     public String getUserRole() {
         return authorities;
     }

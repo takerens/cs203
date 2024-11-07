@@ -15,9 +15,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import csd.grp3.user.User;
+import csd.grp3.user.UserService;
 import csd.grp3.tournament.Tournament;
 
 public class UserTournamentServiceTest {
+
+    @Mock
+    private UserService userService;
 
     @Mock
     private UserTournamentRepository userTournamentRepo;
@@ -36,6 +40,8 @@ public class UserTournamentServiceTest {
         // Arrange
         List<User> mockUsers = Arrays.asList(new User("user1", "abcd1234"), new User("user2", "abcd1234"));
         when(userTournamentRepo.findRegisteredUsersByTournamentId(any(Long.class))).thenReturn(mockUsers);
+        when(userService.findByUsername("user1")).thenReturn(new User("user1", "abcd1234"));
+        when(userService.findByUsername("user2")).thenReturn(new User("user2", "abcd1234"));
 
         // Act
         List<User> players = userTournamentService.getPlayers(1L);

@@ -1,26 +1,24 @@
 package csd.grp3.user;
 
 import org.springframework.security.authentication.BadCredentialsException;
+import csd.grp3.user.UserNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
-    
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder) {
-        this.userRepository = userRepository;
-        this.encoder = encoder;
-    }
 
     @Override
     public User findByUsername(String username) throws UserNotFoundException{
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(UserNotFoundException::new);
     }
 
     @Override
@@ -29,12 +27,11 @@ public class UserServiceImpl implements UserService {
 
         //Check if the username already exists, if it does throw exception
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new BadCredentialsException("Username already exists");
+            throw new BadCredentialsException("Username already taken. Try a different username.");
         }
 
         // Encode password given by user to store
         String encodedPassword = encoder.encode(password);
-
         return userRepository.save(new User(username, encodedPassword));
     }
 
@@ -42,10 +39,9 @@ public class UserServiceImpl implements UserService {
     public User login(String username, String password) throws UserNotFoundException, BadCredentialsException{
         //Get the password associated with the searched username
         User user = findByUsername(username);
-        String encodedPassword = user.getPassword();
 
         //Return the user if the password matches
-        if (encoder.matches(password, encodedPassword)) {
+        if (encoder.matches(password, user.getPassword())) {
             return user;
         }
         //Else throw exception
@@ -53,15 +49,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User changePassword(String username, String newPassword) throws UserNotFoundException, BadCredentialsException{
+    public User changePassword(String username, String newPassword) {
         User user = findByUsername(username);
-        //Only change the password if it is different
-        if (!encoder.matches(newPassword, user.getPassword())) {
-            user.setPassword(encoder.encode(newPassword));
-            return userRepository.save(user);
-        }
 
-        throw new BadCredentialsException("Password already in use");        
+        // If the new password is the same as the old one, throw an error
+        if (encoder.matches(newPassword, user.getPassword())) {
+            throw new BadCredentialsException("New password should not be the same as the old one");
+        }
+        
+        user.setPassword(encoder.encode(newPassword));
+        return userRepository.save(user);
     }
 
     public String deleteByUsername(String username) {

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import csd.grp3.tournament.Tournament;
 import csd.grp3.user.User;
-import csd.grp3.user.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -19,90 +18,78 @@ public class UserTournamentServiceImpl implements UserTournamentService {
     @Autowired
     private UserTournamentRepository userTournamentRepo;
 
-    @Autowired
-    private UserService userService;
-
-    public UserTournament findRecord(Long tourneyID, String username) throws UserTournamentNotFoundException {
-        return userTournamentRepo.findById_TournamentIdAndId_Username(tourneyID, username)
+    public UserTournament findRecord(Long tournamentID, String username) throws UserTournamentNotFoundException {
+        return userTournamentRepo.findById_TournamentIdAndId_Username(tournamentID, username)
                 .orElseThrow(() -> new UserTournamentNotFoundException());
     }
 
-    /**
-     * Retrieves a list of players registered for a given tournament, excluding the default bot user.
-     *
-     * @param tourneyID the ID of the tournament for which to retrieve the players
-     * @return a list of users registered for the specified tournament, excluding the default bot user
-     */
     @Override
-    public List<User> getPlayers(Long tourneyID) {
-        List<User> players = userTournamentRepo.findRegisteredUsersByTournamentId(tourneyID);
-        User user = userService.findByUsername("DEFAULT_BOT");
-        players.remove(user);
-        return players;
+    public List<User> getPlayers(Long tournamentID) {
+        return userTournamentRepo.findRegisteredUsersByTournamentId(tournamentID);
     }
 
     @Override
-    public List<User> getWaitingList(Long tourneyID) {
-        return userTournamentRepo.findWaitlistUsersByTournamentId(tourneyID);
+    public List<User> getWaitingList(Long tournamentID) {
+        return userTournamentRepo.findWaitlistUsersByTournamentId(tournamentID);
     }
 
     @Override
-    public double getGamePoints(Long tourneyID, String username) {
-        UserTournament ut = findRecord(tourneyID, username);
-        return ut.getGamePoints();
+    public double getGamePoints(Long tournamentID, String username) {
+        UserTournament userTournament = findRecord(tournamentID, username);
+        return userTournament.getGamePoints();
     }
 
     @Override
-    public void updateGamePoints(Long tourneyID, String username) {
-        UserTournament ut = findRecord(tourneyID, username);
-        ut.setGamePoints(ut.getGamePoints()); // getGamePoints adds MatchPoints
-        ut.setMatchPoints(0); // reset match points
-        userTournamentRepo.save(ut);
+    public void updateGamePoints(Long tournamentID, String username) {
+        UserTournament userTournament = findRecord(tournamentID, username);
+        userTournament.setGamePoints(userTournament.getGamePoints()); // getGamePoints adds MatchPoints
+        userTournament.setMatchPoints(0); // reset match points
+        userTournamentRepo.save(userTournament);
     }
 
     @Override
-    public void updateMatchPoints(Long tourneyID, String username, double points) {
-        UserTournament ut = findRecord(tourneyID, username);
-        ut.setMatchPoints(points);
-        userTournamentRepo.save(ut);
+    public void updateMatchPoints(Long tournamentID, String username, double points) {
+        UserTournament userTournament = findRecord(tournamentID, username);
+        userTournament.setMatchPoints(points);
+        userTournamentRepo.save(userTournament);
     }
 
     @Override
     // @Transactional
-    public UserTournament updatePlayerStatus(Long tourneyID, String username, char status) {
-        UserTournament ut = findRecord(tourneyID, username);
-        ut.setStatus(status);
-        return userTournamentRepo.save(ut);
+    public UserTournament updatePlayerStatus(Long tournamentID, String username, char status) {
+        UserTournament userTournament = findRecord(tournamentID, username);
+        userTournament.setStatus(status);
+        return userTournamentRepo.save(userTournament);
     }
 
     @Override
     @Transactional
-    public UserTournament add(Tournament tourney, User user, char status) {
+    public UserTournament add(Tournament tournament, User user, char status) {
         // Check if the UserTournament already exists
-        Optional<UserTournament> existingUT = userTournamentRepo.findById_TournamentIdAndId_Username(tourney.getId(),
+        Optional<UserTournament> existinguserTournament = userTournamentRepo.findById_TournamentIdAndId_Username(tournament.getId(),
                 user.getUsername());
-        if (existingUT.isPresent()) {
-            return updatePlayerStatus(tourney.getId(), user.getUsername(), status);
+        if (existinguserTournament.isPresent()) {
+            return updatePlayerStatus(tournament.getId(), user.getUsername(), status);
         }
 
-        UserTournament ut = new UserTournament(
-                new UserTournamentId(tourney.getId(), user.getUsername()),
-                tourney, user, status, 0, 0);
+        UserTournament userTournament = new UserTournament(
+                new UserTournamentId(tournament.getId(), user.getUsername()),
+                tournament, user, status, 0, 0);
 
         // Add the userTournament to both parent entities' lists
-        tourney.getUserTournaments().add(ut);
-        user.getUserTournaments().add(ut);
+        tournament.getUserTournaments().add(userTournament);
+        user.getUserTournaments().add(userTournament);
 
-        return ut;
+        return userTournament;
     }
 
     @Override
     @Transactional
-    public void delete(Tournament tourney, User user) {
+    public void delete(Tournament tournament, User user) {
         // Remove the userTournament from both parent entities' lists
-        UserTournament ut = findRecord(tourney.getId(), user.getUsername());
-        tourney.getUserTournaments().remove(ut);
-        user.getUserTournaments().remove(ut);
-        userTournamentRepo.deleteById_TournamentIdAndId_Username(tourney.getId(), user.getUsername());
+        UserTournament userTournament = findRecord(tournament.getId(), user.getUsername());
+        tournament.getUserTournaments().remove(userTournament);
+        user.getUserTournaments().remove(userTournament);
+        userTournamentRepo.deleteById_TournamentIdAndId_Username(tournament.getId(), user.getUsername());
     }
 }

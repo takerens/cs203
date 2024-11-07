@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.Set;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,11 +44,11 @@ public class UserControllerTest {
     @Test
     public void getUserDetails_Success() {
         //Arrange
-        UserController uc = new UserController(userService);
         User user = new User("username", "password");
-        uc.setUser(user);
+        when(userService.login(user.getUsername(), user.getPassword())).thenReturn(user);
+        userController.loginUser(user);
 
-        ResponseEntity<User> response = uc.getUserDetails();
+        ResponseEntity<User> response = userController.getUserDetails();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(user, response.getBody());
@@ -163,9 +164,6 @@ public class UserControllerTest {
         assertThrows(UserNotFoundException.class,()-> {
             userController.viewProfile(username);
         });
-        // Assert
-        // assertEquals(HttpStatus.NOT_FOUND, userController.viewProfile(username).getStatusCode());
-        // assertEquals("user not found", userController.viewProfile(username).getBody());
 
         // Verify that the service method was called
         verify(userService, times(1)).findByUsername(username);
