@@ -28,7 +28,7 @@ export const handleUpdateMatchResults = async (updatedMatches, setErrorMessage, 
     };
 
     await apiRequest({
-        url: `${process.env.REACT_APP_API_URL}/match/updateList`,
+        url: `${process.env.REACT_APP_API_URL}/matches`,
         method: 'PUT',
         body: updatedMatches,
         callback: onSuccess,
@@ -105,7 +105,7 @@ export const handleRegister = async (title, tournamentId, userData, setErrorMess
     const onSuccess = registrationCallback(`${userData.username} has registered for ${title}.`, userData, setErrorMessage, setTournaments);
 
     await apiRequest({
-        url: `${process.env.REACT_APP_API_URL}/tournaments/${tournamentId}/register`,
+        url: `${process.env.REACT_APP_API_URL}/tournaments/${tournamentId}/user`,
         method: 'POST',
         body: userData,
         callback: onSuccess,
@@ -117,7 +117,7 @@ export const handleWithdraw = async (title, tournamentId, userData, setErrorMess
     const onSuccess = registrationCallback(`${userData.username} has withdrawn from ${title}.`, userData, setErrorMessage, setTournaments);
 
     await apiRequest({
-        url: `${process.env.REACT_APP_API_URL}/tournaments/${tournamentId}/withdraw`,
+        url: `${process.env.REACT_APP_API_URL}/tournaments/${tournamentId}/user`,
         method: 'DELETE',
         body: userData,
         callback: onSuccess,
