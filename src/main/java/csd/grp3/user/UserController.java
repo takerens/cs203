@@ -1,7 +1,12 @@
 package csd.grp3.user;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,16 +15,28 @@ import jakarta.validation.Valid;
 @RestController
 public class UserController {
     private UserService userService;
-    private User currentUser;
 
     public UserController(UserService userService) {
         this.userService = userService;
-        this.currentUser = null; // TEMP
     }
 
     @GetMapping("/user")
     public ResponseEntity<User> getUserDetails() {
-        return currentUser == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(currentUser);
+        // Extract the current authentication object from the SecurityContext
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // If the principal is an instance of UserDetails (from Spring Security), extract the username
+        if (principal instanceof UserDetails) {
+            String username = ((UserDetails) principal).getUsername();
+
+            // You can now retrieve user details from the database using the username
+            User currentUser = userService.findByUsername(username);
+
+            return ResponseEntity.ok(currentUser); // Return the user details as a response
+        }
+
+        // If the user is not authenticated, return 401 Unauthorized or any other error response
+        return ResponseEntity.status(401).build();
     }
 
     @PostMapping("/signup")
@@ -29,9 +46,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody User user) {
-        currentUser = userService.login(user.getUsername(), user.getPassword());
-        return ResponseEntity.status(HttpStatus.OK).body(currentUser);
+    public ResponseEntity<Map<String, String>> loginUser(@RequestBody User user) {
+        String token = userService.login(user.getUsername(), user.getPassword());
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);  // Store the token in a map with the key "token"
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/profile/{username}")

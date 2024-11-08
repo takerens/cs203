@@ -18,9 +18,10 @@ const App = () => {
         <Route path="/signup" element={<Registration />} />
         <Route path="/login" element={<Login />} />
         <Route path="/tournaments" element={<TournamentManagement />} />
-        {/* User */}
+        {/* Both */}
         <Route path="/tournaments/:tournamentId/rounds/:roundNumber" element={<TournamentRounds />} />
         <Route path="/tournaments/:tournamentId/standings" element={<TournamentStandings />} />
+        {/* User */}
         <Route path='/profile' element={<Profile />} />
         {/* Admin */}
         <Route path='/addTournament' element={<AddTournament />}/>

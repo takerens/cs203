@@ -25,7 +25,6 @@ const TournamentForm = ({ tournament, onSubmit }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(date);
         onSubmit({
             title,
             minElo,

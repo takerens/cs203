@@ -2,9 +2,21 @@ export const apiRequest = async ({ url, method, body, callback, setErrorMessage 
     setErrorMessage(''); // Clear previous error message
 
     try {
+        // Create headers object
+        const headers = { 
+            'Content-Type': 'application/json'
+        };
+
+        // Check if token exists in localStorage, and add Authorization header if available
+        const token = localStorage.getItem('jwtToken');
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        // Prepare the fetch options
         const options = {
             method,
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: body ? JSON.stringify(body) : undefined, // Include body if provided
         };
 

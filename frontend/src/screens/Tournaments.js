@@ -24,8 +24,10 @@ const TournamentManagement = () => {
         if (user.userRole === "ROLE_USER") {
             fetchEligibleTournaments(user.elo, setErrorMessage, setTournaments);
             fetchHistory(user.username, setErrorMessage, setHistory);
-        } else {
+        } else if (user.userRole === "ROLE_ADMIN") {
             fetchAllTournaments(setErrorMessage, setTournaments);
+        } else {
+            setErrorMessage('User role not recognized.');
         }
     }, [user])
 

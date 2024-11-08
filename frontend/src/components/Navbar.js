@@ -8,6 +8,7 @@ const Navbar = ({ userRole }) => {
     const handleLogout = (e) => {
         e.preventDefault(); // Prevent default form submission
         navigate("/login"); // Navigate to the login page
+        localStorage.removeItem('jwtToken'); // Remove jwtToken from localStorage
     };
 
     const renderNavItems = () => (

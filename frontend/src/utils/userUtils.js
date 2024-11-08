@@ -1,5 +1,5 @@
 import { apiRequest } from './ApiUtils';
-import { successCallback, fetchCallback, getHomePage } from './SuccessCallback';
+import { successCallback, fetchCallback } from './SuccessCallback';
 
 export const handleSignup = async (userData, setErrorMessage, navigate) => {
     await apiRequest({
@@ -12,11 +12,17 @@ export const handleSignup = async (userData, setErrorMessage, navigate) => {
 };
 
 export const handleLogin = async (userData, setErrorMessage, navigate) => {
+    const onSuccess = (responseData) => {
+        localStorage.setItem('jwtToken', responseData.token);
+        console.log(responseData.token);
+        navigate("/tournaments");
+    };
+
     await apiRequest({
         url: `${process.env.REACT_APP_API_URL}/login`,
         method: 'POST',
         body: userData,
-        callback: getHomePage(null, navigate),
+        callback: onSuccess,
         setErrorMessage,
     });
 };

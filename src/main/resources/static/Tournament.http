@@ -1,9 +1,12 @@
 ######### Focus: Player and Waiting List
 ### Get all tournaments
-GET http://localhost:8080/tournaments/
+GET http://localhost:8080/tournaments
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwic3ViIjoiVXNlcjEwMCIsImlhdCI6MTczMTA3NjkzMSwiZXhwIjo2MjMxODc2OTUzNDgyODAwfQ.m8B2281R2y4BoD6BSWiVdiW3z6vwn4-1vmmQLYzymzg
 
 ### Get tourn by ID
 GET http://localhost:8080/tournaments/2
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwic3ViIjoiVXNlcjEwMCIsImlhdCI6MTczMTA3NjkzMSwiZXhwIjo2MjMxODc2OTUzNDgyODAwfQ.m8B2281R2y4BoD6BSWiVdiW3z6vwn4-1vmmQLYzymzg
 
 ### Get tourn by ID - not found
 GET http://localhost:8080/tournaments/9
