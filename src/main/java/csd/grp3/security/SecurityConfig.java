@@ -4,16 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -86,7 +88,8 @@ public class SecurityConfig {
 
                         // User-only access
                         .requestMatchers(HttpMethod.PUT, "/user").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET, "/tournaments/byElo/*", "/tournaments/byUser/*").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/tournaments/byElo/*", "/tournaments/byUser/*")
+                        .hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/tournaments/*/user").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/tournaments/*/user").hasRole("USER")
 
@@ -98,17 +101,35 @@ public class SecurityConfig {
 
                         // Deny all other requests
                         .anyRequest().denyAll())
-
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(accessDeniedHandler())
+                        .authenticationEntryPoint(authenticationEntryPoint()))
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // .httpBasic(Customizer.withDefaults())
-                // .csrf(csrf -> csrf.disable()) // CSRF protection is needed only for browser based attacks
-                // .formLogin(form -> form.disable())
-                // .headers(header -> header.disable()) // disable the security headers, as we do not return HTML in our
-                // // APIs
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-                
+    }
+
+    // Custom AccessDeniedHandler
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.setContentType("application/json");
+            response.getWriter().write(
+                    "{\"error\": \"Forbidden\", \"message\": \"You do not have permission to access this resource.\"}");
+        };
+    }
+
+    // Custom AuthenticationEntryPoint
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) -> {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
+            response.getWriter().write(
+                    "{\"error\": \"Unauthorized\", \"message\": \"You need to be authenticated to access this resource.\"}");
+        };
     }
 
     @Bean

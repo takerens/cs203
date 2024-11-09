@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,6 +39,22 @@ public class RestExceptionHandler {
         Map<String, Object> body = new HashMap<>();
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    // Handle unauthorized access (for authenticated users without the required role)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "You do not have permission to access this resource");
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
+    // Handle unauthenticated access (for requests from unauthenticated users)
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthenticationException(AuthenticationException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "You need to be authenticated to access this resource");
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
