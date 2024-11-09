@@ -11,7 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -24,6 +23,7 @@ import csd.grp3.tournament.InvalidTournamentStatus;
 import csd.grp3.tournament.TournamentNotFoundException;
 import csd.grp3.tournament.TournamentService;
 import csd.grp3.tournament.UserNotRegisteredException;
+import csd.grp3.user.UserNotFoundException;
 import csd.grp3.user.UserService;
 
 @WebMvcTest
@@ -83,7 +83,7 @@ public class RestExceptionHandlerTest {
         UserNotRegisteredException ex = new UserNotRegisteredException("User is not registered.");
 
         // Act
-        ResponseEntity<Object> response = restExceptionHandler.handleUserNotRegisteredException(ex);
+        ResponseEntity<Object> response = restExceptionHandler.handleUserNotRegistered(ex);
 
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -96,7 +96,7 @@ public class RestExceptionHandlerTest {
         TournamentNotFoundException ex = new TournamentNotFoundException(1L);
 
         // Act
-        ResponseEntity<Object> response = restExceptionHandler.handleTournamentNotFoundException(ex);
+        ResponseEntity<Object> response = restExceptionHandler.handleTournamentNotFound(ex);
 
         // Assert
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -117,12 +117,12 @@ public class RestExceptionHandlerTest {
     }
 
     @Test
-    public void testHandleUsernameNotFoundException() {
+    public void testHandleUserNotFoundException() {
         // Arrange
-        UsernameNotFoundException ex = new UsernameNotFoundException("User not found");
+        UserNotFoundException ex = new UserNotFoundException();
 
         // Act
-        ResponseEntity<Object> response = restExceptionHandler.handleUsernameNotFoundException(ex);
+        ResponseEntity<Object> response = restExceptionHandler.handleUserNotFound(ex);
 
         // Assert
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -135,10 +135,10 @@ public class RestExceptionHandlerTest {
         BadCredentialsException ex = new BadCredentialsException("Invalid credentials.");
 
         // Act
-        ResponseEntity<Object> response = restExceptionHandler.handleBadCredentialsException(ex);
+        ResponseEntity<Object> response = restExceptionHandler.handleBadCredentials(ex);
 
         // Assert
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertTrue(response.getBody().toString().contains("Invalid credentials."));
     }
 }

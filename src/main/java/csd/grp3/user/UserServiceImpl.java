@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,11 +63,12 @@ public class UserServiceImpl implements UserService {
 
         //Check if the username already exists, if it does throw exception
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new BadCredentialsException("Username already taken. Try a different username.");
+            throw new BadCredentialsException("Username already exists");
         }
 
         // Encode password given by user to store
         String encodedPassword = encoder.encode(password);
+
         return userRepository.save(new User(username, encodedPassword));
     }
 
@@ -86,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
         //Return the user if the password matches
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(username);
+            return jwtService.generateToken((UserDetails) authentication.getPrincipal());
         }
         //Else throw exception
         throw new BadCredentialsException("Username and Password do not match");
@@ -104,13 +106,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User changePassword(String username, String newPassword) {
         User user = findByUsername(username);
-        //Only change the password if it is different
-        if (!encoder.matches(newPassword, user.getPassword())) {
-            user.setPassword(encoder.encode(newPassword));
-            return userRepository.save(user);
-        }
 
-        throw new BadCredentialsException("Password already in use");        
+        // If the new password is the same as the old one, throw an error
+        if (encoder.matches(newPassword, user.getPassword())) {
+            throw new BadCredentialsException("New password should not be the same as the old one");
+        }
+        
+        user.setPassword(encoder.encode(newPassword));
+        return userRepository.save(user);
     }
 
     /*
