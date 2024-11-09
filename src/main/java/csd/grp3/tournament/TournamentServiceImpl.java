@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import csd.grp3.match.Match;
@@ -24,23 +23,14 @@ import csd.grp3.usertournament.UserTournamentService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 @Service
+@AllArgsConstructor
 public class TournamentServiceImpl implements TournamentService {
 
-    @Autowired
     private TournamentRepository tournaments;
-
-    @Autowired
     private MatchService matchService;
-
-    @Autowired
     private UserTournamentService UTService;
-
-    @Autowired
     private UserService userService;
-
-    @Autowired
     private RoundService roundService;
 
     @Override
@@ -230,7 +220,7 @@ public class TournamentServiceImpl implements TournamentService {
 
         // check if tournament already has that user data
         if (playerList.contains(user) || waitingList.contains(user)) {
-            throw new PlayerAlreadyRegisteredException();
+            throw new UserAlreadyRegisteredException();
         } else { // if user isn't inside tournament
             // if tournament is full, we add to waiting list instead
             if (playerList.size() == tournament.getSize()) {
@@ -250,7 +240,6 @@ public class TournamentServiceImpl implements TournamentService {
      */
     @Override
     @Transactional
-    // TODO : Check necessity of throwing error since frontend blocks it
     public void withdrawUser(User tempUser, Long tournamentID) throws UserNotRegisteredException {
         Tournament tournament = getTournament(tournamentID);
         List<User> playerList = UTService.getPlayers(tournamentID);

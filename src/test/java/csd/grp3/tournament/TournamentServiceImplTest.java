@@ -288,7 +288,7 @@ public class TournamentServiceImplTest {
         when(userService.findByUsername(player.getUsername())).thenReturn(player);
 
         // Act & Assert: Expect TournamentNotFoundException to be thrown
-        PlayerAlreadyRegisteredException exception = assertThrows(PlayerAlreadyRegisteredException.class, () -> {
+        UserAlreadyRegisteredException exception = assertThrows(UserAlreadyRegisteredException.class, () -> {
             tournamentService.registerUser(player, tournament.getId());
         });
 
@@ -312,7 +312,7 @@ public class TournamentServiceImplTest {
         when(userService.findByUsername(player.getUsername())).thenReturn(player);
 
         // Act & Assert: Expect TournamentNotFoundException to be thrown
-        PlayerAlreadyRegisteredException exception = assertThrows(PlayerAlreadyRegisteredException.class, () -> {
+        UserAlreadyRegisteredException exception = assertThrows(UserAlreadyRegisteredException.class, () -> {
             tournamentService.registerUser(player, tournament.getId());
         });
 

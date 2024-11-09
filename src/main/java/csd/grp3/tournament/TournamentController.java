@@ -2,7 +2,6 @@ package csd.grp3.tournament;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,11 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/tournaments")
 public class TournamentController {
-    @Autowired
+    
     private TournamentService tournamentService;
 
     @GetMapping
@@ -83,7 +84,6 @@ public class TournamentController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    // TODO
     @GetMapping("/{id}/standings")
     public ResponseEntity<List<User>> getStandings(@PathVariable Long id) {
         List<User> users = tournamentService.getSortedUsers(id);
@@ -101,5 +101,4 @@ public class TournamentController {
         List<Tournament> t = tournamentService.getHistoryByUser(username);
         return new ResponseEntity<List<Tournament>>(t, HttpStatus.OK);
     }
-    
 }

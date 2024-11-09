@@ -165,9 +165,9 @@ public class TournamentControllerTest {
 
     @Test
     public void testRegisterUser_PlayerAlreadyRegistered() {
-        doThrow(new PlayerAlreadyRegisteredException()).when(tournamentService).registerUser(user, 1L);
+        doThrow(new UserAlreadyRegisteredException()).when(tournamentService).registerUser(user, 1L);
 
-        PlayerAlreadyRegisteredException exception = assertThrows(PlayerAlreadyRegisteredException.class, () -> {
+        UserAlreadyRegisteredException exception = assertThrows(UserAlreadyRegisteredException.class, () -> {
             tournamentController.registerUser(user, 1L);
         });
 

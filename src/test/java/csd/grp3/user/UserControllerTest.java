@@ -1,6 +1,5 @@
 package csd.grp3.user;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -20,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import jakarta.validation.ConstraintViolation; 
@@ -163,10 +163,10 @@ public class UserControllerTest {
         String username = "nonexistentuser";
         
         // Mock the userService to throw UsernameNotFoundException
-        when(userService.findByUsername(username)).thenThrow(new UserNotFoundException());
+        when(userService.findByUsername(username)).thenThrow(new UsernameNotFoundException("User not found"));
 
         // Act and assert
-        assertThrows(UserNotFoundException.class,()-> {
+        assertThrows(UsernameNotFoundException.class,()-> {
             userController.viewProfile(username);
         });
 

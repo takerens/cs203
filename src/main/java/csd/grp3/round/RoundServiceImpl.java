@@ -1,14 +1,14 @@
 package csd.grp3.round;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import csd.grp3.tournament.Tournament;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor
 public class RoundServiceImpl implements RoundService {
 
-    @Autowired
     private RoundRepository rounds;
 
     /**
