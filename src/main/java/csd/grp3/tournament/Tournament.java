@@ -92,7 +92,7 @@ public class Tournament {
 
 
     public boolean hasStarted() {
-        return !(LocalDateTime.now().isBefore(startDateTime) || userTournaments.size() < 2); // bot has no UT 
+        return LocalDateTime.now().isAfter(startDateTime) && userTournaments.size() > 2; // 2 Users + 1 Bot 
     }
 
     // Custom validation method
