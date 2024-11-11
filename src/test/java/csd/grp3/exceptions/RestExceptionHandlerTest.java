@@ -80,27 +80,27 @@ public class RestExceptionHandlerTest {
     @Test
     public void testHandleUserNotRegisteredException() {
         // Arrange
-        UserNotRegisteredException ex = new UserNotRegisteredException("User is not registered.");
+        UserNotRegisteredException ex = new UserNotRegisteredException();
 
         // Act
         ResponseEntity<Object> response = restExceptionHandler.handleUserNotRegistered(ex);
 
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody().toString().contains("User is not registered."));
+        assertTrue(response.getBody().toString().contains("User did not register for this tournament."));
     }
 
     @Test
     public void testHandleTournamentNotFoundException() {
         // Arrange
-        TournamentNotFoundException ex = new TournamentNotFoundException(1L);
+        TournamentNotFoundException ex = new TournamentNotFoundException();
 
         // Act
         ResponseEntity<Object> response = restExceptionHandler.handleTournamentNotFound(ex);
 
         // Assert
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertTrue(response.getBody().toString().contains("Could not find tournament 1"));
+        assertTrue(response.getBody().toString().contains("tournament not found"));
     }
 
     @Test

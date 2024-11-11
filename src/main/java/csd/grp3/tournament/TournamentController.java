@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 
 @RestController
-@AllArgsConstructor
 @RequestMapping("/tournaments")
 public class TournamentController {
     

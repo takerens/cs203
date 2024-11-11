@@ -126,7 +126,7 @@ public class TournamentServiceImplTest {
         });
 
         // Verify that the exception message is correct
-        assertEquals("Could not find tournament 1", exception.getMessage());
+        assertEquals("tournament not found", exception.getMessage());
 
         // Verify that findById was called with the correct argument
         verify(tournamentRepository).findById(1L);
@@ -208,7 +208,7 @@ public class TournamentServiceImplTest {
         });
 
         // Assert
-        assertEquals("Could not find tournament 1", exception.getMessage());
+        assertEquals("tournament not found", exception.getMessage());
         verify(tournamentRepository).findById(1L);
     }
 
@@ -238,7 +238,7 @@ public class TournamentServiceImplTest {
         });
 
         // Verify that the exception message is correct
-        assertEquals("Could not find tournament 1", exception.getMessage());
+        assertEquals("tournament not found", exception.getMessage());
 
         // Verify that deleteById was never called with the correct argument
         verify(tournamentRepository, never()).deleteById(1L);
@@ -293,7 +293,7 @@ public class TournamentServiceImplTest {
         });
 
         // Verify that the exception message is correct
-        assertEquals("Player has already registered for this tournament.", exception.getMessage());
+        assertEquals("User has already registered for this tournament.", exception.getMessage());
 
         // Verify that deleteById was never called with the correct argument
         verify(tournamentRepository).findById(tournament.getId());
@@ -317,7 +317,7 @@ public class TournamentServiceImplTest {
         });
 
         // Verify that the exception message is correct
-        assertEquals("Player has already registered for this tournament.", exception.getMessage());
+        assertEquals("User has already registered for this tournament.", exception.getMessage());
 
         // Verify that deleteById was never called with the correct argument
         verify(tournamentRepository).findById(tournament.getId());
@@ -335,7 +335,7 @@ public class TournamentServiceImplTest {
         });
 
         // Verify that the exception message is correct
-        assertEquals("Could not find tournament 1", exception.getMessage());
+        assertEquals("tournament not found", exception.getMessage());
 
         // Verify that deleteById was never called with the correct argument
         verify(tournamentRepository).findById(1L);
@@ -384,7 +384,7 @@ public class TournamentServiceImplTest {
         });
 
         // Verify that the exception message is correct
-        assertEquals("Could not find tournament 1", exception.getMessage());
+        assertEquals("tournament not found", exception.getMessage());
 
         // Verify that deleteById was never called with the correct argument
         verify(tournamentRepository).findById(1L);
@@ -539,7 +539,7 @@ public class TournamentServiceImplTest {
         });
 
         // Verify that the exception message is correct
-        assertEquals("Could not find tournament 1", exception.getMessage());
+        assertEquals("tournament not found", exception.getMessage());
 
         // Verify that deleteById was never called with the correct argument
         verify(tournamentRepository).findById(1L);
@@ -656,7 +656,7 @@ public class TournamentServiceImplTest {
     void getTournamentAboveMin_TournamentAboveMin_ReturnListOfTournamentAboveMin() {
         // Arrange
         int elo = 100;
-        Tournament testTournament = new Tournament(1L, null, null, 200, 300, null, elo, 10, false, null);
+        Tournament testTournament = new Tournament(null, 200, 300, null, elo, 10);
         List<Tournament> tournaments = new ArrayList<>();
         tournaments.add(testTournament);
 
@@ -677,7 +677,7 @@ public class TournamentServiceImplTest {
     void getTournamentAboveMin_TournamentBelowMin_ReturnEmptyList() {
         // Arrange
         int elo = 100;
-        Tournament testTournament = new Tournament(1L, null, null, 50, 75, null, elo, 10, false, null);
+        Tournament testTournament = new Tournament(null, 50, 75, null, elo, 10);
         List<Tournament> tournaments = new ArrayList<>();
         tournaments.add(testTournament);
 
@@ -697,7 +697,7 @@ public class TournamentServiceImplTest {
     void getTournamentAboveMin_TournamentIsMin_ReturnListOfTournamentAboveMin() {
         // Arrange
         int elo = 100;
-        Tournament testTournament = new Tournament(1L, null, null, 100, 300, null, elo, 10, false, null);
+        Tournament testTournament = new Tournament(null, 100, 300, null, elo, 10);
         List<Tournament> tournaments = new ArrayList<>();
         tournaments.add(testTournament);
 
@@ -736,7 +736,7 @@ public class TournamentServiceImplTest {
     void getTournamentBelowMax_TournamentBelowMax_ReturnListOfTournamentBelowMax() {
         // Arrange
         int elo = 100;
-        Tournament testTournament = new Tournament(1L, null, null, 50, 75, null, elo, 10, false, null);
+        Tournament testTournament = new Tournament(null, 50, 75, null, elo, 10);
         List<Tournament> tournaments = new ArrayList<>();
         tournaments.add(testTournament);
 
@@ -757,7 +757,7 @@ public class TournamentServiceImplTest {
     void getTournamentBelowMax_TournamentAboveMax_ReturnEmptyList() {
         // Arrange
         int elo = 100;
-        Tournament testTournament = new Tournament(1L, null, null, 50, 200, null, elo, 10, false, null);
+        Tournament testTournament = new Tournament(null, 50, 200, null, elo, 10);
         List<Tournament> tournaments = new ArrayList<>();
         tournaments.add(testTournament);
 
@@ -777,7 +777,7 @@ public class TournamentServiceImplTest {
     void getTournamentBelowMax_TournamentIsMax_ReturnListOfTournamentBelowMax() {
         // Arrange
         int elo = 100;
-        Tournament testTournament = new Tournament(1L, null, null, 50, 100, null, elo, 10, false, null);
+        Tournament testTournament = new Tournament(null, 50, 100, null, elo, 10);
         List<Tournament> tournaments = new ArrayList<>();
         tournaments.add(testTournament);
 
@@ -817,7 +817,7 @@ public class TournamentServiceImplTest {
         // Arrange
         int minElo = 100;
         int maxElo = 200;
-        Tournament testTournament = new Tournament(1L, null, null, 150, 250, null, 10, 10, false, null);
+        Tournament testTournament = new Tournament(null, 150, 250, null, 10, 10);
         List<Tournament> tournaments = new ArrayList<>();
         tournaments.add(testTournament);
 
@@ -838,7 +838,7 @@ public class TournamentServiceImplTest {
         // Arrange
         int minElo = 100;
         int maxElo = 200;
-        Tournament testTournament = new Tournament(1L, null, null, 50, 150, null, 10, 10, false, null);
+        Tournament testTournament = new Tournament(null, 50, 150, null, 10, 10);
         List<Tournament> tournaments = new ArrayList<>();
         tournaments.add(testTournament);
 
@@ -859,7 +859,7 @@ public class TournamentServiceImplTest {
         // Arrange
         int minElo = 100;
         int maxElo = 200;
-        Tournament testTournament = new Tournament(1L, null, null, 125, 175, null, 10, 10, false, null);
+        Tournament testTournament = new Tournament(null, 125, 175, null, 10, 10);
         List<Tournament> tournaments = new ArrayList<>();
         tournaments.add(testTournament);
 
@@ -900,7 +900,7 @@ public class TournamentServiceImplTest {
     void getUserEligibleTournament_Eligible_ReturnTournamentList() {
         // Arrange
         player.setELO(200);
-        Tournament tournament = new Tournament(1L, null, null, 100, 300, null, 10, 10, false, null);
+        Tournament tournament = new Tournament(null, 100, 300, null, 10, 10);
         List<Tournament> tournaments = new ArrayList<>();
         tournaments.add(tournament);
 
@@ -913,7 +913,6 @@ public class TournamentServiceImplTest {
         // Assert
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(1L, result.get(0).getId());
         verify(tournamentRepository).findAll();
     }
 
@@ -921,7 +920,7 @@ public class TournamentServiceImplTest {
     void getUserEligibleTournament_NotEligible_ReturnTournamentList() {
         // Arrange
         player.setELO(0);
-        Tournament tournament = new Tournament(1L, null, null, 100, 300, null, 10, 10, false, null);
+        Tournament tournament = new Tournament(null, 100, 300, null, 10, 10);
         List<Tournament> tournaments = new ArrayList<>();
         tournaments.add(tournament);
 
@@ -1116,7 +1115,7 @@ public class TournamentServiceImplTest {
         when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
         when(userTournamentService.getPlayers(tournament.getId())).thenReturn(players);
         when(userTournamentService.getWaitingList(tournament.getId())).thenReturn(waitingList);
-        when(tournamentRepository.save(newTournamentInfo)).thenReturn(newTournamentInfo);
+        when(tournamentRepository.save(tournament)).thenReturn(newTournamentInfo);
 
         // Call the updateTournament method
         Tournament updatedTournament = tournamentService.updateTournament(tournament.getId(), newTournamentInfo);
