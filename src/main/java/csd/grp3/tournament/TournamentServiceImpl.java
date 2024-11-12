@@ -652,53 +652,54 @@ public class TournamentServiceImpl implements TournamentService {
      * @param tournamentID Long
      */
     @Override
-    public void endTournament(Long tournamentID) {
-        // Retrieve the tournament and mark it as calculated
-        Tournament tournament = getTournament(tournamentID);
-        tournament.setCalculated(true);
-        tournaments.save(tournament);
+public void endTournament(Long tournamentID) {
+    // Retrieve the tournament and mark it as calculated
+    Tournament tournament = getTournament(tournamentID);
+    tournament.setCalculated(true);
+    tournaments.save(tournament);
 
-        List<CheaterbugEntity> analysisEntities = new ArrayList<>();
-        Map<User, List<CheaterbugEntity>> userEntitiesMap = new HashMap<>();
+    Map<User, List<CheaterbugEntity>> userEntitiesMap = new HashMap<>();
 
-        // Gather data for analysis and map entities to users
-        for (User user : UTService.getPlayers(tournamentID)) {
-            List<Match> userMatches = matchService.getUserMatches(user).stream()
-                    .filter(match -> match.getTournament().equals(tournament))
-                    .collect(Collectors.toList());
+    // Gather data for analysis and map entities to users
+    for (User user : UTService.getPlayers(tournamentID)) {
+        List<Match> userMatches = matchService.getUserMatches(user).stream()
+                .filter(match -> match.getTournament().equals(tournament))
+                .collect(Collectors.toList());
 
-            // Calculate new ELO for the user
-            user.setELO(calculateELO(userMatches, user));
-            userService.updateELO(user, user.getELO());
+        // Calculate new ELO for the user
+        Integer newELO = calculateELO(userMatches, user);
+        user.setELO(newELO);
+        userService.updateELO(user, newELO);
 
-            List<CheaterbugEntity> userEntities = new ArrayList<>();
-            for (Match match : userMatches) {
-                User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
-                double actualScore = getActualScore(match.getResult(),
-                        match.getWhite().equals(user) ? "white" : "black");
+        List<CheaterbugEntity> userEntities = new ArrayList<>();
+        for (Match match : userMatches) {
+            User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
+            double actualScore = getActualScore(match.getResult(),
+                    match.getWhite().equals(user) ? "white" : "black");
+            double expectedScore = calculateExpectedScore(user.getELO(), opponent.getELO());
 
-                // Create a CheaterbugEntity for each match
-                CheaterbugEntity entity = new CheaterbugEntity(user.getELO(), opponent.getELO(), actualScore);
-                userEntities.add(entity);
-                analysisEntities.add(entity);
-            }
-            userEntitiesMap.put(user, userEntities); // Link entities to the user
+            // Create a CheaterbugEntity for each match
+            CheaterbugEntity entity = new CheaterbugEntity(expectedScore, actualScore);
+            userEntities.add(entity);
         }
+        userEntitiesMap.put(user, userEntities); // Link entities to the user
+    }
 
-        // Analyze each user's data individually for suspicious activity
-        for (Map.Entry<User, List<CheaterbugEntity>> entry : userEntitiesMap.entrySet()) {
-            User user = entry.getKey();
-            List<CheaterbugEntity> userEntities = entry.getValue();
+    // Analyze each user's data individually for suspicious activity
+    for (Map.Entry<User, List<CheaterbugEntity>> entry : userEntitiesMap.entrySet()) {
+        User user = entry.getKey();
+        List<CheaterbugEntity> userEntities = entry.getValue();
 
-            // Analyze this user's matches using the CheaterbugService
-            CheaterbugResponse response = cheaterbugService.analyze(userEntities);
+        // Analyze this user's matches using the CheaterbugService
+        CheaterbugResponse response = cheaterbugService.analyze(userEntities);
 
-            if (cheaterbugService.isSuspicious(response)) {
-                System.out.println("Suspicious activity detected for user: " + user.getUsername() +
-                        " in tournament ID: " + tournamentID + ", Title: " + tournament.getTitle());
-            }
+        if (cheaterbugService.isSuspicious(response)) {
+            System.out.println("Suspicious activity detected for user: " + user.getUsername() +
+                    " in tournament ID: " + tournamentID + ", Title: " + tournament.getTitle());
         }
     }
+}
+
 
     /**
      * Handles BYE case for user in round
@@ -738,7 +739,6 @@ public class TournamentServiceImpl implements TournamentService {
     public Integer calculateELO(List<Match> matches, User user) {
         Integer userELO = user.getELO();
         Integer developmentCoefficient = getDevelopmentCoefficient(user);
-        Double classInterval = 50.0;
         Double changeInRating = 0.0;
 
         for (Match match : matches) {
@@ -747,7 +747,7 @@ public class TournamentServiceImpl implements TournamentService {
                 continue;
 
             User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
-            Double expectedScore = 1.0 / (1 + Math.pow(10, (opponent.getELO() - userELO) / classInterval));
+            Double expectedScore = calculateExpectedScore(userELO, opponent.getELO());
             Double actualScore = getActualScore(match.getResult(), match.getWhite().equals(user) ? "white" : "black");
             changeInRating += developmentCoefficient * (actualScore - expectedScore);
         }
@@ -791,6 +791,17 @@ public class TournamentServiceImpl implements TournamentService {
             return NEWBIE_COEFFICIENT;
         }
         return DEFAULT_COEFFICIENT;
+    }
+    /**
+     * Calculate expected score of user based on ELO difference
+     * 
+     * @param userELO     Integer
+     * @param opponentELO Integer
+     * @return Double expected score
+     */
+    private Double calculateExpectedScore(Integer userELO, Integer opponentELO) {
+        Double classInterval = 50.0;
+        return 1.0 / (1 + Math.pow(10, (opponentELO - userELO) / classInterval));
     }
 
     /**

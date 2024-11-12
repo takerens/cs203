@@ -13,9 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.http.ResponseEntity;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-
 
 @ExtendWith(MockitoExtension.class)
 public class CheaterbugControllerTest {
@@ -28,9 +26,9 @@ public class CheaterbugControllerTest {
 
     @Test
     public void testAnalyze() {
-        // Prepare the input data (a list of CheaterbugEntity objects)
-        CheaterbugEntity entity1 = new CheaterbugEntity(1200,1800, 0.5);
-        CheaterbugEntity entity2 = new CheaterbugEntity(1200,1100, 0.6);
+        // Prepare the input data (a list of CheaterbugEntity objects with actual and expected scores)
+        CheaterbugEntity entity1 = new CheaterbugEntity(0.5, 0.9);
+        CheaterbugEntity entity2 = new CheaterbugEntity(0.6, 0.8);
         List<CheaterbugEntity> requestPayload = List.of(entity1, entity2);
 
         // Prepare the mock response data with expected probabilities
@@ -49,6 +47,6 @@ public class CheaterbugControllerTest {
 
         // Assert the response matches expected mock data
         assertEquals(mockResponse, actualResponse.getBody(), "The response should match the expected response");
-        assertEquals(HttpStatus.OK , actualResponse.getStatusCode(), "The HTTP status code should be 200 (OK)");
+        assertEquals(HttpStatus.OK, actualResponse.getStatusCode(), "The HTTP status code should be 200 (OK)");
     }
 }
