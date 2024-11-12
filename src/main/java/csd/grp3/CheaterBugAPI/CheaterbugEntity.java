@@ -13,10 +13,10 @@ public class CheaterbugEntity {
     private static final double CLASSINTERVAL = 50.0;
 
     @NotNull(message = "User ELO must not be null")
-    private Double userELO;
+    private int userELO;
 
     @NotNull(message = "Opponent ELO must not be null")
-    private Double opponentELO;
+    private int opponentELO;
 
     @NotNull(message = "Actual score must not be null")
     @DecimalMin(value = "0.0", message = "Actual score must be between 0.0 and 1.0")
@@ -27,7 +27,7 @@ public class CheaterbugEntity {
     @DecimalMax(value = "1.0", message = "Expected score must be between 0.0 and 1.0")
     private Double expectedScore;
 
-    public CheaterbugEntity(Double userELO, Double opponentELO, Double actualScore) {
+    public CheaterbugEntity(int userELO, int opponentELO, Double actualScore) {
         this.userELO = userELO;
         this.opponentELO = opponentELO;
         this.actualScore = actualScore;

@@ -29,8 +29,8 @@ public class CheaterbugControllerTest {
     @Test
     public void testAnalyze() {
         // Prepare the input data (a list of CheaterbugEntity objects)
-        CheaterbugEntity entity1 = new CheaterbugEntity(0.8, 0.5);
-        CheaterbugEntity entity2 = new CheaterbugEntity(0.7, 0.6);
+        CheaterbugEntity entity1 = new CheaterbugEntity(1200,1800, 0.5);
+        CheaterbugEntity entity2 = new CheaterbugEntity(1200,1100, 0.6);
         List<CheaterbugEntity> requestPayload = List.of(entity1, entity2);
 
         // Prepare the mock response data with expected probabilities
