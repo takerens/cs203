@@ -1,54 +1,54 @@
 package csd.grp3.CheaterBugAPI;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-@WebMvcTest(CheaterBugController.class)
-public class CheaterBugControllerTest {
+import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 
-    @Autowired
-    private MockMvc mockMvc;
 
-    @MockBean
+@ExtendWith(MockitoExtension.class)
+public class CheaterbugControllerTest {
+
+    @Mock
     private CheaterbugService cheaterbugService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private CheaterbugController cheaterbugController;
 
     @Test
-    public void testAnalyzeEndpoint() throws Exception {
-        // Prepare mock data for request and response
+    public void testAnalyze() {
+        // Prepare the input data (a list of CheaterbugEntity objects)
         CheaterbugEntity entity1 = new CheaterbugEntity(0.8, 0.5);
         CheaterbugEntity entity2 = new CheaterbugEntity(0.7, 0.6);
-        List<CheaterbugEntity> request = List.of(entity1, entity2);
+        List<CheaterbugEntity> requestPayload = List.of(entity1, entity2);
 
+        // Prepare the mock response data with expected probabilities
         Map<String, String> cheatProbability = Map.of("99thPercentile", "0.95");
         Map<String, String> expectedProbability = Map.of("5thPercentile", "0.04");
         CheaterbugResponse mockResponse = new CheaterbugResponse(cheatProbability, expectedProbability);
 
-        // Mock the service response
-        Mockito.when(cheaterbugService.analyze(request)).thenReturn(mockResponse);
+        // Define behavior of mocked cheaterbugService when analyze is called
+        when(cheaterbugService.analyze(requestPayload)).thenReturn(mockResponse);
 
-        // Perform the POST request
-        mockMvc.perform(post("/cheaterbug/analysis")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cheatProbability.99thPercentile", is("0.95")))
-                .andExpect(jsonPath("$.expectedProbability.5thPercentile", is("0.04")));
+        // Call the controller method and capture the actual response
+        ResponseEntity<CheaterbugResponse> actualResponse = cheaterbugController.analyze(requestPayload);
+
+        // Verify that the service's analyze method was called once with the correct parameter
+        verify(cheaterbugService).analyze(requestPayload);
+
+        // Assert the response matches expected mock data
+        assertEquals(mockResponse, actualResponse.getBody(), "The response should match the expected response");
+        assertEquals(HttpStatus.OK , actualResponse.getStatusCode(), "The HTTP status code should be 200 (OK)");
     }
 }
