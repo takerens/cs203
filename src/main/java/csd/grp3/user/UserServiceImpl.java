@@ -13,16 +13,14 @@ import org.springframework.stereotype.Service;
 
 import csd.grp3.jwt.JwtService;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder encoder;
-    private final AuthenticationManager authManager;
-    private final JwtService jwtService;
+    private UserRepository userRepository;
+    private BCryptPasswordEncoder encoder;
+    private AuthenticationManager authManager;
+    private JwtService jwtService;
 
     /**
      * This method is used to find a user by their username

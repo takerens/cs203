@@ -8,10 +8,8 @@ import org.springframework.stereotype.Service;
 import csd.grp3.tournament.Tournament;
 import csd.grp3.user.User;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class UserTournamentServiceImpl implements UserTournamentService {
 
     private UserTournamentRepository userTournamentRepo;

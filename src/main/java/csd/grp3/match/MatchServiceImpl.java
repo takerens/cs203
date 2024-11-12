@@ -6,10 +6,8 @@ import org.springframework.stereotype.Service;
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class MatchServiceImpl implements MatchService{
 
     private MatchRepository matches;

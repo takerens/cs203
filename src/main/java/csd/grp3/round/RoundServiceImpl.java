@@ -3,10 +3,8 @@ package csd.grp3.round;
 import org.springframework.stereotype.Service;
 
 import csd.grp3.tournament.Tournament;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class RoundServiceImpl implements RoundService {
 
     private RoundRepository rounds;

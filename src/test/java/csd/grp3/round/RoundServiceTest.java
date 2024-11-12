@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,14 +36,14 @@ public class RoundServiceTest {
         Round round = new Round(mockTournament);
 
         // mock the save operation
-        when(rounds.save(round)).thenReturn(round);
+        when(rounds.save(any(Round.class))).thenReturn(round);
 
         // act
         Round returnedRound = roundService.createRound(mockTournament);
 
         // assert
         assertEquals(round, returnedRound);
-        verify(rounds).save(round);
+        verify(rounds).save(any(Round.class));
     }
 
     @Test

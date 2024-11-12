@@ -21,18 +21,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Getter
 @Setter
-@ToString
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Table(name = "AppUsers")

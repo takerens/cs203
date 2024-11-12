@@ -21,10 +21,8 @@ import csd.grp3.user.UserService;
 import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentService;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class TournamentServiceImpl implements TournamentService {
 
     private TournamentRepository tournaments;
@@ -61,7 +59,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Tournament getTournament(Long tournamentID) throws TournamentNotFoundException {
         return tournaments.findById(tournamentID)
-                .orElseThrow(() -> new TournamentNotFoundException(tournamentID));
+                .orElseThrow(() -> new TournamentNotFoundException());
     }
 
     /**
@@ -247,7 +245,7 @@ public class TournamentServiceImpl implements TournamentService {
         User user = userService.findByUsername(tempUser.getUsername());
 
         if (!playerList.contains(user) && !waitingList.contains(user)) {
-            throw new UserNotRegisteredException("User has not registered for tournament");
+            throw new UserNotRegisteredException();
         }
 
         if (tournament.getRounds().size() != 0 && playerList.contains(user)) {

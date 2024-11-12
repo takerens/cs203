@@ -28,8 +28,8 @@ public class RestExceptionHandler {
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String errorMessage = error.getDefaultMessage();
-            body.put("message", errorMessage);
+            body.put("error", error.getObjectName());
+            body.put("message", error.getDefaultMessage());
         });
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
@@ -37,6 +37,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Object> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getName());
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
@@ -45,6 +46,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
         Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getClass().getSimpleName());
         body.put("message", "You do not have permission to access this resource");
         return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
     }
@@ -53,6 +55,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Map<String, Object>> handleAuthentication(AuthenticationException ex) {
         Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getClass().getSimpleName());
         body.put("message", "You need to be authenticated to access this resource");
         return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
     }
@@ -60,6 +63,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Object> handleBadCredentials(BadCredentialsException ex) {
         Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getClass().getSimpleName());
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
@@ -67,6 +71,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(UserNotRegisteredException.class)
     public ResponseEntity<Object> handleUserNotRegistered(UserNotRegisteredException ex) {
         Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getClass().getSimpleName());
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
@@ -74,6 +79,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(TournamentNotFoundException.class)
     public ResponseEntity<Object> handleTournamentNotFound(TournamentNotFoundException ex) {
         Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getClass().getSimpleName());
         body.put("message", "Tournament not found with ID: " + ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
@@ -81,6 +87,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(UserAlreadyRegisteredException.class)
     public ResponseEntity<Object> handleUserAlreadyRegistered(UserAlreadyRegisteredException ex) {
         Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getClass().getSimpleName());
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
@@ -88,6 +95,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(InvalidTournamentStatus.class)
     public ResponseEntity<Object> handleInvalidTournamentStatus(InvalidTournamentStatus ex) {
         Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getClass().getSimpleName());
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
@@ -95,6 +103,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<Object> handleUsernameNotFound(UsernameNotFoundException ex) {
         Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getClass().getSimpleName());
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
