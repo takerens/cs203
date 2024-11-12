@@ -24,4 +24,9 @@ public class CheaterbugEntity {
     @DecimalMax(value = "1.0", message = "Actual score must be between 0.0 and 1.0")
     private Double actualScore;
 
+    public CheaterbugEntity(Double expectedScore, Double actualScore) {
+        this.expectedScore = expectedScore;
+        this.actualScore = actualScore;
+    }   
+
 }
