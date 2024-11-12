@@ -38,25 +38,24 @@ import lombok.ToString;
 @Table(name = "AppUsers")
 
 public class User implements UserDetails{
-    private Integer ELO = 100;
+    private static final int DEFAULT_ELO = 100;
 
     @Id @NotNull(message = "Username should not be null")
     private String username;
 
     @NotNull (message = "Password should not be null")
     @Size(min = 8, message = "Password should be at least 8 characters long")
-    // @JsonIgnore
     private String password;
 
     @NotNull(message = "Authorities should not be null")
-    // @JsonIgnore
     private String authorities;
+
+    private Integer ELO = DEFAULT_ELO;
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
         this.authorities = "ROLE_USER";
-        this.ELO = 100; // Default
     }
 
     public User(String username, String password, String authorities, int ELO) {
@@ -66,7 +65,6 @@ public class User implements UserDetails{
         this.ELO = ELO;
     }
 
-    // @JsonIgnore
     public String getUserRole() {
         return authorities;
     }

@@ -2,7 +2,6 @@ package csd.grp3.tournament;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,19 +15,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import csd.grp3.round.Round;
 import csd.grp3.user.User;
-
-
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/tournaments")
 public class TournamentController {
-    // @Autowired
-    // private TournamentRepository tournamentRepo;
-
-    @Autowired
+    
     private TournamentService tournamentService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<Tournament>> getAllTournaments() {
         List<Tournament> tournamentList = tournamentService.listTournaments();
         return ResponseEntity.status(HttpStatus.OK).body(tournamentList);
@@ -57,88 +54,40 @@ public class TournamentController {
         return new ResponseEntity<List<Round>>(tournamentData.getRounds(), HttpStatus.OK);
     }
 
-    // @GetMapping("/tournaments/{title}")
-    // public ResponseEntity<Tournament> getTournamentByTitle(@PathVariable String title) {
-    //     Tournament tournamentData = tournamentRepo.findByTitle(title);
-        
-    //     if (tournamentData != null) {
-    //         return new ResponseEntity<>(tournamentData, HttpStatus.OK);
-    //     }
-
-    //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    // }
-
     @PostMapping
-    // @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HttpStatus> addTournament(@RequestBody Tournament tournament) {
+    public ResponseEntity<HttpStatus> addTournament(@Valid @RequestBody Tournament tournament) {
         tournamentService.addTournament(tournament);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
-    // @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HttpStatus> updateTournamentById(@PathVariable Long id, @RequestBody Tournament newTournamentData) {
-        // updatedTournamentData.setMatches(newTournamentData.getMatches());
-        // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
-        // updatedTournamentData.setWaitingList(newTournamentData.getWaitingList());
+    public ResponseEntity<HttpStatus> updateTournamentById(@PathVariable Long id, @Valid @RequestBody Tournament newTournamentData) {
         tournamentService.updateTournament(id, newTournamentData);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
-    // @PostMapping("/tournaments/title/{title}")
-    // @PreAuthorize("hasRole('ADMIN')")
-    // public ResponseEntity<Tournament> updateTournamentByTitle(@PathVariable String title, @RequestBody Tournament newTournamentData) {
-    //     Tournament oldTournamentData = tournamentRepo.findByTitle(title);
-
-    //     if (oldTournamentData != null) {
-    //         Tournament updatedTournamentData = oldTournamentData;
-    //         updatedTournamentData.setTitle(newTournamentData.getTitle());
-    //         updatedTournamentData.setDate(newTournamentData.getDate());
-    //         // updatedTournamentData.setMatches(newTournamentData.getMatches());
-    //         updatedTournamentData.setMaxElo(newTournamentData.getMaxElo());
-    //         // updatedTournamentData.setParticipants(newTournamentData.getParticipants());
-    //         updatedTournamentData.setMinElo(newTournamentData.getMinElo());
-    //         updatedTournamentData.setSize(newTournamentData.getSize());
-    //         updatedTournamentData.setWaitingList(newTournamentData.getWaitingList());
-
-    //         Tournament tournamentObj = tournamentRepo.save(updatedTournamentData);
-    //         return new ResponseEntity<>(tournamentObj, HttpStatus.OK);
-    //     }
-
-    //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    // }
 
     @DeleteMapping("/{id}")
-    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HttpStatus> deleteTournamentById(@PathVariable Long id) {
         tournamentService.deleteTournament(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    // @DeleteMapping("/tournaments/{title}")
-    // @PreAuthorize("hasRole('ADMIN')")
-    // public ResponseEntity<HttpStatus> deleteTournamentByTitle(@PathVariable String title) {
-    //     tournamentRepo.deleteByTitle(title);
-    //     return new ResponseEntity<>(HttpStatus.OK);
-    // }
-
-    @DeleteMapping("/{id}/withdraw")
-    public ResponseEntity<Void> withdraw(@RequestBody User user, @PathVariable Long id) {
+    @DeleteMapping("/{id}/user")
+    public ResponseEntity<HttpStatus> withdraw(@RequestBody User user, @PathVariable Long id) {
         tournamentService.withdrawUser(user, id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/{id}/register")
-    public ResponseEntity<Void> registerUser(@RequestBody User user, @PathVariable Long id) {
+    @PostMapping("/{id}/user")
+    public ResponseEntity<HttpStatus> registerUser(@RequestBody User user, @PathVariable Long id) {
         tournamentService.registerUser(user, id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    // TODO
     @GetMapping("/{id}/standings")
     public ResponseEntity<List<User>> getStandings(@PathVariable Long id) {
         List<User> users = tournamentService.getSortedUsers(id);
-        return new ResponseEntity<List<User>>(users, HttpStatus.OK);
+        return new ResponseEntity<List<User>>(users.subList(0, users.size() - 1), HttpStatus.OK); // excl bot
     }
 
     @GetMapping("/byElo/{elo}")
@@ -146,5 +95,10 @@ public class TournamentController {
         List<Tournament> t = tournamentService.getUserEligibleTournament(elo);
         return new ResponseEntity<List<Tournament>>(t, HttpStatus.OK);
     }
-    
+
+    @GetMapping("/byUser/{username}")
+    public ResponseEntity<List<Tournament>> getHistoryByUser(@PathVariable String username) {
+        List<Tournament> t = tournamentService.getHistoryByUser(username);
+        return new ResponseEntity<List<Tournament>>(t, HttpStatus.OK);
+    }
 }

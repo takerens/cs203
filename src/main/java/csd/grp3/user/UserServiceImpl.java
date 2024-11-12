@@ -1,28 +1,62 @@
 package csd.grp3.user;
 
+import java.util.List;
+
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import csd.grp3.jwt.JwtService;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
-    
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder) {
-        this.userRepository = userRepository;
-        this.encoder = encoder;
-    }
+    private final AuthenticationManager authManager;
+    private final JwtService jwtService;
 
+    /**
+     * This method is used to find a user by their username
+     * Throws a UsernameNotFoundException if the user is not found
+     * 
+     * @param username The username of the user to be found
+     * @return The user with the given username
+     */
     @Override
-    public User findByUsername(String username) throws UserNotFoundException{
+    public User findByUsername(String username) throws UsernameNotFoundException{
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+
+    /**
+     * This method is used to list all users in the database
+     * 
+     * @return A list of all users in the database
+     */
+    @Override
+    public List<User> listUsers() {
+        return userRepository.findAll();
+    }
+
+
+    /**
+     * This method is used to create a new user
+     * Throws a BadCredentialsException if the username already exists
+     * 
+     * @param username The username of the new user
+     * @param password The password of the new user
+     * @return The new user
+     */
     @Override
     @Transactional
     public User createNewUser(String username, String password) throws BadCredentialsException{
@@ -38,38 +72,68 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(new User(username, encodedPassword));
     }
 
+    /**
+     * This method is used to login a user
+     * Throws a BadCredentialsException if the username and password do not match
+     * 
+     * @param username The username of the user to be logged in
+     * @param password The password of the user to be logged in
+     * @return The JWT token of the user
+     */
     @Override
-    public User login(String username, String password) throws UserNotFoundException, BadCredentialsException{
-        //Get the password associated with the searched username
-        User user = findByUsername(username);
-        String encodedPassword = user.getPassword();
+    public String login(String username, String password) throws BadCredentialsException{
+
+        Authentication authentication = 
+            authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
         //Return the user if the password matches
-        if (encoder.matches(password, encodedPassword)) {
-            return user;
+        if (authentication.isAuthenticated()) {
+            return jwtService.generateToken((UserDetails) authentication.getPrincipal());
         }
         //Else throw exception
-        throw new BadCredentialsException("Password does not match");
+        throw new BadCredentialsException("Username and Password do not match");
     }
 
+    /**
+     * This method is used to change the password of a user
+     * Throws a UsernameNotFoundException if the user is not found
+     * Throws a BadCredentialsException if the new password is the same as the old password
+     * 
+     * @param username The username of the user to change the password
+     * @param newPassword The new password of the user
+     * @return The user with the new password
+     */
     @Override
-    public User changePassword(String username, String newPassword) throws UserNotFoundException, BadCredentialsException{
+    public User changePassword(String username, String newPassword) {
         User user = findByUsername(username);
-        //Only change the password if it is different
-        if (!encoder.matches(newPassword, user.getPassword())) {
-            user.setPassword(encoder.encode(newPassword));
-            return userRepository.save(user);
-        }
 
-        throw new BadCredentialsException("Password already in use");        
+        // If the new password is the same as the old one, throw an error
+        if (encoder.matches(newPassword, user.getPassword())) {
+            throw new BadCredentialsException("New password should not be the same as the old one");
+        }
+        
+        user.setPassword(encoder.encode(newPassword));
+        return userRepository.save(user);
     }
 
+    /**
+     * This method is used to delete a user by their username
+     * 
+     * @param username The username of the user to be deleted
+     * @return The username of the deleted user
+     */
     public String deleteByUsername(String username) {
         User user = findByUsername(username);
         userRepository.delete(user);
         return username;
     }
 
+    /**
+     * This method is used to update the ELO of a user
+     * 
+     * @param tempUser The user to update the ELO
+     * @param ELO The new ELO of the user
+     */
     @Override
     public void updateELO(User tempUser, int ELO) {
         User user = findByUsername(tempUser.getUsername());

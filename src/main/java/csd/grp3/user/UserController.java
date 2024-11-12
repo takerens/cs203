@@ -1,39 +1,40 @@
 package csd.grp3.user;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 
 @RestController
+@AllArgsConstructor
 public class UserController {
     private UserService userService;
 
-    //TEMPORARY
-    private User user;
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    User getUser() {
-        return this.user;
-    }
-    // Till HERE
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-        this.user = null; //TEMP
-    }
-
     @GetMapping("/user")
     public ResponseEntity<User> getUserDetails() {
-        if (getUser() != null) {
-            return ResponseEntity.ok(getUser());
+        // Extract the current authentication object from the SecurityContext
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // If the principal is an instance of UserDetails (from Spring Security), extract the username
+        if (principal instanceof UserDetails) {
+            String username = ((UserDetails) principal).getUsername();
+
+            // You can now retrieve user details from the database using the username
+            User currentUser = userService.findByUsername(username);
+
+            return ResponseEntity.ok(currentUser); // Return the user details as a response
         }
-        return ResponseEntity.notFound().build();
+
+        // If the user is not authenticated, return 401 Unauthorized or any other error response
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/signup")
@@ -43,10 +44,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody User user) {
-        User loggedIn = userService.login(user.getUsername(), user.getPassword());
-        setUser(loggedIn);
-        return ResponseEntity.status(HttpStatus.OK).body(loggedIn);
+    public ResponseEntity<Map<String, String>> loginUser(@RequestBody User user) {
+        String token = userService.login(user.getUsername(), user.getPassword());
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);  // Store the token in a map with the key "token"
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/profile/{username}")
@@ -54,15 +56,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findByUsername(username));
     }
 
-    @PutMapping("/user/changePassword")
+    @PutMapping("/user")
     public ResponseEntity<User> changePassword(@Valid @RequestBody User user) {
         User updatedUser = userService.changePassword(user.getUsername(), user.getPassword());
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
     @DeleteMapping("/profile/{username}")
-    public ResponseEntity<String> deleteUser(@PathVariable String username) {
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable String username) {
         userService.deleteByUsername(username);
-        return ResponseEntity.status(HttpStatus.OK).body(username + " has been deleted");
+        return ResponseEntity.noContent().build();
     }
 }
