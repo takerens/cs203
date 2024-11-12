@@ -15,7 +15,7 @@ public class CheaterbugService {
     private final String cheaterbugUrl;
 
     public CheaterbugService(RestTemplate restTemplate, 
-                             @Value("${cheaterbug.url:http://localhost:8081/cheaterbug/analysis}") String cheaterbugUrl) {
+    @Value("${cheaterbug.url}") String cheaterbugUrl) {
         this.restTemplate = restTemplate;
         this.cheaterbugUrl = cheaterbugUrl;
     }
