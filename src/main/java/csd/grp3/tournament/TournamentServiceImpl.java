@@ -3,6 +3,7 @@ package csd.grp3.tournament;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -80,8 +81,8 @@ public class TournamentServiceImpl implements TournamentService {
 
     /**
      * Update tournament specified by tournamentID and save it to repository
-     *  
-     * @param tournamentID Long ID of tournament object to be updated
+     * 
+     * @param tournamentID      Long ID of tournament object to be updated
      * @param newTournamentInfo Tournament object with updated details
      * @return Tournamnet object updated
      */
@@ -114,7 +115,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     /**
-     * Removes users from tournament players and waiting list to fit min max ELO range
+     * Removes users from tournament players and waiting list to fit min max ELO
+     * range
      * 
      * @param tournamentID Long
      */
@@ -148,7 +150,7 @@ public class TournamentServiceImpl implements TournamentService {
      * Changes player status from 'w' to 'r'.
      * 
      * @param tournamentID Long
-     * @param numToAdd int
+     * @param numToAdd     int
      */
     private void addFromWaiting(Long tournamentID, int numToAdd) {
         // invite players from waiting list
@@ -167,7 +169,7 @@ public class TournamentServiceImpl implements TournamentService {
      * Changes player status from 'r' to 'w'
      * 
      * @param tournamentID Long
-     * @param numToRemove int
+     * @param numToRemove  int
      */
     private void addToWaiting(Long tournamentID, int numToRemove) {
         // invite players from waiting list
@@ -185,7 +187,7 @@ public class TournamentServiceImpl implements TournamentService {
      * Checks if user ELO is above minELO and below maxELO of tournament
      * 
      * @param tournament tournament object
-     * @param userELO int value
+     * @param userELO    int value
      * @return true if userELO is between min and max
      */
     private boolean isUserEloEligible(Tournament tournament, int userELO) {
@@ -221,8 +223,8 @@ public class TournamentServiceImpl implements TournamentService {
      * Checks if user is in tournament already.
      * Else add user to either player list or waiting list
      * 
-     * @param user User object to be registered
-     * @param tournamentID Long 
+     * @param user         User object to be registered
+     * @param tournamentID Long
      */
     @Override
     @Transactional
@@ -241,7 +243,7 @@ public class TournamentServiceImpl implements TournamentService {
             // if tournament is full, we add to waiting list instead
             if (playerList.size() == tournament.getSize()) {
                 UTService.add(tournament, user, 'w');
-                // else, we want to add to player list 
+                // else, we want to add to player list
             } else {
                 UTService.add(tournament, user, 'r');
             }
@@ -251,8 +253,8 @@ public class TournamentServiceImpl implements TournamentService {
     /**
      * Removes user from tournament player list or waiting list
      * 
-     * @param tempUser User object to be withdrawn
-     * @param tournamentID Long 
+     * @param tempUser     User object to be withdrawn
+     * @param tournamentID Long
      */
     @Override
     @Transactional
@@ -289,7 +291,7 @@ public class TournamentServiceImpl implements TournamentService {
     /**
      * Adds a new round to the tournament
      * 
-     * @param tournamentID Long 
+     * @param tournamentID Long
      */
     @Override
     @Transactional
@@ -327,27 +329,27 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = round.getTournament();
 
         round.getMatches().stream()
-            .filter(match -> match.getResult() != 0)
-            .forEach(match -> updatePlayerPoints(tournament.getId(), match));
+                .filter(match -> match.getResult() != 0)
+                .forEach(match -> updatePlayerPoints(tournament.getId(), match));
     }
 
     /**
      * Updates both player points based on match results
      * 
      * @param tournamentId Long
-     * @param match Match object to update player points
+     * @param match        Match object to update player points
      */
     private void updatePlayerPoints(Long tournamentId, Match match) {
         // Map of results to arrays. First index is white points, second is black points
         Map<Double, double[]> resultPoints = Map.of(
-             1.0, new double[]{1.0, 0.0},  // White wins
-            -1.0, new double[]{0.0, 1.0},  // Black wins
-             0.5, new double[]{0.5, 0.5}   // Draw
+                1.0, new double[] { 1.0, 0.0 }, // White wins
+                -1.0, new double[] { 0.0, 1.0 }, // Black wins
+                0.5, new double[] { 0.5, 0.5 } // Draw
         );
-    
+
         double result = match.getResult();
         double[] points = resultPoints.get(result);
-    
+
         UTService.updateMatchPoints(tournamentId, match.getWhite().getUsername(), points[0]);
         UTService.updateMatchPoints(tournamentId, match.getBlack().getUsername(), points[1]);
     }
@@ -477,10 +479,12 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     /**
-     * Buchholz score is the sum of game points obtained by the opponents throughout the tournament.
-     * Iterate through user's matches in the tournament and sum up the game points of all opponents faced.
+     * Buchholz score is the sum of game points obtained by the opponents throughout
+     * the tournament.
+     * Iterate through user's matches in the tournament and sum up the game points
+     * of all opponents faced.
      * 
-     * @param user User to calculate Buchholz score for
+     * @param user       User to calculate Buchholz score for
      * @param tournament Tournament object
      * @return Buchholz score of user
      */
@@ -500,7 +504,7 @@ public class TournamentServiceImpl implements TournamentService {
     /**
      * Get list of users sorted in order of by game points, buchholz score, and ELO
      * 
-     * @param tournamentID Long 
+     * @param tournamentID Long
      * @return List of sorted users
      */
     @Override
@@ -647,45 +651,60 @@ public class TournamentServiceImpl implements TournamentService {
      * 
      * @param tournamentID Long
      */
-        @Override
+    @Override
     public void endTournament(Long tournamentID) {
+        // Retrieve the tournament and mark it as calculated
         Tournament tournament = getTournament(tournamentID);
         tournament.setCalculated(true);
-        tournaments.save(tournament); // set Calculated
+        tournaments.save(tournament);
 
         List<CheaterbugEntity> analysisEntities = new ArrayList<>();
+        Map<User, List<CheaterbugEntity>> userEntitiesMap = new HashMap<>();
 
+        // Gather data for analysis and map entities to users
         for (User user : UTService.getPlayers(tournamentID)) {
             List<Match> userMatches = matchService.getUserMatches(user).stream()
-                .filter(match -> match.getTournament().equals(tournament))
-                .collect(Collectors.toList());
+                    .filter(match -> match.getTournament().equals(tournament))
+                    .collect(Collectors.toList());
 
             // Calculate new ELO for the user
             user.setELO(calculateELO(userMatches, user));
             userService.updateELO(user, user.getELO());
 
-            // Prepare data for CheaterbugService analysis
+            List<CheaterbugEntity> userEntities = new ArrayList<>();
             for (Match match : userMatches) {
                 User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
-                double actualScore = getActualScore(match.getResult(), match.getWhite().equals(user) ? "white" : "black");
+                double actualScore = getActualScore(match.getResult(),
+                        match.getWhite().equals(user) ? "white" : "black");
 
                 // Create a CheaterbugEntity for each match
                 CheaterbugEntity entity = new CheaterbugEntity(user.getELO(), opponent.getELO(), actualScore);
+                userEntities.add(entity);
                 analysisEntities.add(entity);
             }
+            userEntitiesMap.put(user, userEntities); // Link entities to the user
         }
 
-        // Send data to CheaterbugService for analysis
-        CheaterbugResponse response = cheaterbugService.analyze(analysisEntities);
-        if (cheaterbugService.isSuspicious(response)) {
-            System.out.println("Suspicious activity detected in tournament ID: " + tournamentID);
+        // Analyze each user's data individually for suspicious activity
+        for (Map.Entry<User, List<CheaterbugEntity>> entry : userEntitiesMap.entrySet()) {
+            User user = entry.getKey();
+            List<CheaterbugEntity> userEntities = entry.getValue();
+
+            // Analyze this user's matches using the CheaterbugService
+            CheaterbugResponse response = cheaterbugService.analyze(userEntities);
+
+            if (cheaterbugService.isSuspicious(response)) {
+                System.out.println("Suspicious activity detected for user: " + user.getUsername() +
+                        " in tournament ID: " + tournamentID + ", Title: " + tournament.getTitle());
+            }
         }
     }
+
     /**
      * Handles BYE case for user in round
      * 
      * @param round Round object
-     * @param user User object
+     * @param user  User object
      */
     @Transactional
     public void handleBYE(Round round, User user) { // color is color of worst player
@@ -709,10 +728,11 @@ public class TournamentServiceImpl implements TournamentService {
      * Calculate user ELO via this formula documentation
      * https://en.wikipedia.org/wiki/Chess_rating_system#Linear_approximation
      * Based on difference in expected vs actual score.
-     * Uses a development coefficient, depending on the user's match history, via getDevelopmentCoefficient()
+     * Uses a development coefficient, depending on the user's match history, via
+     * getDevelopmentCoefficient()
      * 
      * @param matches List of matches to consider
-     * @param user User object
+     * @param user    User object
      * @return User's new ELO
      */
     public Integer calculateELO(List<Match> matches, User user) {
@@ -738,14 +758,14 @@ public class TournamentServiceImpl implements TournamentService {
     /**
      * Calculates actual score of user via results and user colour
      * 
-     * @param result double
+     * @param result     double
      * @param userColour String
      * @return Actual score wrt user
      */
     private Double getActualScore(double result, String userColour) {
         return result == 1.0 ? (userColour.equals("white") ? 1.0 : 0.0) // case if result is 1
-                    : result == -1 ? (userColour.equals("white") ? 0.0 : 1.0) // case if result is -1
-                    : 0.5;
+                : result == -1 ? (userColour.equals("white") ? 0.0 : 1.0) // case if result is -1
+                        : 0.5;
     }
 
     /**
@@ -772,6 +792,7 @@ public class TournamentServiceImpl implements TournamentService {
         }
         return DEFAULT_COEFFICIENT;
     }
+
     /**
      * Get tournament history of user
      * 

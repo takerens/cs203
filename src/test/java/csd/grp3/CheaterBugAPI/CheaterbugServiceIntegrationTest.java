@@ -17,12 +17,16 @@ public class CheaterbugServiceIntegrationTest {
     @Test
     public void testAnalyzeWithRealApiCall() {
         // Prepare the input data (a list of CheaterbugEntity objects)
-        CheaterbugEntity entity1 = new CheaterbugEntity(1200,1800, 0.5);
-        CheaterbugEntity entity2 = new CheaterbugEntity(1200,1100, 1.0);
+        CheaterbugEntity entity1 = new CheaterbugEntity(1200, 1800, 0.5);
+        CheaterbugEntity entity2 = new CheaterbugEntity(1200, 1100, 1.0);
         List<CheaterbugEntity> requestPayload = List.of(entity1, entity2);
 
         // Call the service method
         CheaterbugResponse response = cheaterbugService.analyze(requestPayload);
+
+        // Print the response to see actual values
+        System.out.println("Cheat Probability: " + response.getCheatProbability());
+        System.out.println("Expected Probability: " + response.getExpectedProbability());
 
         // Assertions to verify the response
         assertNotNull(response, "The response should not be null");
