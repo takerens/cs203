@@ -5,11 +5,11 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.DecimalMax;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.util.Map;
 
+@Getter
+@Setter
 public class CheaterbugEntity {
 
 
