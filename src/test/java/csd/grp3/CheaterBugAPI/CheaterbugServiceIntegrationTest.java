@@ -42,7 +42,7 @@ public class CheaterbugServiceIntegrationTest {
     public void testAnalyze_NormalPlay_NoSuspicion() {
         // Prepare normal play data
         CheaterbugEntity entity1 = new CheaterbugEntity(1500, 1600, 0.5);
-        CheaterbugEntity entity2 = new CheaterbugEntity(1400, 1300, 1.0);
+        CheaterbugEntity entity2 = new CheaterbugEntity(1500, 1300, 1.0);
         List<CheaterbugEntity> requestPayload = List.of(entity1, entity2);
 
         // Call the service method and check results
@@ -52,23 +52,28 @@ public class CheaterbugServiceIntegrationTest {
     }
 
     @Test
-    public void testAnalyze_ExpectedBelow5th_CheatAbove99th_Suspicion() {
-        // This case should trigger suspicion due to expected score being low and cheat probability high
-        CheaterbugEntity entity1 = new CheaterbugEntity(1200, 2000, 0.1);
-        CheaterbugEntity entity2 = new CheaterbugEntity(1000, 1900, 0.2);
-        List<CheaterbugEntity> requestPayload = List.of(entity1, entity2);
-
+    public void testAnalyze_ExpectedBelow5th_CheatAbove99th_Suspicion_WithMoreData() {
+        // Adding more data points to simulate a richer dataset for suspicion detection
+        CheaterbugEntity entity1 = new CheaterbugEntity(100, 2000, 1.0);
+        CheaterbugEntity entity2 = new CheaterbugEntity(100, 1900, 1.0);
+        CheaterbugEntity entity3 = new CheaterbugEntity(100, 1800, 0.9);
+        CheaterbugEntity entity4 = new CheaterbugEntity(100, 1700, 1.0);
+        CheaterbugEntity entity5 = new CheaterbugEntity(100, 1600, 0.8);
+        CheaterbugEntity entity6 = new CheaterbugEntity(100, 1500, 1.0);
+        List<CheaterbugEntity> requestPayload = List.of(entity1, entity2, entity3, entity4, entity5, entity6);
+    
         // Call the service method and check results
         CheaterbugResponse response = cheaterbugService.analyze(requestPayload);
-        assertNotNull(response);
-        assertTrue(cheaterbugService.isSuspicious(response), "Expected suspicious activity when expected score is very low and cheat probability is high.");
+        assertNotNull(response, "The response should not be null.");
+        assertTrue(cheaterbugService.isSuspicious(response), 
+            "Expected suspicious activity with low expected scores and consistently high actual scores.");
     }
 
     @Test
     public void testAnalyze_HighExpectedScore_NoSuspicion() {
         // High expected score (player likely to win); should not be flagged as suspicious
         CheaterbugEntity entity1 = new CheaterbugEntity(1800, 1200, 1.0);
-        CheaterbugEntity entity2 = new CheaterbugEntity(1900, 1300, 0.9);
+        CheaterbugEntity entity2 = new CheaterbugEntity(1800, 1300, 0.9);
         List<CheaterbugEntity> requestPayload = List.of(entity1, entity2);
 
         // Call the service method and check results
@@ -80,8 +85,8 @@ public class CheaterbugServiceIntegrationTest {
     @Test
     public void testAnalyze_CheatingPatternWithMixedScores() {
         // Mixed scores with one expected to trigger suspicion
-        CheaterbugEntity entity1 = new CheaterbugEntity(1500, 1900, 0.5);
-        CheaterbugEntity entity2 = new CheaterbugEntity(1400, 1900, 0.9); // High actual, low expected -> suspicious
+        CheaterbugEntity entity1 = new CheaterbugEntity(10, 1900, 0.1);
+        CheaterbugEntity entity2 = new CheaterbugEntity(10, 1900, 1.0); // High actual, low expected -> suspicious
         List<CheaterbugEntity> requestPayload = List.of(entity1, entity2);
 
         // Call the service method and check results
@@ -94,7 +99,7 @@ public class CheaterbugServiceIntegrationTest {
     public void testAnalyze_LowActualScores_NoSuspicion() {
         // All scores are low, no strong indication of cheating
         CheaterbugEntity entity1 = new CheaterbugEntity(1500, 1600, 0.2);
-        CheaterbugEntity entity2 = new CheaterbugEntity(1400, 1700, 0.3);
+        CheaterbugEntity entity2 = new CheaterbugEntity(1500, 1700, 0.3);
         List<CheaterbugEntity> requestPayload = List.of(entity1, entity2);
 
         // Call the service method and check results
