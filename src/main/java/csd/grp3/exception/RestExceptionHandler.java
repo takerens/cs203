@@ -12,6 +12,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import csd.grp3.CheaterBugAPI.CheatingSuspicionException;
 import csd.grp3.tournament.InvalidTournamentStatus;
 import csd.grp3.tournament.PlayerAlreadyRegisteredException;
 import csd.grp3.tournament.TournamentNotFoundException;
@@ -41,7 +43,8 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    // Handle unauthorized access (for authenticated users without the required role)
+    // Handle unauthorized access (for authenticated users without the required
+    // role)
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -97,5 +100,10 @@ public class RestExceptionHandler {
         Map<String, Object> body = new HashMap<>();
         body.put("message", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CheatingSuspicionException.class)
+    public ResponseEntity<String> handleCheatingSuspicion(CheatingSuspicionException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
     }
 }
