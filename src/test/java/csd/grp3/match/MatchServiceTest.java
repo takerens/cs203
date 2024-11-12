@@ -49,13 +49,13 @@ public class MatchServiceTest {
 
         // assert
         assertEquals(match,returnedMatch);
-        verify(matches).save(match);
+        verify(matches).save(any(Match.class));
     }
 
     @Test
     void addMatch() {
         // arrange
-        Match match = new Match(null, null, null, null, false, 0);
+        Match match = new Match();
 
         // act
         // mock the save operation

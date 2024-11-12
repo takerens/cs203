@@ -18,19 +18,16 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name="Tournaments")
 @Getter
 @Setter
-@ToString
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 
@@ -89,7 +86,6 @@ public class Tournament {
     public boolean isOver() {
         return rounds.size() == totalRounds && rounds.get(rounds.size() - 1).isOver();
     }
-
 
     public boolean hasStarted() {
         return LocalDateTime.now().isAfter(startDateTime) && userTournaments.size() > 2; // 2 Users + 1 Bot 
