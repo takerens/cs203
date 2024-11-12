@@ -1,7 +1,6 @@
 package csd.grp3.CheaterBugAPI;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
