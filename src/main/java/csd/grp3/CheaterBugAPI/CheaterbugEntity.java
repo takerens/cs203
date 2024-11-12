@@ -24,49 +24,4 @@ public class CheaterbugEntity {
     @DecimalMax(value = "1.0", message = "Actual score must be between 0.0 and 1.0")
     private Double actualScore;
 
-    // existing fields and methods
-
-    public CheaterbugEntity(Double expectedScore, Double actualScore) {
-        this.expectedScore = expectedScore;
-        this.actualScore = actualScore;
-    }
-
-
-
-    private Map<String, String> cheatProbability;
-
-    private Map<String, String> expectedProbability;
-
-
-
-    public Map<String, String> getCheatProbability() {
-
-        return cheatProbability;
-
-    }
-
-
-
-    public void setCheatProbability(Map<String, String> cheatProbability) {
-
-        this.cheatProbability = cheatProbability;
-
-    }
-
-
-
-    public Map<String, String> getExpectedProbability() {
-
-        return expectedProbability;
-
-    }
-
-
-
-    public void setExpectedProbability(Map<String, String> expectedProbability) {
-
-        this.expectedProbability = expectedProbability;
-
-    }
-
 }
