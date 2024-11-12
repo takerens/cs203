@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import csd.grp3.CheaterBugAPI.*;
 import csd.grp3.match.Match;
 import csd.grp3.match.MatchService;
 import csd.grp3.round.Round;
@@ -42,6 +43,9 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Autowired
     private RoundService roundService;
+
+    @Autowired
+    private CheaterbugService cheaterbugService;
 
     @Override
     public List<Tournament> listTournaments() {
@@ -643,22 +647,40 @@ public class TournamentServiceImpl implements TournamentService {
      * 
      * @param tournamentID Long
      */
-    @Override
+        @Override
     public void endTournament(Long tournamentID) {
         Tournament tournament = getTournament(tournamentID);
         tournament.setCalculated(true);
         tournaments.save(tournament); // set Calculated
+
+        List<CheaterbugEntity> analysisEntities = new ArrayList<>();
 
         for (User user : UTService.getPlayers(tournamentID)) {
             List<Match> userMatches = matchService.getUserMatches(user).stream()
                 .filter(match -> match.getTournament().equals(tournament))
                 .collect(Collectors.toList());
 
+            // Calculate new ELO for the user
             user.setELO(calculateELO(userMatches, user));
             userService.updateELO(user, user.getELO());
+
+            // Prepare data for CheaterbugService analysis
+            for (Match match : userMatches) {
+                User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
+                double actualScore = getActualScore(match.getResult(), match.getWhite().equals(user) ? "white" : "black");
+
+                // Create a CheaterbugEntity for each match
+                CheaterbugEntity entity = new CheaterbugEntity(user.getELO(), opponent.getELO(), actualScore);
+                analysisEntities.add(entity);
+            }
+        }
+
+        // Send data to CheaterbugService for analysis
+        CheaterbugResponse response = cheaterbugService.analyze(analysisEntities);
+        if (cheaterbugService.isSuspicious(response)) {
+            System.out.println("Suspicious activity detected in tournament ID: " + tournamentID);
         }
     }
-
     /**
      * Handles BYE case for user in round
      * 

@@ -36,6 +36,10 @@ public class CheaterbugEntity {
 
     // Method to calculate expected score based on userELO, opponentELO, and classInterval
     private double calculateExpectedScore(double userELO, double opponentELO, double classInterval) {
+        if (classInterval == 0) {
+            // Avoid division by zero, return a neutral expected score
+            return 0.5;
+        }
         return 1.0 / (1 + Math.pow(10, (opponentELO - userELO) / classInterval));
     }
 }
