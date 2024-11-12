@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import csd.grp3.match.Match;
@@ -25,10 +26,19 @@ import jakarta.transaction.Transactional;
 @Service
 public class TournamentServiceImpl implements TournamentService {
 
+    @Autowired
     private TournamentRepository tournaments;
+
+    @Autowired
     private MatchService matchService;
+
+    @Autowired
     private UserTournamentService UTService;
+
+    @Autowired
     private UserService userService;
+
+    @Autowired
     private RoundService roundService;
 
     @Override
@@ -681,7 +691,7 @@ public class TournamentServiceImpl implements TournamentService {
     public Integer calculateELO(List<Match> matches, User user) {
         Integer userELO = user.getELO();
         Integer developmentCoefficient = getDevelopmentCoefficient(user);
-        Double classInterval = 50.0;
+        Double classInterval = 100.0;
         Double changeInRating = 0.0;
 
         for (Match match : matches) {

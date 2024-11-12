@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import csd.grp3.jwt.JwtService;
 import jakarta.transaction.Transactional;
@@ -17,9 +18,16 @@ import jakarta.transaction.Transactional;
 @Service
 public class UserServiceImpl implements UserService {
 
+    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
     private BCryptPasswordEncoder encoder;
+
+    @Autowired
     private AuthenticationManager authManager;
+
+    @Autowired
     private JwtService jwtService;
 
     /**
