@@ -3,6 +3,7 @@ package csd.grp3.tournament;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import csd.grp3.CheaterBugAPI.CheaterbugEntity;
+import csd.grp3.CheaterBugAPI.CheaterbugService;
 import csd.grp3.match.Match;
 import csd.grp3.match.MatchService;
 import csd.grp3.round.Round;
@@ -40,6 +43,9 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Autowired
     private RoundService roundService;
+
+    @Autowired
+    private CheaterbugService cheaterbugService;
 
     @Override
     public List<Tournament> listTournaments() {
@@ -644,12 +650,18 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setCalculated(true);
         tournaments.save(tournament); // set Calculated
 
+        Map<User, Integer> eloChanges = new HashMap<>();
         for (User user : UTService.getPlayers(tournamentID)) {
-            List<Match> userMatches = matchService.getUserMatches(user).stream()
-                .filter(match -> match.getTournament().equals(tournament))
-                .collect(Collectors.toList());
+            eloChanges.put(user, calculateChangeInELO(getUserExpectedActualScoreInTournament(tournament, user), getDevelopmentCoefficient(user)));
+        }
+        updateUserEloMap(eloChanges);
+    }
 
-            user.setELO(calculateELO(userMatches, user));
+    private void updateUserEloMap(Map<User, Integer> eloChanges) {
+        for (Map.Entry<User, Integer> entry : eloChanges.entrySet()) {
+            User user = entry.getKey();
+            Integer eloChange = entry.getValue();
+            user.setELO(user.getELO() + eloChange);
             userService.updateELO(user, user.getELO());
         }
     }
@@ -679,33 +691,21 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     /**
-     * Calculate user ELO via this formula documentation
-     * https://en.wikipedia.org/wiki/Chess_rating_system#Linear_approximation
-     * Based on difference in expected vs actual score.
-     * Uses a development coefficient, depending on the user's match history, via getDevelopmentCoefficient()
+     * Calculate change in user ELO based on matches played in tournament
+     * Uses a development coefficient, depending on the user's match history
      * 
      * @param matches List of matches to consider
      * @param user User object
      * @return User's new ELO
      */
-    public Integer calculateELO(List<Match> matches, User user) {
-        Integer userELO = user.getELO();
-        Integer developmentCoefficient = getDevelopmentCoefficient(user);
-        Double classInterval = 100.0;
-        Double changeInRating = 0.0;
+    public Integer calculateChangeInELO(List<Map<String, Double>> userExpectedActualScores, Integer developmentCoefficient) {
+        Double changeInELO = 0.0;
 
-        for (Match match : matches) {
-            // void match results as both users didnt play tgt
-            if (match.isBYE())
-                continue;
-
-            User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
-            Double expectedScore = 1.0 / (1 + Math.pow(10, (opponent.getELO() - userELO) / classInterval));
-            Double actualScore = getActualScore(match.getResult(), match.getWhite().equals(user) ? "white" : "black");
-            changeInRating += developmentCoefficient * (actualScore - expectedScore);
+        for (Map<String, Double> scoreMap : userExpectedActualScores) {
+            changeInELO += developmentCoefficient * (scoreMap.get("actual") - scoreMap.get("expected"));
         }
 
-        return (int) (changeInRating + 0.5) + userELO;
+        return (int) (changeInELO + 0.5);
     }
 
     /**
@@ -761,5 +761,77 @@ public class TournamentServiceImpl implements TournamentService {
             }
         }
         return list;
+    }
+
+    /**
+     * Get user's expected and actual score for matches played in tournament
+     * 
+     * @param tournament Tournament object
+     * @param user User object
+     * @return List of maps of expected and actual scores
+     */
+    private List<Map<String, Double>> getUserExpectedActualScoreInTournament(Tournament tournament, User user) {
+        List<Map<String, Double>> expectedActualScores = new ArrayList<>();
+        List<Match> matches = matchService.getUserMatches(user).stream()
+                .filter(match -> match.getTournament().equals(tournament))
+                .collect(Collectors.toList());
+
+        for (Match match : matches) {
+            // void match results as both users didnt play tgt
+            if (match.isBYE())
+                continue;
+
+            expectedActualScores.add(getUserExpectedActualScoreInMatch(match, user));
+        }
+        return expectedActualScores;
+    }
+
+    /**
+     * Calculate expected and actual score of user in match based on this formula
+     * https://en.wikipedia.org/wiki/Chess_rating_system#Linear_approximation
+     * 
+     * @param match Match object
+     * @param user User object
+     * @return Map of expected and actual score
+     */
+    private Map<String, Double> getUserExpectedActualScoreInMatch(Match match, User user) {
+        final Double CLASS_INTERVAL = 100.0;
+        Map<String, Double> expectedActualScore = new HashMap<>();
+        User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
+        Double expectedScore = 1.0 / (1 + Math.pow(10, (opponent.getELO() - user.getELO()) / CLASS_INTERVAL));
+        Double actualScore = getActualScore(match.getResult(), match.getWhite().equals(user) ? "white" : "black");
+
+        expectedActualScore.put("expected", expectedScore);
+        expectedActualScore.put("actual", actualScore);
+
+        return expectedActualScore;
+    }
+
+    /**
+     * Flag users in tournament if suspicious performance detected
+     * 
+     * @param tournamentID Long
+     */
+    public void flagSusUserPerformance(Long tournamentID) {
+        Tournament tournament = getTournament(tournamentID);
+        for (User user : UTService.getPlayers(tournamentID)) {
+            List<Map<String, Double>> userExpectedActualScores = getUserExpectedActualScoreInTournament(tournament, user);
+            if (checkCheaterbug(userExpectedActualScores)) {
+                //  TODO userService.flagUser(user.getUsername());
+            }
+        }
+    }
+
+    /**
+     * Use Cheaterbug API to check if user's expected vs actual scores are suspicious
+     * 
+     * @param userExpectedActualScores List of maps of expected and actual scores
+     */
+    private boolean checkCheaterbug(List<Map<String, Double>> userExpectedActualScores) {
+        List<CheaterbugEntity> cheaterbugEntities = new ArrayList<>();
+        for (Map<String, Double> scoreMap : userExpectedActualScores) {
+            cheaterbugEntities.add(new CheaterbugEntity(scoreMap.get("actual"), scoreMap.get("expected")));
+        }
+        return cheaterbugService.isSuspicious(cheaterbugService.analyze(cheaterbugEntities));
     }
 }
