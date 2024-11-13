@@ -21,7 +21,10 @@ jobs:
         with:
           distribution: 'temurin'  # You can use temurin, zulu, etc.
           java-version: '17'        # Use the JDK version compatible with Spring Boot project
-
+          
+      - name: Verify Java version
+        run: java -version  # Check Java version to ensure it's 17
+        
       - name: Cache Maven dependencies
         uses: actions/cache@v3
         with:
