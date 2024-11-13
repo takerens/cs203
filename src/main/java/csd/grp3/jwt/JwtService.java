@@ -23,10 +23,9 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    private String secretKey = "tempsecretkey";
+    private String secretKey = "25c257be54802ca8acb53a15eb1909d37e0ae704981cb1b0679898e0e3b4c9016a555e1b0367bca80862db2f699ac46486ab14e81ba028a4c55d309a2d00ad46";
 
     public JwtService() {
-
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
             SecretKey sk = keyGen.generateKey();

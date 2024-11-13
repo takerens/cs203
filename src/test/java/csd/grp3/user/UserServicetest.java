@@ -1,4 +1,4 @@
-// package csd.grp3.user;
+package csd.grp3.user;
 
 // import java.util.Optional;
 
@@ -14,6 +14,7 @@
 // import static org.mockito.Mockito.when;
 // import org.mockito.MockitoAnnotations;
 // import org.springframework.security.authentication.BadCredentialsException;
+// import org.springframework.security.core.userdetails.UsernameNotFoundException;
 // import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
@@ -92,10 +93,10 @@
 
 //         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-//         assertThrows(UserNotFoundException.class, () -> {
-//             userService.findByUsername(username);
-//         });
-//     }
+    //     assertThrows(UsernameNotFoundException.class, () -> {
+    //         userService.findByUsername(username);
+    //     });
+    // }
 
 //     @Test
 //     void changePassword_ValidUsernameAndPassword_ReturnUser() {
@@ -118,9 +119,9 @@
 //         String username = "username";
 //         String newPassword = "newpassword";
 
-//         assertThrows(UserNotFoundException.class, ()-> {
-//             userService.changePassword(username, newPassword);
-//         });
-//     }
+    //     assertThrows(UsernameNotFoundException.class, ()-> {
+    //         userService.changePassword(username, newPassword);
+    //     });
+    // }
     
 // }

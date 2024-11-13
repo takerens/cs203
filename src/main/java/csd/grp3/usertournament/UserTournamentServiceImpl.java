@@ -3,21 +3,18 @@ package csd.grp3.usertournament;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import csd.grp3.tournament.Tournament;
 import csd.grp3.user.User;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 @Service
 public class UserTournamentServiceImpl implements UserTournamentService {
 
-    @Autowired
     private UserTournamentRepository userTournamentRepo;
 
+    @Override
     public UserTournament findRecord(Long tournamentID, String username) throws UserTournamentNotFoundException {
         return userTournamentRepo.findById_TournamentIdAndId_Username(tournamentID, username)
                 .orElseThrow(() -> new UserTournamentNotFoundException());
@@ -55,7 +52,6 @@ public class UserTournamentServiceImpl implements UserTournamentService {
     }
 
     @Override
-    // @Transactional
     public UserTournament updatePlayerStatus(Long tournamentID, String username, char status) {
         UserTournament userTournament = findRecord(tournamentID, username);
         userTournament.setStatus(status);

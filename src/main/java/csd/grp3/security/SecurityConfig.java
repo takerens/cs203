@@ -23,20 +23,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import csd.grp3.jwt.JwtFilter;
 import csd.grp3.user.CustomUserDetailsService;
+import lombok.AllArgsConstructor;
 
 @EnableWebSecurity
 @Configuration
+@AllArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
     private CustomUserDetailsService userDetailsService;
-
-    @Autowired
     private JwtFilter jwtFilter;
-
-    public SecurityConfig(CustomUserDetailsService userDetailsSvc) {
-        this.userDetailsService = userDetailsSvc;
-    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
