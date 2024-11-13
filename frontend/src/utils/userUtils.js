@@ -63,7 +63,7 @@ export const handleUnflagUser = async (userData, tournamentId, setErrorMessage, 
         url: `${process.env.REACT_APP_API_URL}/user/flag`,
         method: 'PUT',
         body: userData,
-        callback: successCallback(`${userData.username}'s has been unflagged.`, () => fetchStandings(tournamentId, setErrorMessage, setStandings)),
+        callback: successCallback(`${userData.username} has been unflagged.`, () => fetchStandings(tournamentId, setErrorMessage, setStandings)),
         setErrorMessage,
     });
 };

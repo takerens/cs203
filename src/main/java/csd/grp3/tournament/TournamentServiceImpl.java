@@ -61,7 +61,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     @Transactional
     public Tournament addTournament(Tournament newTournamentInfo) {
-        // newTournamentInfo.setSize(newTournamentInfo.getSize() + 1); // space for bot
+        newTournamentInfo.setSize(newTournamentInfo.getSize() + 1); // space for bot
         tournaments.save(newTournamentInfo);
         registerUser(userService.findByUsername("DEFAULT_BOT"), newTournamentInfo.getId());
         return newTournamentInfo;
@@ -100,7 +100,7 @@ public class TournamentServiceImpl implements TournamentService {
         updateTournamentEloRange(tournament);
 
         // update player and waiting list based on new size
-        tournament.setSize(newTournamentInfo.getSize() - 1); // setSize + 1 when mapping newTournamentInfo, counter it happening twice
+        tournament.setSize(newTournamentInfo.getSize() + 1); // space for bot
         updateTournamentSize(tournament);
 
         return tournaments.save(tournament);
@@ -534,7 +534,7 @@ public class TournamentServiceImpl implements TournamentService {
             // assume user1 is white
             boolean isUser1White = isNextColourWhite(user1, tournament);
 
-            for (int j = i + 1; j < users.size(); j++) {
+            for (int j = i + 1; j < users.size() - 1; j++) {
                 User user2 = users.get(j);
 
                 if (pairedUsers.contains(user2))
@@ -655,6 +655,8 @@ public class TournamentServiceImpl implements TournamentService {
         for (User user : UTService.getPlayers(tournamentID)) {
             eloChanges.put(user, calculateChangeInELO(getUserExpectedActualScoreInTournament(tournament, user), getDevelopmentCoefficient(user)));
         }
+        // catch cheaters 
+        flagSusUserPerformance(tournamentID);
         updateUserEloMap(eloChanges);
     }
 
@@ -776,7 +778,7 @@ public class TournamentServiceImpl implements TournamentService {
         List<Match> matches = matchService.getUserMatches(user).stream()
                 .filter(match -> match.getTournament().equals(tournament))
                 .collect(Collectors.toList());
-
+        // System.out.println("Matches: "+matches);
         for (Match match : matches) {
             // void match results as both users didnt play tgt
             if (match.isBYE())
@@ -796,7 +798,7 @@ public class TournamentServiceImpl implements TournamentService {
      * @return Map of expected and actual score
      */
     private Map<String, Double> getUserExpectedActualScoreInMatch(Match match, User user) {
-        final Double CLASS_INTERVAL = 100.0;
+        final Double CLASS_INTERVAL = 200.0;
         Map<String, Double> expectedActualScore = new HashMap<>();
         User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
         Double expectedScore = 1.0 / (1 + Math.pow(10, (opponent.getELO() - user.getELO()) / CLASS_INTERVAL));
@@ -804,7 +806,7 @@ public class TournamentServiceImpl implements TournamentService {
 
         expectedActualScore.put("expected", expectedScore);
         expectedActualScore.put("actual", actualScore);
-
+        // System.out.println("In Match: "+expectedActualScore);
         return expectedActualScore;
     }
 
@@ -818,7 +820,8 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = getTournament(tournamentID);
         for (User user : UTService.getPlayers(tournamentID)) {
             List<Map<String, Double>> userExpectedActualScores = getUserExpectedActualScoreInTournament(tournament, user);
-            if (checkCheaterbug(userExpectedActualScores)) {
+            System.out.println("User: "+ user.getUsername() + " User Expected Actual: "+userExpectedActualScores);
+            if (!user.getUsername().equals("DEFAULT_BOT") && checkCheaterbug(userExpectedActualScores)) {
                 user.setSuspicious(true);
                 userService.updateSuspicious(user, true);
             }
@@ -831,10 +834,14 @@ public class TournamentServiceImpl implements TournamentService {
      * @param userExpectedActualScores List of maps of expected and actual scores
      */
     public boolean checkCheaterbug(List<Map<String, Double>> userExpectedActualScores) {
+        System.out.println("CHECKING CHEATERBUG");
+        System.out.println("User Expected Actual: "+userExpectedActualScores);
         List<CheaterbugEntity> cheaterbugEntities = new ArrayList<>();
         for (Map<String, Double> scoreMap : userExpectedActualScores) {
             cheaterbugEntities.add(new CheaterbugEntity(scoreMap.get("actual"), scoreMap.get("expected")));
         }
+        System.out.println("Cheat Entities: "+cheaterbugEntities);
+        System.out.println(cheaterbugService.analyze(cheaterbugEntities));
         return cheaterbugService.isSuspicious(cheaterbugService.analyze(cheaterbugEntities));
     }
 }

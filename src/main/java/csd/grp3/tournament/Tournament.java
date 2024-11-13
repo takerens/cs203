@@ -77,10 +77,6 @@ public class Tournament {
         return size;
     }
 
-    public void setSize(int size) {
-        this.size = size + 1; // Add 1 to include the bot
-    }
-
     public int getDisplaySize() {
         return size - 1; // Subtract 1 to exclude the bot
     }

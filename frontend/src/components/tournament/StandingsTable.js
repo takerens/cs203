@@ -3,10 +3,10 @@ import TableComponent from '../TableComponent';
 
 const StandingsTable = ({ standings, tournament, user, handleDeleteUser, handleUnflagUser }) => {
     const getUserTournament = (userTournaments, tournamentId, username) => {
-        return (userTournaments.find(tournament =>
+        return userTournaments.find(tournament =>
             tournament.id.tournamentId === tournamentId &&
             tournament.id.username === username
-        ));
+        );
     };
 
     // Define headers based on user role
@@ -21,7 +21,7 @@ const StandingsTable = ({ standings, tournament, user, handleDeleteUser, handleU
             index + 1,               // Rank
             player.username,         // Player
             player.elo,              // Rating
-            ut.gamePoints            // Points
+            ut?.gamePoints || 0      // Points, default to 0 if undefined
         ];
 
         if (user.userRole === "ROLE_ADMIN") {
@@ -31,13 +31,15 @@ const StandingsTable = ({ standings, tournament, user, handleDeleteUser, handleU
                         <button onClick={() => handleDeleteUser(player)}>Delete</button>
                         <button onClick={() => handleUnflagUser(player)}>Unflag</button>
                     </div>
-                ) : null
+                ) : (
+                    <span>Not Suspicious</span>
+                )
             );
         }
 
         return {
             data: row,
-            isSuspicious: player.suspicious, // Mark row as suspicious if needed
+            isSuspicious: player.suspicious // Mark row as suspicious if needed
         };
     });
 
@@ -45,7 +47,10 @@ const StandingsTable = ({ standings, tournament, user, handleDeleteUser, handleU
         <TableComponent
             headers={headers}
             rows={rows.map(row => row.data)}
-            rowStyles={rows.map(row => row.isSuspicious ? { backgroundColor: 'orange' } : {})}
+            // Apply rowStyles only if user is admin
+            rowStyles={user.userRole === "ROLE_ADMIN"
+                ? rows.map(row => row.isSuspicious ? { backgroundColor: 'orange' } : {})
+                : []}
         />
     );
 };

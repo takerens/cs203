@@ -21,11 +21,19 @@ const TournamentStandings = () => {
     }, [tournamentId]);
 
     const onDeleteUser = (user) => {
-        handleDeleteUser(user.username, tournament.id, setErrorMessage, setStandings);
+        const userData = {
+            username: user.username,
+            password: user.password,
+        }
+        handleDeleteUser(userData, tournament.id, setErrorMessage, setStandings);
     };
 
     const onUnflagUser = (user) => {
-        handleUnflagUser(user.username, tournament.id, setErrorMessage, setStandings);
+        const userData = {
+            username: user.username,
+            password: user.password,
+        }
+        handleUnflagUser(userData, tournament.id, setErrorMessage, setStandings);
     };
 
     return (
@@ -35,6 +43,9 @@ const TournamentStandings = () => {
             <main>
                 <h3>Standings</h3>
                 <ErrorMessage message={errorMessage} />
+                {user.userRole === 'ROLE_ADMIN' && (
+                    <p style={{ color: 'red' }}>WARNING: if you unflag a user, you cannot reflag them.</p>
+                )}
                 <StandingsTable
                     standings={standings}
                     tournament={tournament}

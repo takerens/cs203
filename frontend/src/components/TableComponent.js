@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TableComponent = ({ headers, rows }) => {
+const TableComponent = ({ headers, rows, rowStyles = [] }) => {
     return (
         <table>
             {headers && ( // optional headers
@@ -14,7 +14,7 @@ const TableComponent = ({ headers, rows }) => {
             )}
             <tbody>
                 {rows.map((row, rowIndex) => (
-                    <tr key={rowIndex}>
+                    <tr key={rowIndex} style={rowStyles[rowIndex] || {}}>  {/* Apply row style if it exists */}
                         {row.map((cell, cellIndex) => (
                             <td key={cellIndex}>{cell}</td>
                         ))}
