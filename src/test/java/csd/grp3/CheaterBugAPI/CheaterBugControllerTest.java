@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
 @ExtendWith(MockitoExtension.class)
-public class CheaterBugControllerTest {
+public class CheaterbugControllerTest {
 
     @Mock
     private CheaterbugService cheaterbugService;
