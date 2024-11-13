@@ -63,6 +63,9 @@ const TournamentManagement = () => {
                 <div className="view">
                     {renderAdminLink()}
                     <h3>Available Tournaments</h3>
+                    {user.userRole === 'ROLE_ADMIN' && (
+                    <p style={{ color: 'red' }}>Red titles indicate that tournament has ended. Check standings for suspicious activity.</p>
+                )}
                     <Tournaments tournaments={tournaments} user={user} handleSubmit={handleSubmit} />
                     {user.userRole === 'ROLE_USER' && <TournamentHistory history={history} />}
                 </div>

@@ -11,12 +11,23 @@ const Tournaments = ({ tournaments, user, handleSubmit }) => {
     };
 
     const rows = tournaments.map((tournament) => {
+        // Check if the tournament is over
         const hasTournamentStarted = new Date() > new Date(tournament.startDateTime);
         const overloaded = tournament.size - tournament.userTournaments.length;
         const vacancies = overloaded < 0 ? 0 : overloaded;
 
+        // For ROLE_USER, exclude rows where the tournament is over
+        if (user.userRole === 'ROLE_USER' && tournament.over) {
+            return null; // Skip adding this row
+        }
+
+        // Define row styles for admin
+        const rowStyle = user.userRole === 'ROLE_ADMIN' && tournament.over
+            ? { color: 'red' }  // Set title color to red if tournament is over
+            : {};
+
         return [
-            tournament.title,
+            <span style={rowStyle}>{tournament.title}</span>,  // Apply rowStyle to the title
             tournament.minElo,
             tournament.maxElo,
             formatDate(tournament.startDateTime),
@@ -40,13 +51,14 @@ const Tournaments = ({ tournaments, user, handleSubmit }) => {
                     </Link>
                     <Link to={`/updateTournament/${tournament.id}`} className='table-link'>
                         <button type="button" className='table-button'>Update Tournament</button>
-                    </Link><form onSubmit={(e) => handleSubmit(e, tournament.id, "delete")}>
+                    </Link>
+                    <form onSubmit={(e) => handleSubmit(e, tournament.id, "delete")}>
                         <button type="submit">Delete Tournament</button>
                     </form>
                 </>
             )
         ];
-    });
+    }).filter(row => row !== null); // Filter out the null entries for over tournaments
 
     return (
         <TableComponent headers={["Title", "Min Elo", "Max Elo", "Date", "Vacancies", "Actions"]} rows={rows} />
