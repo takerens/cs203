@@ -51,6 +51,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+          
+      - name: Install Maven 3.8.1
+        run: |
+          curl -sL https://archive.apache.org/dist/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz | tar xz
+          sudo mv apache-maven-3.8.1 /opt/maven
+          sudo ln -s /opt/maven/bin/mvn /usr/local/bin/mvn
 
       - name: Build the project with Maven
         run: |
