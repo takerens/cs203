@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.client.RestTemplate;
 
 import csd.grp3.user.UserRepository;
 import csd.grp3.tournament.Tournament;
@@ -21,13 +23,20 @@ public class Grp3Application {
 
 		// JPA User Repository init
 		UserRepository users = ctx.getBean(UserRepository.class);
-		System.out.println("[Add Admin]: " + users.save(new User("Admin", encoder.encode("password123"), "ROLE_ADMIN", 0)).getUsername());
-		System.out.println("[Add User]: " + users.save(new User("User100", encoder.encode("user1234"), "ROLE_USER", 100)).getUsername());
-		System.out.println("[Add User]: " + users.save(new User("User0", encoder.encode("user1234"), "ROLE_USER", 0)).getUsername());
-		System.out.println("[Add User]: " + users.save(new User("User110", encoder.encode("user1234"), "ROLE_USER", 110)).getUsername());
-		System.out.println("[Add User]: " + users.save(new User("User150", encoder.encode("user1234"), "ROLE_USER", 150)).getUsername());
-		System.out.println("[Add User]: " + users.save(new User("User120", encoder.encode("user1234"), "ROLE_USER", 120)).getUsername());
-		System.out.println("[Add Bot]: " + users.save(new User("DEFAULT_BOT", encoder.encode("goodpassword"), "ROLE_USER", -1)).getUsername());
+		System.out.println("[Add Admin]: "
+				+ users.save(new User("Admin", encoder.encode("password123"), "ROLE_ADMIN", 0)).getUsername());
+		System.out.println("[Add User]: "
+				+ users.save(new User("User100", encoder.encode("user1234"), "ROLE_USER", 100)).getUsername());
+		System.out.println("[Add User]: "
+				+ users.save(new User("User0", encoder.encode("user1234"), "ROLE_USER", 0)).getUsername());
+		System.out.println("[Add User]: "
+				+ users.save(new User("User110", encoder.encode("user1234"), "ROLE_USER", 110)).getUsername());
+		System.out.println("[Add User]: "
+				+ users.save(new User("User150", encoder.encode("user1234"), "ROLE_USER", 150)).getUsername());
+		System.out.println("[Add User]: "
+				+ users.save(new User("User120", encoder.encode("user1234"), "ROLE_USER", 120)).getUsername());
+		System.out.println("[Add Bot]: "
+				+ users.save(new User("DEFAULT_BOT", encoder.encode("goodpassword"), "ROLE_USER", -1)).getUsername());
 
 		// JPA User Repository init
 		TournamentService Ts = ctx.getBean(TournamentService.class);
@@ -45,5 +54,10 @@ public class Grp3Application {
 		t1.setTotalRounds(1);
 		t1.setStartDateTime(LocalDateTime.of(2024, 12, 20, 15, 0));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t1).getTitle());
+	}
+
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
 	}
 }
