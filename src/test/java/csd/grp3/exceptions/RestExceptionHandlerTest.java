@@ -1,30 +1,29 @@
-package csd.grp3.exceptions;
+// package csd.grp3.exceptions;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.validation.BindException;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
+// import static org.junit.jupiter.api.Assertions.assertTrue;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.mockito.InjectMocks;
+// import org.mockito.MockitoAnnotations;
+// import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+// import org.springframework.boot.test.mock.mockito.MockBean;
+// import org.springframework.http.HttpStatus;
+// import org.springframework.http.ResponseEntity;
+// import org.springframework.security.authentication.BadCredentialsException;
+// import org.springframework.validation.BindException;
+// import org.springframework.validation.ObjectError;
+// import org.springframework.web.bind.MethodArgumentNotValidException;
+// import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import csd.grp3.exception.RestExceptionHandler;
-import csd.grp3.jwt.JwtService;
-import csd.grp3.match.MatchService;
-import csd.grp3.tournament.InvalidTournamentStatus;
-import csd.grp3.tournament.TournamentNotFoundException;
-import csd.grp3.tournament.TournamentService;
-import csd.grp3.tournament.UserNotRegisteredException;
-import csd.grp3.user.UserService;
+// import csd.grp3.exception.RestExceptionHandler;
+// import csd.grp3.match.MatchService;
+// import csd.grp3.tournament.InvalidTournamentStatus;
+// import csd.grp3.tournament.TournamentNotFoundException;
+// import csd.grp3.tournament.TournamentService;
+// import csd.grp3.tournament.UserNotRegisteredException;
+// import csd.grp3.user.UserNotFoundException;
+// import csd.grp3.user.UserService;
 
 // @WebMvcTest
 // public class RestExceptionHandlerTest {
@@ -37,11 +36,8 @@ import csd.grp3.user.UserService;
 //     @MockBean
 //     private UserService userService;
 
-    // @MockBean
-    // private JwtService jwtService;
-
-    // @InjectMocks
-    // private RestExceptionHandler restExceptionHandler;
+//     @InjectMocks
+//     private RestExceptionHandler restExceptionHandler;
 
 //     @BeforeEach
 //     public void setUp() {
@@ -77,31 +73,31 @@ import csd.grp3.user.UserService;
 //         assertTrue(response.getBody().toString().contains("Invalid type"));
 //     }
 
-    // @Test
-    // public void testHandleUserNotRegisteredException() {
-    //     // Arrange
-    //     UserNotRegisteredException ex = new UserNotRegisteredException();
+//     @Test
+//     public void testHandleUserNotRegisteredException() {
+//         // Arrange
+//         UserNotRegisteredException ex = new UserNotRegisteredException("User is not registered.");
 
-    //     // Act
-    //     ResponseEntity<Object> response = restExceptionHandler.handleUserNotRegistered(ex);
+//         // Act
+//         ResponseEntity<Object> response = restExceptionHandler.handleUserNotRegisteredException(ex);
 
-    //     // Assert
-    //     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    //     assertTrue(response.getBody().toString().contains("User did not register for this tournament."));
-    // }
+//         // Assert
+//         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//         assertTrue(response.getBody().toString().contains("User is not registered."));
+//     }
 
-    // @Test
-    // public void testHandleTournamentNotFoundException() {
-    //     // Arrange
-    //     TournamentNotFoundException ex = new TournamentNotFoundException();
+//     @Test
+//     public void testHandleTournamentNotFoundException() {
+//         // Arrange
+//         TournamentNotFoundException ex = new TournamentNotFoundException(1L);
 
-    //     // Act
-    //     ResponseEntity<Object> response = restExceptionHandler.handleTournamentNotFound(ex);
+//         // Act
+//         ResponseEntity<Object> response = restExceptionHandler.handleTournamentNotFoundException(ex);
 
-    //     // Assert
-    //     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    //     assertTrue(response.getBody().toString().contains("tournament not found"));
-    // }
+//         // Assert
+//         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+//         assertTrue(response.getBody().toString().contains("Could not find tournament 1"));
+//     }
 
 //     @Test
 //     public void testHandleInvalidTournamentStatus() {
@@ -116,29 +112,29 @@ import csd.grp3.user.UserService;
 //         assertTrue(response.getBody().toString().contains("Invalid status."));
 //     }
 
-    // @Test
-    // public void testHandleUsernameNotFoundException() {
-    //     // Arrange
-    //     UsernameNotFoundException ex = new UsernameNotFoundException("User not found");
+//     @Test
+//     public void testHandleUserNotFoundException() {
+//         // Arrange
+//         UserNotFoundException ex = new UserNotFoundException("User not found.");
 
-    //     // Act
-    //     ResponseEntity<Object> response = restExceptionHandler.handleUsernameNotFound(ex);
+//         // Act
+//         ResponseEntity<Object> response = restExceptionHandler.handleUserNotFoundException(ex);
 
-    //     // Assert
-    //     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    //     assertTrue(response.getBody().toString().contains("User not found"));
-    // }
+//         // Assert
+//         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+//         assertTrue(response.getBody().toString().contains("User not found."));
+//     }
 
 //     @Test
 //     public void testHandleBadCredentialsException() {
 //         // Arrange
 //         BadCredentialsException ex = new BadCredentialsException("Invalid credentials.");
 
-        // Act
-//         ResponseEntity<Object> response = restExceptionHandler.handleBadCredentials(ex);
+//         // Act
+//         ResponseEntity<Object> response = restExceptionHandler.handleBadCredentialsException(ex);
 
 //         // Assert
-//         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+//         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
 //         assertTrue(response.getBody().toString().contains("Invalid credentials."));
 //     }
 // }

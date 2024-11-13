@@ -1,31 +1,25 @@
-package csd.grp3.user;
+// package csd.grp3.user;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.util.Set;
+// import jakarta.validation.ConstraintViolation;
+// import jakarta.validation.Validation;
+// import jakarta.validation.Validator;
+// import jakarta.validation.ValidatorFactory;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.mockito.InjectMocks;
+// import org.mockito.Mock;
+// import org.mockito.MockitoAnnotations;
+// import org.springframework.http.HttpStatus;
+// import org.springframework.http.ResponseEntity;
+// import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+// import java.util.Set;
 
-import jakarta.validation.ConstraintViolation; 
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
+// import static org.junit.jupiter.api.Assertions.*;
+// import static org.mockito.ArgumentMatchers.any;
+// import static org.mockito.ArgumentMatchers.anyString;
+// import static org.mockito.Mockito.*;
 
 // public class UserControllerTest {
 //     @Mock
@@ -46,26 +40,26 @@ import jakarta.validation.ValidatorFactory;
 //         validator = factory.getValidator();
 //     }
 
-    // @Test
-    // public void getUserDetails_Success() {
-    //     //Arrange
-    //     User user = new User("username", "password");
-    //     when(userService.login(user.getUsername(), user.getPassword())).thenReturn(user);
-    //     userController.loginUser(user);
+//     @Test
+//     public void getUserDetails_Success() {
+//         //Arrange
+//         UserController uc = new UserController(userService);
+//         User user = new User("username", "password");
+//         uc.setUser(user);
 
-    //     ResponseEntity<User> response = userController.getUserDetails();
+//         ResponseEntity<User> response = uc.getUserDetails();
 
-    //     assertEquals(HttpStatus.OK, response.getStatusCode());
-    //     assertEquals(user, response.getBody());
-    // }
+//         assertEquals(HttpStatus.OK, response.getStatusCode());
+//         assertEquals(user, response.getBody());
+//     }
 
-    // @Test
-    // public void getUserDetails_Fail_ReturnNotFound() {
-    //     ResponseEntity<User> response = userController.getUserDetails();
+//     @Test
+//     public void getUserDetails_Fail_ReturnNotFound() {
+//         ResponseEntity<User> response = userController.getUserDetails();
 
-    //     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    //     assertEquals(null, response.getBody());
-    // }
+//         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+//         assertEquals(null, response.getBody());
+//     }
 
 //     @Test
 //     public void registerUser_Success() throws MethodArgumentNotValidException {
@@ -162,13 +156,13 @@ import jakarta.validation.ValidatorFactory;
 //         // Arrange
 //         String username = "nonexistentuser";
         
-        // Mock the userService to throw UsernameNotFoundException
-        // when(userService.findByUsername(username)).thenThrow(new UsernameNotFoundException("User not found"));
+//         // Mock the userService to throw UsernameNotFoundException
+//         when(userService.findByUsername(username)).thenThrow(new UserNotFoundException("user not found"));
 
-        // // Act and assert
-        // assertThrows(UsernameNotFoundException.class,()-> {
-        //     userController.viewProfile(username);
-        // });
+//         // Act and assert
+//         assertThrows(UserNotFoundException.class,()-> {
+//             userController.viewProfile(username);
+//         });
 
 //         // Verify that the service method was called
 //         verify(userService, times(1)).findByUsername(username);

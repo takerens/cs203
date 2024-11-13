@@ -71,13 +71,13 @@ public class TournamentControllerTest {
 
     @Test
     public void testGetTournamentById_NotFound() {
-        when(tournamentService.getTournament(1L)).thenThrow(new TournamentNotFoundException());
+        when(tournamentService.getTournament(1L)).thenThrow(new TournamentNotFoundException(1L));
 
         TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
             tournamentController.getTournamentById(1L);
         });
 
-        assertEquals("tournament not found", exception.getMessage());
+        assertEquals("Could not find tournament 1", exception.getMessage());
     }
 
     @Test
@@ -103,13 +103,13 @@ public class TournamentControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testUpdateTournamentById_NotFound() {
-        when(tournamentService.updateTournament(1L, tournament)).thenThrow(new TournamentNotFoundException());
+        when(tournamentService.updateTournament(1L, tournament)).thenThrow(new TournamentNotFoundException(1L));
 
         TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
             tournamentController.updateTournamentById(1L, tournament);
         });
 
-        assertEquals("tournament not found", exception.getMessage());
+        assertEquals("Could not find tournament 1", exception.getMessage());
     }
 
     @Test
@@ -125,13 +125,13 @@ public class TournamentControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testDeleteTournamentById_NotFound() {
-        doThrow(new TournamentNotFoundException()).when(tournamentService).deleteTournament(1L);
+        doThrow(new TournamentNotFoundException(1L)).when(tournamentService).deleteTournament(1L);
 
         TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
             tournamentController.deleteTournamentById(1L);
         });
 
-        assertEquals("tournament not found", exception.getMessage());
+        assertEquals("Could not find tournament 1", exception.getMessage());
     }
 
     @Test
@@ -145,13 +145,13 @@ public class TournamentControllerTest {
 
     @Test
     public void testWithdrawUser_TournamentNotFound() {
-        doThrow(new TournamentNotFoundException()).when(tournamentService).withdrawUser(user, 1L);
+        doThrow(new TournamentNotFoundException(1L)).when(tournamentService).withdrawUser(user, 1L);
 
         TournamentNotFoundException exception = assertThrows(TournamentNotFoundException.class, () -> {
             tournamentController.withdraw(user, 1L);
         });
 
-        assertEquals("tournament not found", exception.getMessage());
+        assertEquals("Could not find tournament 1", exception.getMessage());
     }
 
     @Test
@@ -165,13 +165,13 @@ public class TournamentControllerTest {
 
     @Test
     public void testRegisterUser_PlayerAlreadyRegistered() {
-        doThrow(new UserAlreadyRegisteredException()).when(tournamentService).registerUser(user, 1L);
+        doThrow(new PlayerAlreadyRegisteredException()).when(tournamentService).registerUser(user, 1L);
 
-        UserAlreadyRegisteredException exception = assertThrows(UserAlreadyRegisteredException.class, () -> {
+        PlayerAlreadyRegisteredException exception = assertThrows(PlayerAlreadyRegisteredException.class, () -> {
             tournamentController.registerUser(user, 1L);
         });
 
-        assertEquals("User has already registered for this tournament.", exception.getMessage());
+        assertEquals("Player has already registered for this tournament.", exception.getMessage());
     }
 
     @Test
@@ -183,7 +183,7 @@ public class TournamentControllerTest {
 
         User user1 = new User("user1", "user1", "ROLE_PLAYER", 0);
         User user2 = new User("user2", "user2", "ROLE_PLAYER", 0);
-        Round lastRound = new Round(mockTournament);
+        Round lastRound = new Round(tournamentId, mockTournament, null);
         Match match = new Match(user1, user2, lastRound);
         match.setResult(-1);
         List<Match> matches = new ArrayList<>();
@@ -217,7 +217,7 @@ public class TournamentControllerTest {
 
         User user1 = new User("user1", "user1", "ROLE_PLAYER", 0);
         User user2 = new User("user2", "user2", "ROLE_PLAYER", 0);
-        Round lastRound = new Round(mockTournament);
+        Round lastRound = new Round(tournamentId, mockTournament, null);
         Match match = new Match(user1, user2, lastRound);
         match.setResult(-1);
         List<Match> matches = new ArrayList<>();

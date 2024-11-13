@@ -37,7 +37,6 @@ public class Grp3Application {
 		Tournament t = new Tournament();
 		t.setTitle("Tournament A");
 		t.setSize(4);
-		t.setMaxElo(115);
 		t.setTotalRounds(2);
 		t.setMaxElo(200);
 		t.setStartDateTime(LocalDateTime.of(2024, 9, 30, 15, 45));

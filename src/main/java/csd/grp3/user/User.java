@@ -20,22 +20,26 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import csd.grp3.usertournament.UserTournament;
 
 @Entity
 @Getter
 @Setter
+@ToString
+@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Table(name = "AppUsers")
 public class User implements UserDetails {
 
-public class User implements UserDetails{
     private static final int DEFAULT_ELO = 100;
 
     @Id
@@ -48,6 +52,10 @@ public class User implements UserDetails{
 
     @NotNull(message = "Authorities should not be null")
     private String authorities;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference(value = "userUserTournament") // Prevents infinite recursion
+    private List<UserTournament> userTournaments = new ArrayList<>();
 
     private Integer ELO = DEFAULT_ELO;
 

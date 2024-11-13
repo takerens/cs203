@@ -2,6 +2,7 @@ package csd.grp3.tournament;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +21,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/tournaments")
 public class TournamentController {
-    
+    @Autowired
     private TournamentService tournamentService;
 
     @GetMapping
