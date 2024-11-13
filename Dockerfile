@@ -1,5 +1,5 @@
 # Use OpenJDK 17 with Alpine Linux
-FROM openjdk:17-jdk-alpine
+FROM openjdk:17-jdk
 
 # Argument to specify the JAR file
 ARG JAR_FILE=target/*.jar
