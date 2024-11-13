@@ -18,7 +18,7 @@ const TournamentForm = ({ tournament, onSubmit }) => {
             setMinElo(tournament.minElo || '');
             setMaxElo(tournament.maxElo || '');
             setDate(tournament.startDateTime ? tournament.startDateTime.split('T')[0] : '');
-            setSize(tournament.size - 1 || '');
+            setSize(tournament.displaySize || '');
             setTotalRounds(tournament.totalRounds || '');
         }
     }, [tournament]);
@@ -30,7 +30,7 @@ const TournamentForm = ({ tournament, onSubmit }) => {
             minElo,
             maxElo,
             startDateTime: `${date}T00:00:00`, // Format date here
-            size: Number(size) + 1, // Space for bot
+            size: Number(size),
             totalRounds
         });
     };

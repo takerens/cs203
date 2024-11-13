@@ -1,5 +1,6 @@
 import { apiRequest } from './ApiUtils';
 import { successCallback, fetchCallback } from './SuccessCallback';
+import { fetchStandings } from './TournamentUtils';
 
 export const handleSignup = async (userData, setErrorMessage, navigate) => {
     await apiRequest({
@@ -45,5 +46,24 @@ export const handlePassword = async (userData, setErrorMessage, setNewPassword) 
         setErrorMessage,
     }).then(() => {
         setNewPassword(''); // Clear password input after successful password change
+    });
+};
+
+export const handleDeleteUser = async (userData, tournamentId, setErrorMessage, setStandings) => {
+    await apiRequest({
+        url: `${process.env.REACT_APP_API_URL}/profile/${userData.username}`,
+        method: 'DELETE',
+        callback: successCallback(`${userData.username}'s account has been deleted.`, () => fetchStandings(tournamentId, setErrorMessage, setStandings)),
+        setErrorMessage,
+    });
+};
+
+export const handleUnflagUser = async (userData, tournamentId, setErrorMessage, setStandings) => {
+    await apiRequest({
+        url: `${process.env.REACT_APP_API_URL}/user/flag`,
+        method: 'PUT',
+        body: userData,
+        callback: successCallback(`${userData.username}'s has been unflagged.`, () => fetchStandings(tournamentId, setErrorMessage, setStandings)),
+        setErrorMessage,
     });
 };

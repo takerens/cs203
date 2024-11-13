@@ -23,26 +23,35 @@ public class Grp3Application {
 
 		// JPA User Repository init
 		UserRepository users = ctx.getBean(UserRepository.class);
-		User user110 = new User("User110", encoder.encode("user1234"), "ROLE_USER", 110);
+		User user10 = new User("User10", encoder.encode("user1234"), "ROLE_USER", 10);
+		User user40 = new User("User40", encoder.encode("user1234"), "ROLE_USER", 40);
 		User user150 = new User("User150", encoder.encode("user1234"), "ROLE_USER", 150);
 		User user100 = new User("User100", encoder.encode("user1234"), "ROLE_USER", 100);
+		User user110 = new User("User100", encoder.encode("user1234"), "ROLE_USER", 110);
+		User user120 = new User("User120", encoder.encode("user1234"), "ROLE_USER", 120);
 		System.out.println("[Add Admin]: " + users.save(new User("Admin", encoder.encode("password123"), "ROLE_ADMIN", 0)).getUsername());
 		System.out.println("[Add User]: " + users.save(new User("User0", encoder.encode("user1234"), "ROLE_USER", 0)).getUsername());
 		System.out.println("[Add User]: " + users.save(user110).getUsername());
 		System.out.println("[Add User]: " + users.save(user150).getUsername());
 		System.out.println("[Add User]: " + users.save(user100).getUsername());
-		System.out.println("[Add User]: " + users.save(new User("User120", encoder.encode("user1234"), "ROLE_USER", 120)).getUsername());
+		System.out.println("[Add User]: " + users.save(user120).getUsername());
+		System.out.println("[Add User]: " + users.save(user10).getUsername());
+		System.out.println("[Add User]: " + users.save(user40).getUsername());
 		System.out.println("[Add Bot]: " + users.save(new User("DEFAULT_BOT", encoder.encode("goodpassword"), "ROLE_USER", -1)).getUsername());
 
 		// JPA User Repository init
 		TournamentService Ts = ctx.getBean(TournamentService.class);
 		Tournament t = new Tournament();
 		t.setTitle("Tournament A");
-		t.setSize(4);
+		t.setSize(6);
 		t.setTotalRounds(2);
 		t.setMaxElo(200);
 		t.setStartDateTime(LocalDateTime.of(2024, 9, 30, 15, 45));
 		System.out.println("[Add Tournament]: " + Ts.addTournament(t).getTitle());
+		Ts.registerUser(user120, t.getId());
+		Ts.registerUser(user100, t.getId());
+		Ts.registerUser(user110, t.getId());
+		Ts.registerUser(user150, t.getId());
 		Tournament t1 = new Tournament();
 		t1.setTitle("Tournament B");
 		t1.setSize(5);

@@ -78,6 +78,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authz) -> authz
                         // Open Access for all
                         .requestMatchers(HttpMethod.POST, "/signup", "/login").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/user/flag").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/profile/*").permitAll()
 
                         // Admin-only access
                         .requestMatchers(HttpMethod.GET, "/tournaments").hasRole("ADMIN")

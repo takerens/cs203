@@ -4,7 +4,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import Navbar from '../components/Navbar';
 import SecondaryNavbar from '../components/SecondaryNavbar';
 import StandingsTable from '../components/tournament/StandingsTable';
-import { fetchUserData } from '../utils/UserUtils';
+import { fetchUserData, handleDeleteUser, handleUnflagUser } from '../utils/UserUtils';
 import { fetchTournamentData, fetchStandings } from '../utils/TournamentUtils';
 
 const TournamentStandings = () => {
@@ -14,11 +14,19 @@ const TournamentStandings = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [user, setUser] = useState({});
 
-    useEffect(() => { // Fetch Tournament Standings
+    useEffect(() => {
         fetchUserData(setErrorMessage, setUser);
         fetchTournamentData(tournamentId, setErrorMessage, setTournament);
         fetchStandings(tournamentId, setErrorMessage, setStandings);
     }, [tournamentId]);
+
+    const onDeleteUser = (user) => {
+        handleDeleteUser(user.username, tournament.id, setErrorMessage, setStandings);
+    };
+
+    const onUnflagUser = (user) => {
+        handleUnflagUser(user.username, tournament.id, setErrorMessage, setStandings);
+    };
 
     return (
         <>
@@ -27,7 +35,13 @@ const TournamentStandings = () => {
             <main>
                 <h3>Standings</h3>
                 <ErrorMessage message={errorMessage} />
-                <StandingsTable standings={standings} tournament={tournament} />
+                <StandingsTable
+                    standings={standings}
+                    tournament={tournament}
+                    user={user}
+                    handleDeleteUser={onDeleteUser}
+                    handleUnflagUser={onUnflagUser}
+                />
             </main>
         </>
     );

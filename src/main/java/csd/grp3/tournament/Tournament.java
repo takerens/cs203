@@ -73,6 +73,18 @@ public class Tournament {
     @JsonManagedReference(value = "tournamentUserTournament") // Prevents infinite recursion
     private List<UserTournament> userTournaments = new ArrayList<>();
 
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size + 1; // Add 1 to include the bot
+    }
+
+    public int getDisplaySize() {
+        return size - 1; // Subtract 1 to exclude the bot
+    }
+
     public void setTotalRounds(int totalRounds) {
         this.totalRounds = totalRounds;
 

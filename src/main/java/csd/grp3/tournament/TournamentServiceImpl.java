@@ -61,6 +61,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     @Transactional
     public Tournament addTournament(Tournament newTournamentInfo) {
+        // newTournamentInfo.setSize(newTournamentInfo.getSize() + 1); // space for bot
         tournaments.save(newTournamentInfo);
         registerUser(userService.findByUsername("DEFAULT_BOT"), newTournamentInfo.getId());
         return newTournamentInfo;
@@ -99,7 +100,7 @@ public class TournamentServiceImpl implements TournamentService {
         updateTournamentEloRange(tournament);
 
         // update player and waiting list based on new size
-        tournament.setSize(newTournamentInfo.getSize());
+        tournament.setSize(newTournamentInfo.getSize() - 1); // setSize + 1 when mapping newTournamentInfo, counter it happening twice
         updateTournamentSize(tournament);
 
         return tournaments.save(tournament);
@@ -761,5 +762,79 @@ public class TournamentServiceImpl implements TournamentService {
             }
         }
         return list;
+    }
+
+    /**
+     * Get user's expected and actual score for matches played in tournament
+     * 
+     * @param tournament Tournament object
+     * @param user User object
+     * @return List of maps of expected and actual scores
+     */
+    private List<Map<String, Double>> getUserExpectedActualScoreInTournament(Tournament tournament, User user) {
+        List<Map<String, Double>> expectedActualScores = new ArrayList<>();
+        List<Match> matches = matchService.getUserMatches(user).stream()
+                .filter(match -> match.getTournament().equals(tournament))
+                .collect(Collectors.toList());
+
+        for (Match match : matches) {
+            // void match results as both users didnt play tgt
+            if (match.isBYE())
+                continue;
+
+            expectedActualScores.add(getUserExpectedActualScoreInMatch(match, user));
+        }
+        return expectedActualScores;
+    }
+
+    /**
+     * Calculate expected and actual score of user in match based on this formula
+     * https://en.wikipedia.org/wiki/Chess_rating_system#Linear_approximation
+     * 
+     * @param match Match object
+     * @param user User object
+     * @return Map of expected and actual score
+     */
+    private Map<String, Double> getUserExpectedActualScoreInMatch(Match match, User user) {
+        final Double CLASS_INTERVAL = 100.0;
+        Map<String, Double> expectedActualScore = new HashMap<>();
+        User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
+        Double expectedScore = 1.0 / (1 + Math.pow(10, (opponent.getELO() - user.getELO()) / CLASS_INTERVAL));
+        Double actualScore = getActualScore(match.getResult(), match.getWhite().equals(user) ? "white" : "black");
+
+        expectedActualScore.put("expected", expectedScore);
+        expectedActualScore.put("actual", actualScore);
+
+        return expectedActualScore;
+    }
+
+    /**
+     * Flag users in tournament if suspicious performance detected
+     * 
+     * @param tournamentID Long
+     */
+    @Override
+    public void flagSusUserPerformance(Long tournamentID) {
+        Tournament tournament = getTournament(tournamentID);
+        for (User user : UTService.getPlayers(tournamentID)) {
+            List<Map<String, Double>> userExpectedActualScores = getUserExpectedActualScoreInTournament(tournament, user);
+            if (checkCheaterbug(userExpectedActualScores)) {
+                user.setSuspicious(true);
+                userService.updateSuspicious(user, true);
+            }
+        }
+    }
+
+    /**
+     * Use Cheaterbug API to check if user's expected vs actual scores are suspicious
+     * 
+     * @param userExpectedActualScores List of maps of expected and actual scores
+     */
+    public boolean checkCheaterbug(List<Map<String, Double>> userExpectedActualScores) {
+        List<CheaterbugEntity> cheaterbugEntities = new ArrayList<>();
+        for (Map<String, Double> scoreMap : userExpectedActualScores) {
+            cheaterbugEntities.add(new CheaterbugEntity(scoreMap.get("actual"), scoreMap.get("expected")));
+        }
+        return cheaterbugService.isSuspicious(cheaterbugService.analyze(cheaterbugEntities));
     }
 }
