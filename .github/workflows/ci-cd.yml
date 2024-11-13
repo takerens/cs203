@@ -52,10 +52,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up Maven 3.8.1
-        uses: actions/setup-maven@v2
-        with:
-          maven-version: '3.8.1'
+      - name: Install Maven
+        run: |
+          sudo apt update
+          sudo apt install -y maven
 
       - name: Verify Maven and Java Version
         run: |
