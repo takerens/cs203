@@ -146,4 +146,17 @@ public class UserServiceImpl implements UserService {
         user.setELO(ELO);
         userRepository.save(user);
     }
+
+    /**
+     * This method is used to update the suspicious status of a user
+     * 
+     * @param tempUser The user to update the suspicious status
+     * @param suspicious The new suspicious status of the user
+     */
+    @Override
+    public void updateSuspicious(User tempUser, boolean suspicious) {
+        User user = findByUsername(tempUser.getUsername());
+        user.setSuspicious(suspicious);
+        userRepository.save(user);
+    }
 }

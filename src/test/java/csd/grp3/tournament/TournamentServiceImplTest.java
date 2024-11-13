@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyChar;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -31,6 +32,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import csd.grp3.CheaterBugAPI.CheaterbugResponse;
+import csd.grp3.CheaterBugAPI.CheaterbugService;
 import csd.grp3.match.Match;
 import csd.grp3.match.MatchRepository;
 import csd.grp3.match.MatchServiceImpl;
@@ -69,6 +72,9 @@ public class TournamentServiceImplTest {
 
     @Mock
     private MatchServiceImpl matchService;
+
+    @Mock
+    private CheaterbugService cheaterbugService;
 
     private Tournament tournament;
     private User player;
@@ -1135,5 +1141,34 @@ public class TournamentServiceImplTest {
         verify(userTournamentService, never()).delete(tournament, player2); // Within new Elo limit
         verify(userTournamentService, times(1)).delete(tournament, player3); // Above new Elo limit
         verify(userTournamentService, never()).delete(tournament, player4); // Bot should be ignored
+    }
+
+    @Test
+    public void testflagSusUserPerformance_true() {
+        // Mock data setup
+        User user = new User("player1", "password1", "ROLE_PLAYER", 1000);
+        User opp1 = new User("player2", "password2", "ROLE_PLAYER", 1150);
+        User opp2 = new User("player3", "password3", "ROLE_PLAYER", 1190);
+        User opp3 = new User("player4", "password4", "ROLE_PLAYER", 1100);
+        User opp4 = new User("player5", "password5", "ROLE_PLAYER", 1050);
+        
+        List<Match> matches = List.of(
+            new Match(user, opp1, new Round(tournament)), 
+            new Match(user, opp2, new Round(tournament)), 
+            new Match(user, opp3, new Round(tournament)), 
+            new Match(user, opp4, new Round(tournament))
+        );
+        matches.forEach(match -> match.setResult(1.0));
+
+        when(matchService.getUserMatches(user)).thenReturn(matches);
+        when(userTournamentService.getPlayers(tournament.getId())).thenReturn(List.of(user));
+        when(tournamentRepository.findById(tournament.getId())).thenReturn(Optional.of(tournament));
+        when(cheaterbugService.isSuspicious(null)).thenReturn(true);
+
+        // Call the flagSusUserPerformance method
+        tournamentService.flagSusUserPerformance(tournament.getId());
+
+        // Verify that the user's performance was flagged as suspicious
+        assertTrue(user.isSuspicious());
     }
 }

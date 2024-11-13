@@ -812,12 +812,14 @@ public class TournamentServiceImpl implements TournamentService {
      * 
      * @param tournamentID Long
      */
+    @Override
     public void flagSusUserPerformance(Long tournamentID) {
         Tournament tournament = getTournament(tournamentID);
         for (User user : UTService.getPlayers(tournamentID)) {
             List<Map<String, Double>> userExpectedActualScores = getUserExpectedActualScoreInTournament(tournament, user);
             if (checkCheaterbug(userExpectedActualScores)) {
-                //  TODO userService.flagUser(user.getUsername());
+                user.setSuspicious(true);
+                userService.updateSuspicious(user, true);
             }
         }
     }
@@ -827,7 +829,7 @@ public class TournamentServiceImpl implements TournamentService {
      * 
      * @param userExpectedActualScores List of maps of expected and actual scores
      */
-    private boolean checkCheaterbug(List<Map<String, Double>> userExpectedActualScores) {
+    public boolean checkCheaterbug(List<Map<String, Double>> userExpectedActualScores) {
         List<CheaterbugEntity> cheaterbugEntities = new ArrayList<>();
         for (Map<String, Double> scoreMap : userExpectedActualScores) {
             cheaterbugEntities.add(new CheaterbugEntity(scoreMap.get("actual"), scoreMap.get("expected")));
