@@ -19,7 +19,7 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          distribution: 'adoptopenjdk'  # You can use temurin, zulu, etc.
+          distribution: 'temurin'  # You can use temurin, zulu, etc.
           java-version: '17'        # Use the JDK version compatible with Spring Boot project
           
       - name: Verify Java version
