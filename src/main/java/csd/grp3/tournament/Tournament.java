@@ -17,21 +17,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name="Tournaments")
 @Getter
 @Setter
-@ToString
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 
@@ -49,21 +45,17 @@ public class Tournament {
     private String title;
 
     @NotNull(message = "minElo: put a valid Elo")
-    @Min(value = 0, message = "minElo: Minimum value of 0")
-    private int minElo = 0;
+    private int minElo;
 
     @NotNull(message = "maxElo: put a valid Elo")
-    @Min(value = 0, message = "maxElo: Minimum value of 0")
-    private int maxElo = 1;
+    private int maxElo;
 
     private LocalDateTime startDateTime;
 
     @NotNull(message = "size: put a valid tournament size")
-    @Min(value = 3, message = "needs at least 2 players") // managing size in frontend for bot
     private int size;
 
     @NotNull(message = "totalRounds: put a valid number of rounds")
-    @Min(value = 1, message = "tournament should have at least 1 round")
     private int totalRounds;
 
     private boolean isCalculated = false;
@@ -96,7 +88,7 @@ public class Tournament {
     }
 
     public boolean hasStarted() {
-        return !(LocalDateTime.now().isBefore(startDateTime) || userTournaments.size() < 3); // bot has no UT 
+        return LocalDateTime.now().isAfter(startDateTime) && userTournaments.size() > 2; // 2 Users + 1 Bot 
     }
 
     // Custom validation method

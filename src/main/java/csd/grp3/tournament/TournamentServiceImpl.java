@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import csd.grp3.match.Match;
@@ -22,25 +21,14 @@ import csd.grp3.user.UserService;
 import csd.grp3.usertournament.UserTournament;
 import csd.grp3.usertournament.UserTournamentService;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 @Service
 public class TournamentServiceImpl implements TournamentService {
 
-    @Autowired
     private TournamentRepository tournaments;
-
-    @Autowired
     private MatchService matchService;
-
-    @Autowired
     private UserTournamentService UTService;
-
-    @Autowired
     private UserService userService;
-
-    @Autowired
     private RoundService roundService;
 
     @Override
@@ -71,7 +59,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Tournament getTournament(Long tournamentID) throws TournamentNotFoundException {
         return tournaments.findById(tournamentID)
-                .orElseThrow(() -> new TournamentNotFoundException(tournamentID));
+                .orElseThrow(() -> new TournamentNotFoundException());
     }
 
     /**
@@ -92,49 +80,47 @@ public class TournamentServiceImpl implements TournamentService {
         // update player and waiting list based on new Elo range
         tournament.setMaxElo(newTournamentInfo.getMaxElo());
         tournament.setMinElo(newTournamentInfo.getMinElo());
-        updateTournamentEloRange(tournamentID);
+        updateTournamentEloRange(tournament);
 
         // update player and waiting list based on new size
-        int currentSize = tournament.getSize();
         tournament.setSize(newTournamentInfo.getSize());
-        int newSize = tournament.getSize();
-        if (currentSize < newSize) {
-            addFromWaiting(tournamentID, newSize - currentSize);
-        } else if (currentSize > newSize) {
-            addToWaiting(tournamentID, currentSize - newSize);
-        }
+        updateTournamentSize(tournament);
 
-        tournaments.save(tournament);
-
-        return tournament;
+        return tournaments.save(tournament);
     }
 
     /**
      * Removes users from tournament players and waiting list to fit min max ELO range
      * 
-     * @param tournamentID Long
+     * @param tournament Tournament object 
      */
-    private void updateTournamentEloRange(Long tournamentID) {
-        Tournament tournament = getTournament(tournamentID);
-        int initialSize = tournament.getSize();
-        List<User> users = UTService.getPlayers(tournamentID);
+    private void updateTournamentEloRange(Tournament tournament) {
+        List<User> users = UTService.getPlayers(tournament.getId());
+        // combine waiting list with player list
+        users.addAll(UTService.getWaitingList(tournament.getId()));
 
-        // modify list of players based on new Elo limits and new Size limits
+        // modify combined list based on new Elo limits
         for (User user : users) {
             if (isUserEloEligible(tournament, user.getELO()) == false) {
-                initialSize--;
                 UTService.delete(tournament, user);
             }
         }
-        tournament.setSize(initialSize);
+    }
 
-        List<User> waitingList = UTService.getWaitingList(tournamentID);
-
-        // modify list of players based on new Elo limits and new Size limits
-        for (User user : waitingList) {
-            if (isUserEloEligible(tournament, user.getELO()) == false) {
-                UTService.delete(tournament, user);
-            }
+    /**
+     * Updates player and waiting list based on new tournament size.
+     * If new size is larger, add players from waiting list.
+     * If new size is smaller, add players to waiting list.
+     * 
+     * @param tournament Tournament object
+     */
+    private void updateTournamentSize(Tournament tournament) {
+        int currentSize = UTService.getPlayers(tournament.getId()).size();
+        int newSize = tournament.getSize();
+        if (currentSize < newSize) {
+            addFromWaiting(tournament.getId(), newSize - currentSize);
+        } else if (currentSize > newSize) {
+            addToWaiting(tournament.getId(), currentSize - newSize);
         }
     }
 
@@ -217,7 +203,7 @@ public class TournamentServiceImpl implements TournamentService {
      * Checks if user is in tournament already.
      * Else add user to either player list or waiting list
      * 
-     * @param user User object to be registered
+     * @param tempUser User object to be registered
      * @param tournamentID Long 
      */
     @Override
@@ -232,7 +218,7 @@ public class TournamentServiceImpl implements TournamentService {
 
         // check if tournament already has that user data
         if (playerList.contains(user) || waitingList.contains(user)) {
-            throw new PlayerAlreadyRegisteredException();
+            throw new UserAlreadyRegisteredException();
         } else { // if user isn't inside tournament
             // if tournament is full, we add to waiting list instead
             if (playerList.size() == tournament.getSize()) {
@@ -243,7 +229,7 @@ public class TournamentServiceImpl implements TournamentService {
             }
         }
     }
-
+    
     /**
      * Removes user from tournament player list or waiting list
      * 
@@ -252,7 +238,6 @@ public class TournamentServiceImpl implements TournamentService {
      */
     @Override
     @Transactional
-    // TODO : Check necessity of throwing error since frontend blocks it
     public void withdrawUser(User tempUser, Long tournamentID) throws UserNotRegisteredException {
         Tournament tournament = getTournament(tournamentID);
         List<User> playerList = UTService.getPlayers(tournamentID);
@@ -260,7 +245,7 @@ public class TournamentServiceImpl implements TournamentService {
         User user = userService.findByUsername(tempUser.getUsername());
 
         if (!playerList.contains(user) && !waitingList.contains(user)) {
-            throw new UserNotRegisteredException("User has not registered for tournament");
+            throw new UserNotRegisteredException();
         }
 
         if (tournament.getRounds().size() != 0 && playerList.contains(user)) {

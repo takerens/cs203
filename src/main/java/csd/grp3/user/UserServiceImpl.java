@@ -13,18 +13,16 @@ import org.springframework.stereotype.Service;
 
 import csd.grp3.jwt.JwtService;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder encoder;
-    private final AuthenticationManager authManager;
-    private final JwtService jwtService;
+    private UserRepository userRepository;
+    private BCryptPasswordEncoder encoder;
+    private AuthenticationManager authManager;
+    private JwtService jwtService;
 
-    /*
+    /**
      * This method is used to find a user by their username
      * Throws a UsernameNotFoundException if the user is not found
      * 
@@ -38,7 +36,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    /*
+    /**
      * This method is used to list all users in the database
      * 
      * @return A list of all users in the database
@@ -49,7 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    /*
+    /**
      * This method is used to create a new user
      * Throws a BadCredentialsException if the username already exists
      * 
@@ -72,7 +70,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(new User(username, encodedPassword));
     }
 
-    /*
+    /**
      * This method is used to login a user
      * Throws a BadCredentialsException if the username and password do not match
      * 
@@ -94,9 +92,9 @@ public class UserServiceImpl implements UserService {
         throw new BadCredentialsException("Username and Password do not match");
     }
 
-    /*
+    /**
      * This method is used to change the password of a user
-     * Throws a UserNotFoundException if the user is not found
+     * Throws a UsernameNotFoundException if the user is not found
      * Throws a BadCredentialsException if the new password is the same as the old password
      * 
      * @param username The username of the user to change the password
@@ -116,7 +114,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    /*
+    /**
      * This method is used to delete a user by their username
      * 
      * @param username The username of the user to be deleted
@@ -128,7 +126,7 @@ public class UserServiceImpl implements UserService {
         return username;
     }
 
-    /*
+    /**
      * This method is used to update the ELO of a user
      * 
      * @param tempUser The user to update the ELO

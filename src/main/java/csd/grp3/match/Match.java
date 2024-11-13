@@ -19,8 +19,6 @@ import lombok.*;
 @Table(name="Matches")
 @Getter
 @Setter
-@ToString
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 
