@@ -25,7 +25,7 @@
 // import csd.grp3.user.UserNotFoundException;
 // import csd.grp3.user.UserService;
 
-// @WebMvcTest
+// @WebMvcTest(RestExceptionHandler.class)
 // public class RestExceptionHandlerTest {
 //     @MockBean
 //     private MatchService matchService; // Mock the MatchService

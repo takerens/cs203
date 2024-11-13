@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import csd.grp3.tournament.Tournament;
 import csd.grp3.user.User;
@@ -12,6 +13,7 @@ import jakarta.transaction.Transactional;
 @Service
 public class UserTournamentServiceImpl implements UserTournamentService {
 
+    @Autowired
     private UserTournamentRepository userTournamentRepo;
 
     @Override

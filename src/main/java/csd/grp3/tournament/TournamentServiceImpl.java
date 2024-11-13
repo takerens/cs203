@@ -3,6 +3,7 @@ package csd.grp3.tournament;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -10,8 +11,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import csd.grp3.CheaterBugAPI.CheaterbugEntity;
+import csd.grp3.CheaterBugAPI.CheaterbugService;
 import csd.grp3.match.Match;
 import csd.grp3.match.MatchService;
 import csd.grp3.round.Round;
@@ -25,11 +29,23 @@ import jakarta.transaction.Transactional;
 @Service
 public class TournamentServiceImpl implements TournamentService {
 
+    @Autowired
     private TournamentRepository tournaments;
+
+    @Autowired
     private MatchService matchService;
+
+    @Autowired
     private UserTournamentService UTService;
+
+    @Autowired
     private UserService userService;
+
+    @Autowired
     private RoundService roundService;
+
+    @Autowired
+    private CheaterbugService cheaterbugService;
 
     @Override
     public List<Tournament> listTournaments() {
@@ -634,12 +650,18 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setCalculated(true);
         tournaments.save(tournament); // set Calculated
 
+        Map<User, Integer> eloChanges = new HashMap<>();
         for (User user : UTService.getPlayers(tournamentID)) {
-            List<Match> userMatches = matchService.getUserMatches(user).stream()
-                .filter(match -> match.getTournament().equals(tournament))
-                .collect(Collectors.toList());
+            eloChanges.put(user, calculateChangeInELO(getUserExpectedActualScoreInTournament(tournament, user), getDevelopmentCoefficient(user)));
+        }
+        updateUserEloMap(eloChanges);
+    }
 
-            user.setELO(calculateELO(userMatches, user));
+    private void updateUserEloMap(Map<User, Integer> eloChanges) {
+        for (Map.Entry<User, Integer> entry : eloChanges.entrySet()) {
+            User user = entry.getKey();
+            Integer eloChange = entry.getValue();
+            user.setELO(user.getELO() + eloChange);
             userService.updateELO(user, user.getELO());
         }
     }
@@ -669,33 +691,21 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     /**
-     * Calculate user ELO via this formula documentation
-     * https://en.wikipedia.org/wiki/Chess_rating_system#Linear_approximation
-     * Based on difference in expected vs actual score.
-     * Uses a development coefficient, depending on the user's match history, via getDevelopmentCoefficient()
+     * Calculate change in user ELO based on matches played in tournament
+     * Uses a development coefficient, depending on the user's match history
      * 
      * @param matches List of matches to consider
      * @param user User object
      * @return User's new ELO
      */
-    public Integer calculateELO(List<Match> matches, User user) {
-        Integer userELO = user.getELO();
-        Integer developmentCoefficient = getDevelopmentCoefficient(user);
-        Double classInterval = 50.0;
-        Double changeInRating = 0.0;
+    public Integer calculateChangeInELO(List<Map<String, Double>> userExpectedActualScores, Integer developmentCoefficient) {
+        Double changeInELO = 0.0;
 
-        for (Match match : matches) {
-            // void match results as both users didnt play tgt
-            if (match.isBYE())
-                continue;
-
-            User opponent = match.getWhite().equals(user) ? match.getBlack() : match.getWhite();
-            Double expectedScore = 1.0 / (1 + Math.pow(10, (opponent.getELO() - userELO) / classInterval));
-            Double actualScore = getActualScore(match.getResult(), match.getWhite().equals(user) ? "white" : "black");
-            changeInRating += developmentCoefficient * (actualScore - expectedScore);
+        for (Map<String, Double> scoreMap : userExpectedActualScores) {
+            changeInELO += developmentCoefficient * (scoreMap.get("actual") - scoreMap.get("expected"));
         }
 
-        return (int) (changeInRating + 0.5) + userELO;
+        return (int) (changeInELO + 0.5);
     }
 
     /**
