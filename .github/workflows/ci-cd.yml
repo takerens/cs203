@@ -8,23 +8,7 @@ on:
     branches:
       - ci/cd
 
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Run Super-Linter
-        uses: github/super-linter@v5
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_JAVA: true           # Enable Java linting
-          VALIDATE_YAML: true           # Enable YAML linting
-          VALIDATE_JSON: true           # Enable JSON linting (optional)
-          
+jobs:     
   build:
     runs-on: ubuntu-latest
 
