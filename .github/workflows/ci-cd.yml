@@ -3,10 +3,10 @@ name: Spring Boot CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - demo1
   pull_request:
     branches:
-      - main
+      - demo1
 
 jobs:     
   build:
