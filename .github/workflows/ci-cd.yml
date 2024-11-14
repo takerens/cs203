@@ -80,6 +80,7 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/cs203-app:latest
 
+  # Test!
   deploy:
     runs-on: ubuntu-latest
     needs: docker  # This ensures deploy runs after the docker job
