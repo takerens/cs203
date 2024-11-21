@@ -4,8 +4,8 @@ import ErrorMessage from '../components/ErrorMessage';
 import Navbar from '../components/Navbar';
 import SecondaryNavbar from '../components/SecondaryNavbar';
 import StandingsTable from '../components/tournament/StandingsTable';
-import { fetchUserData, handleDeleteUser, handleUnflagUser } from '../utils/UserUtils';
-import { fetchTournamentData, fetchStandings } from '../utils/TournamentUtils';
+import { fetchUserData, handleUnflagUser } from '../utils/UserUtils';
+import { fetchTournamentData, fetchStandings, handleDeleteForUser } from '../utils/TournamentUtils';
 
 const TournamentStandings = () => {
     const { tournamentId } = useParams();
@@ -25,7 +25,7 @@ const TournamentStandings = () => {
             username: user.username,
             password: user.password,
         }
-        handleDeleteUser(userData, tournament.id, setErrorMessage, setStandings);
+        handleDeleteForUser(userData, tournament.id, setErrorMessage, setStandings);
     };
 
     const onUnflagUser = (user) => {
