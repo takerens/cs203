@@ -4,9 +4,13 @@ on:
   push:
     branches:
       - ci/cd
+      - demo1
+      - matchmaking
   pull_request:
     branches:
       - ci/cd
+      - demo1
+      - matchmaking
 
 jobs:     
   build:
